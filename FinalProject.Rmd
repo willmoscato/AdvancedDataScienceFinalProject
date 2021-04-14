@@ -113,10 +113,158 @@ fifa16_names <- fifa16_clean %>%
 ```
 
 ```{r}
-
+fifa17_names <- fifa17_clean %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã€", "A")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã‰", "E")) %>%  
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã©", "e")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã¨", "e")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã¡", "a")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã", "A")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Å¡", "s")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã«", "e")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã¶", "o")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "i³", "o")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã", "i")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "°", "d")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "iº", "u")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "i£", "a")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "i¼", "u")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Å", "S")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã¼", "u")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "i–", "O")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "i³", "o")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "i½", "y")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "i¯", "i")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "i®", "i")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Ã€", "A")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Ã‰", "E")) %>%  
+  mutate(player_name = str_replace_all(player_name, "Ã©", "e")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Ã¨", "e")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Ã¡", "a")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Ã", "A")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Å¡", "s")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Ã«", "e")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Ã¶", "o")) %>% 
+  mutate(player_name = str_replace_all(player_name, "i³", "o")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Ã", "i")) %>% 
+  mutate(player_name = str_replace_all(player_name, "°", "d")) %>% 
+  mutate(player_name = str_replace_all(player_name, "iº", "u")) %>% 
+  mutate(player_name = str_replace_all(player_name, "i£", "a")) %>% 
+  mutate(player_name = str_replace_all(player_name, "i¼", "u")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Å", "S")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Ã¼", "u")) %>% 
+  mutate(player_name = str_replace_all(player_name, "i–", "O")) %>% 
+  mutate(player_name = str_replace_all(player_name, "i³", "o")) %>% 
+  mutate(player_name = str_replace_all(player_name, "i½", "y")) %>% 
+  mutate(player_name = str_replace_all(player_name, "i¯", "i")) %>% 
+  mutate(player_name = str_replace_all(player_name, "i®", "i"))
   
 ```
+
+
+```{r}
+fifa18_names <- fifa18_clean %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã€", "A")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã‰", "E")) %>%  
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã©", "e")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã¨", "e")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã¡", "a")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã", "A")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Å¡", "s")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã«", "e")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã¶", "o")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "i³", "o")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã", "i")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "°", "d")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "iº", "u")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "i£", "a")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "i¼", "u")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Å", "S")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã¼", "u")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "i–", "O")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "i³", "o")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "i½", "y")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "i¯", "i")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "i®", "i")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Ã€", "A")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Ã‰", "E")) %>%  
+  mutate(player_name = str_replace_all(player_name, "Ã©", "e")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Ã¨", "e")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Ã¡", "a")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Ã", "A")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Å¡", "s")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Ã«", "e")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Ã¶", "o")) %>% 
+  mutate(player_name = str_replace_all(player_name, "i³", "o")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Ã", "i")) %>% 
+  mutate(player_name = str_replace_all(player_name, "°", "d")) %>% 
+  mutate(player_name = str_replace_all(player_name, "iº", "u")) %>% 
+  mutate(player_name = str_replace_all(player_name, "i£", "a")) %>% 
+  mutate(player_name = str_replace_all(player_name, "i¼", "u")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Å", "S")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Ã¼", "u")) %>% 
+  mutate(player_name = str_replace_all(player_name, "i–", "O")) %>% 
+  mutate(player_name = str_replace_all(player_name, "i³", "o")) %>% 
+  mutate(player_name = str_replace_all(player_name, "i½", "y")) %>% 
+  mutate(player_name = str_replace_all(player_name, "i¯", "i")) %>% 
+  mutate(player_name = str_replace_all(player_name, "i®", "i"))
 ```
+
+
+```{r}
+fifa19_names <- fifa19_clean %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã€", "A")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã‰", "E")) %>%  
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã©", "e")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã¨", "e")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã¡", "a")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã", "A")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Å¡", "s")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã«", "e")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã¶", "o")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "i³", "o")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã", "i")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "°", "d")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "iº", "u")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "i£", "a")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "i¼", "u")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Å", "S")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã¼", "u")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "i–", "O")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "i³", "o")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "i½", "y")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "i¯", "i")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "i®", "i")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Ã€", "A")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Ã‰", "E")) %>%  
+  mutate(player_name = str_replace_all(player_name, "Ã©", "e")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Ã¨", "e")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Ã¡", "a")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Ã", "A")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Å¡", "s")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Ã«", "e")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Ã¶", "o")) %>% 
+  mutate(player_name = str_replace_all(player_name, "i³", "o")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Ã", "i")) %>% 
+  mutate(player_name = str_replace_all(player_name, "°", "d")) %>% 
+  mutate(player_name = str_replace_all(player_name, "iº", "u")) %>% 
+  mutate(player_name = str_replace_all(player_name, "i£", "a")) %>% 
+  mutate(player_name = str_replace_all(player_name, "i¼", "u")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Å", "S")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Ã¼", "u")) %>% 
+  mutate(player_name = str_replace_all(player_name, "i–", "O")) %>% 
+  mutate(player_name = str_replace_all(player_name, "i³", "o")) %>% 
+  mutate(player_name = str_replace_all(player_name, "i½", "y")) %>% 
+  mutate(player_name = str_replace_all(player_name, "i¯", "i")) %>% 
+  mutate(player_name = str_replace_all(player_name, "i®", "i"))
+```
+
+
+```{r}
+
+```
+
+
 
 
 

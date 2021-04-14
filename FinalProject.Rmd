@@ -1,0 +1,18 @@
+---
+title: "FinalProject"
+author: "Will Moscato"
+date: "4/13/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+fifa16 <- read.csv("fut_bin16_players.csv")
+fifa17 <- read.csv("fut_bin17_players.csv")
+fifa18 <- read.csv("fut_bin18_players.csv")
+fifa19 <- read.csv("fut_bin19_players.csv")
+```
+

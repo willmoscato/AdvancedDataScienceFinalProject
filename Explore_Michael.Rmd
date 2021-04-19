@@ -602,6 +602,10 @@ fifa19_prem_standard_stats <- fifa19_prem_full %>%
   distinct(Player, .keep_all = TRUE)
 ```
 
+```{r}
+fifa19_prem_standard_stats <- fifa19_prem_standard_stats %>%
+  mutate(Nation = sub('.* ', '', Nation))
+```
 
 
 

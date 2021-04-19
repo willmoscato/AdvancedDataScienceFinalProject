@@ -289,6 +289,12 @@ fifa17_prem_standard_stats <- fifa17_prem_full %>%
   distinct(Player, .keep_all = TRUE)
 ```
 
+```{r}
+fifa17_standard_plus_table <- fifa17_prem_standard_stats %>% 
+  inner_join(premtable17, by = "Squad")
+```
+
+
 ##18
 
 

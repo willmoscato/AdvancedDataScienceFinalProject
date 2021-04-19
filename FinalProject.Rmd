@@ -281,7 +281,7 @@ premnames16 <-premnames16 %>%
 ```{r}
 prem16_names <- fifa16_names %>% 
   filter(league == "Barclays PL") %>% 
-  select(player_name, player_extended_name, overall, revision)
+  select(player_name, player_extended_name, overall, revision, position)
 ```
 
 
@@ -329,7 +329,8 @@ weird_names <- test1 %>%
 ```{r}
 fifa16_prem_full <- prem16 %>%
   bind_rows(test2, weird_names) %>% 
-  distinct(Player, .keep_all =TRUE)
+  distinct(Player, .keep_all =TRUE) %>% 
+  select(Player, Nation, Squad, Age, revision, position, X90s, CrdY, CrdR, Fls)
 ```
 
 
@@ -345,7 +346,7 @@ premnames17 <-premnames17 %>%
 ```{r}
 prem17_names <- fifa17_names %>% 
   filter(league == "Premier League") %>% 
-  select(player_name, player_extended_name, overall, revision)
+  select(player_name, player_extended_name, overall, revision, position)
 ```
 
 
@@ -397,7 +398,8 @@ weird_names17 <- last_names17 %>%
 ```{r}
 fifa17_prem_full <- prem17 %>%
   bind_rows(not_real_name17, weird_names17) %>% 
-  distinct(Player, .keep_all = TRUE)
+  distinct(Player, .keep_all = TRUE) %>% 
+  select(Player, Nation, Squad, Age, revision, position, X90s, CrdY, CrdR, Fls)
 ```
 
 ##18
@@ -413,7 +415,7 @@ premnames18 <-premnames18 %>%
 ```{r}
 prem18_names <- fifa18_names %>% 
   filter(league == "Premier League") %>% 
-  select(player_name, player_extended_name, overall, revision)
+  select(player_name, player_extended_name, overall, revision, position)
 ```
 
 
@@ -465,7 +467,8 @@ weird_names18 <- last_names18 %>%
 ```{r}
 fifa18_prem_full <- prem18 %>%
   bind_rows(not_real_name18, weird_names18) %>% 
-  distinct(Player, .keep_all = TRUE)
+  distinct(Player, .keep_all = TRUE) %>% 
+  select(Player, Nation, Squad, Age, revision, position, X90s, CrdY, CrdR, Fls)
 ```
 
 
@@ -480,7 +483,7 @@ premnames19 <-premnames19 %>%
 ```{r}
 prem19_names <- fifa19_names %>% 
   filter(league == "Premier League") %>% 
-  select(player_name, player_extended_name, overall, revision)
+  select(player_name, player_extended_name, overall, revision, position)
 ```
 
 
@@ -532,7 +535,8 @@ weird_names19 <- last_names19 %>%
 ```{r}
 fifa19_prem_full <- prem19 %>%
   bind_rows(not_real_name19, weird_names19) %>% 
-  distinct(Player, .keep_all = TRUE)
+  distinct(Player, .keep_all = TRUE) %>% 
+  select(Player, Nation, Squad, Age, revision, position, X90s, CrdY, CrdR, Fls)
 ```
 
 

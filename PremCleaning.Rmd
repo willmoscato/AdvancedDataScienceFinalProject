@@ -260,7 +260,7 @@ missing17 <- premnames17 %>%
 
 ```{r}
 not_missing_17 <- missing17 %>% 
-  select(-overall, -revision) %>% 
+  select(-overall, -revision, -position) %>% 
   left_join(prem17_names, by = c("Player" = "player_name")) 
 ```
 
@@ -271,7 +271,7 @@ last_names17 <- not_missing_17 %>%
   filter(is.na(overall) == TRUE) %>% 
   mutate(Player_short =  gsub(".* ", "", Player)) %>% 
   mutate(Player_short = ifelse(Player_short == "Aanholt", "Van Aanholt", ifelse(Player_short == "Dijk", "Van Dijk", ifelse(Player_short == "min", "Son", ifelse(Player_short == "Prowse", "Ward-Prowse", ifelse(Player_short == "yueng", "Ki Sung Yueng", ifelse(Player_short == "yong", "Lee Chung Yong", ifelse(Player_short == "Cheek", "Loftus-Cheek", ifelse(Player_short == "Chamberlain", "Oxlade-Chamberlain", ifelse(Player_short == "Gea", "De Gea", ifelse(Player_short == "Traore", "Adama", Player_short))))))))))) %>% 
-  select(-player_name, -player_extended_name, -overall, -revision, - Player1)
+  select(-player_name, -player_extended_name, -overall, -revision, - Player1, -position)
 
 not_real_name17 <- not_missing_17 %>% 
   filter(is.na(overall) == FALSE) %>% 
@@ -368,7 +368,7 @@ missing18 <- premnames18 %>%
 
 ```{r}
 not_missing_18 <- missing18 %>% 
-  select(-overall, -revision) %>% 
+  select(-overall, -revision, -position) %>% 
   left_join(prem18_names, by = c("Player" = "player_name")) 
 ```
 
@@ -379,7 +379,7 @@ last_names18 <- not_missing_18 %>%
   filter(is.na(overall) == TRUE) %>% 
   mutate(Player_short =  gsub(".* ", "", Player)) %>% 
   mutate(Player_short = ifelse(Player_short == "Aanholt", "Van Aanholt", ifelse(Player_short == "Dijk", "Van Dijk", ifelse(Player_short == "min", "Son", ifelse(Player_short == "Prowse", "Ward-Prowse", ifelse(Player_short == "yueng", "Ki Sung Yueng", ifelse(Player_short == "yong", "Lee Chung Yong", ifelse(Player_short == "Cheek", "Loftus-Cheek", ifelse(Player_short == "Chamberlain", "Oxlade-Chamberlain", ifelse(Player_short == "Gea", "De Gea", ifelse(Player_short == "Ginkel", "Van Ginkel", ifelse(Player_short == "Traore", "Adama", Player_short)))))))))))) %>% 
-  select(-player_name, -player_extended_name, -overall, -revision, - Player1)
+  select(-player_name, -player_extended_name, -overall, -revision, - Player1, -position)
 
 not_real_name18 <- not_missing_18 %>% 
   filter(is.na(overall) == FALSE) %>% 
@@ -432,8 +432,9 @@ goalkeeper18 <- goalkeeper18 %>%
 fifa18_modeling <- fifa18_standard_plus_table %>% 
   left_join(goalkeeper18, by = "Player") %>% 
   rename(minutes_played_divided_by90 = X90s, Non_PK_G = G.PK, G_plus_A_per90 = G.A, G_minus_Pk_per90 = G.PK.1, G_plus_A_minus_PK_per90 = G.A.PK, Save_percent = Save., CS_percent = CS., Pk_Save_percent = Save..1, G_per90 = Gls.1, A_per90 = Ast.1 ) %>% 
-  select(-Matches.x, -Matches.y, -Player1) %>% 
-  mutate(Nation = sub('.* ', '', Nation))
+  select(-Matches.x, -Matches.y, -Player1, -xG, -npxG, -xA, -npxG.1, -npxG.xA, -npxG.xA.1, -xG.1, -xA.1, -xG.xA, -Rk, -W.y) %>% 
+  mutate(Nation = sub('.* ', '', Nation)) %>% 
+  rename(W = W.x, D = D.x, L = L.x)
 ```
 
 
@@ -472,7 +473,7 @@ missing19 <- premnames19 %>%
 
 ```{r}
 not_missing_19 <- missing19 %>% 
-  select(-overall, -revision) %>% 
+  select(-overall, -revision, -position) %>% 
   left_join(prem19_names, by = c("Player" = "player_name")) 
 ```
 
@@ -483,7 +484,7 @@ last_names19 <- not_missing_19 %>%
   filter(is.na(overall) == TRUE) %>% 
   mutate(Player_short =  gsub(".* ", "", Player)) %>% 
   mutate(Player_short = ifelse(Player_short == "Aanholt", "Van Aanholt", ifelse(Player_short == "Dijk", "Van Dijk", ifelse(Player_short == "min", "Son", ifelse(Player_short == "Prowse", "Ward-Prowse", ifelse(Player_short == "yueng", "Ki Sung Yueng", ifelse(Player_short == "yong", "Lee Chung Yong", ifelse(Player_short == "Cheek", "Loftus-Cheek", ifelse(Player_short == "Chamberlain", "Oxlade-Chamberlain", ifelse(Player_short == "Gea", "De Gea", ifelse(Player_short == "Ginkel", "Van Ginkel", ifelse(Player_short == "Traore", "Adama", Player_short)))))))))))) %>% 
-  select(-player_name, -player_extended_name, -overall, -revision, - Player1)
+  select(-player_name, -player_extended_name, -overall, -revision, - Player1, -position)
 
 not_real_name19 <- not_missing_19 %>% 
   filter(is.na(overall) == FALSE) %>% 
@@ -539,6 +540,11 @@ fifa19_modeling <- fifa19_standard_plus_table %>%
   select(-Matches.x, -Matches.y, -Player1) %>% 
   mutate(Nation = sub('.* ', '', Nation))
 ```
+
+
+
+
+
 
 
 

@@ -28,8 +28,8 @@ premnames18 <- read.csv("17_18_premnames.csv")
 premnames19 <- read.csv("18_19_premnames.csv")
 standardprem16 <- read.csv("standardprem16.csv")
 standardprem17 <- read.csv("standardprem17.csv")
-#standardprem18 <- read.csv("standardprem18.csv")
-#standardprem19 <- read.csv("standardprem19.csv")
+standardprem18 <- read.csv("standardprem18.csv")
+standardprem19 <- read.csv("standardprem19.csv")
 ```
 
 
@@ -502,7 +502,21 @@ weird_names18 <- last_names18 %>%
 fifa18_prem_full <- prem18 %>%
   bind_rows(not_real_name18, weird_names18) %>% 
   distinct(Player, .keep_all = TRUE) %>% 
-  select(Player, Nation, Squad, Age, revision, position, X90s, CrdY, CrdR, Fls)
+  select(Player, revision, position)
+```
+
+
+```{r}
+standardprem18 <- standardprem18 %>% 
+  mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
+  mutate(Player = str_replace_all(Player1, "-", " "))
+```
+
+```{r}
+fifa18_prem_standard_stats <- fifa18_prem_full %>% 
+  inner_join(standardprem18, by = "Player") %>% 
+  select(-Player1, -Pos) %>% 
+  distinct(Player, .keep_all = TRUE)
 ```
 
 
@@ -570,9 +584,22 @@ weird_names19 <- last_names19 %>%
 fifa19_prem_full <- prem19 %>%
   bind_rows(not_real_name19, weird_names19) %>% 
   distinct(Player, .keep_all = TRUE) %>% 
-  select(Player, Nation, Squad, Age, revision, position, X90s, CrdY, CrdR, Fls)
+  select(Player, revision, position)
 ```
 
+
+```{r}
+standardprem19 <- standardprem19 %>% 
+  mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
+  mutate(Player = str_replace_all(Player1, "-", " "))
+```
+
+```{r}
+fifa19_prem_standard_stats <- fifa19_prem_full %>% 
+  inner_join(standardprem19, by = "Player") %>% 
+  select(-Player1, -Pos) %>% 
+  distinct(Player, .keep_all = TRUE)
+```
 
 ```{r}
 

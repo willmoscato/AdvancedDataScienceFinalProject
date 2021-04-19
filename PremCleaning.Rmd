@@ -334,7 +334,7 @@ weird_names <- test1 %>%
 fifa16_prem_full <- prem16 %>%
   bind_rows(test2, weird_names) %>% 
   distinct(Player, .keep_all =TRUE) %>% 
-  select(Player, revision, position)
+  select(Player, revision, position, Int, TklW, OG, PKcon)
 ```
 
 
@@ -419,7 +419,7 @@ weird_names17 <- last_names17 %>%
 fifa17_prem_full <- prem17 %>%
   bind_rows(not_real_name17, weird_names17) %>% 
   distinct(Player, .keep_all = TRUE) %>% 
-  select(Player, revision, position)
+  select(Player, revision, position, Int, TklW, OG, PKcon)
 ```
 
 
@@ -502,7 +502,7 @@ weird_names18 <- last_names18 %>%
 fifa18_prem_full <- prem18 %>%
   bind_rows(not_real_name18, weird_names18) %>% 
   distinct(Player, .keep_all = TRUE) %>% 
-  select(Player, revision, position)
+  select(Player, revision, position, Int, TklW, OG, PKcon)
 ```
 
 
@@ -584,7 +584,7 @@ weird_names19 <- last_names19 %>%
 fifa19_prem_full <- prem19 %>%
   bind_rows(not_real_name19, weird_names19) %>% 
   distinct(Player, .keep_all = TRUE) %>% 
-  select(Player, revision, position)
+  select(Player, revision, position, Int, TklW, OG, PKcon)
 ```
 
 

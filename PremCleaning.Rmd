@@ -103,7 +103,8 @@ fifa17_names <- fifa17_clean %>%
   mutate(player_name = str_replace_all(player_name, "i½", "y")) %>% 
   mutate(player_name = str_replace_all(player_name, "i¯", "i")) %>% 
   mutate(player_name = str_replace_all(player_name, "i®", "i")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ä", "c"))
+  mutate(player_name = str_replace_all(player_name, "Ä", "c")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Ä‡", "c"))
 ```
 
 
@@ -154,7 +155,8 @@ fifa18_names <- fifa18_clean %>%
   mutate(player_name = str_replace_all(player_name, "i½", "y")) %>% 
   mutate(player_name = str_replace_all(player_name, "i¯", "i")) %>% 
   mutate(player_name = str_replace_all(player_name, "i®", "i")) %>% 
-   mutate(player_name = str_replace_all(player_name, "Ä", "c"))
+  mutate(player_name = str_replace_all(player_name, "Ä", "c")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Ä‡", "c"))
 ```
 
 
@@ -205,7 +207,8 @@ fifa19_names <- fifa19_clean %>%
   mutate(player_name = str_replace_all(player_name, "i½", "y")) %>% 
   mutate(player_name = str_replace_all(player_name, "i¯", "i")) %>% 
   mutate(player_name = str_replace_all(player_name, "i®", "i")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ä", "c"))
+  mutate(player_name = str_replace_all(player_name, "Ä", "c")) %>% 
+  mutate(player_name = str_replace_all(player_name, "Ä‡", "c"))
 ```
 
 
@@ -244,9 +247,9 @@ missing17 <- premnames17 %>%
 
 
 ```{r}
-not_missing_17 <- missing %>% 
+not_missing_17 <- missing17 %>% 
   select(-overall, -revision) %>% 
-  left_join(prem16_names, by = c("Player" = "player_name")) 
+  left_join(prem17_names, by = c("Player" = "player_name")) 
 ```
 
 
@@ -333,7 +336,7 @@ missing18 <- premnames18 %>%
 
 
 ```{r}
-not_missing_18 <- missing %>% 
+not_missing_18 <- missing18 %>% 
   select(-overall, -revision) %>% 
   left_join(prem18_names, by = c("Player" = "player_name")) 
 ```
@@ -421,7 +424,7 @@ missing19 <- premnames19 %>%
 
 
 ```{r}
-not_missing_19 <- missing %>% 
+not_missing_19 <- missing19 %>% 
   select(-overall, -revision) %>% 
   left_join(prem19_names, by = c("Player" = "player_name")) 
 ```

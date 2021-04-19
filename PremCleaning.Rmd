@@ -28,6 +28,8 @@ standardprem17 <- read.csv("standardprem17.csv")
 standardprem18 <- read.csv("standardprem18.csv")
 standardprem19 <- read.csv("standardprem19.csv")
 premtable17 <- read.csv("premtable17.csv")
+premtable18 <- read.csv("premtable18.csv")
+premtable19 <- read.csv("premtable19.csv")
 ```
 
 
@@ -378,6 +380,12 @@ fifa18_prem_standard_stats <- fifa18_prem_full %>%
   distinct(Player, .keep_all = TRUE)
 ```
 
+```{r}
+fifa18_standard_plus_table <- fifa18_prem_standard_stats %>% 
+  inner_join(premtable18, by = "Squad")
+```
+
+
 
 ##19
 ```{r}
@@ -461,7 +469,8 @@ fifa19_prem_standard_stats <- fifa19_prem_full %>%
 ```
 
 ```{r}
-
+fifa19_standard_plus_table <- fifa19_prem_standard_stats %>% 
+  inner_join(premtable19, by = "Squad")
 ```
 
 

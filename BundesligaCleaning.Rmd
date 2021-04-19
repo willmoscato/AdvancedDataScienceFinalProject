@@ -1,7 +1,7 @@
 ---
-title: "FinalProject"
+title: "Bundesliga Cleaning"
 author: "Will Moscato"
-date: "4/13/2021"
+date: "4/19/2021"
 output: html_document
 ---
 
@@ -21,18 +21,18 @@ library(lubridate)
 fifa17 <- read.csv("fut_bin17_players.csv")
 fifa18 <- read.csv("fut_bin18_players.csv")
 fifa19 <- read.csv("fut_bin19_players.csv")
-premnames17 <- read.csv("16_17_premnames.csv")
-premnames18 <- read.csv("17_18_premnames.csv")
-premnames19 <- read.csv("18_19_premnames.csv")
-standardprem17 <- read.csv("standardprem17.csv")
-standardprem18 <- read.csv("standardprem18.csv")
-standardprem19 <- read.csv("standardprem19.csv")
-premtable17 <- read.csv("premtable17.csv")
-premtable18 <- read.csv("premtable18.csv")
-premtable19 <- read.csv("premtable19.csv")
-goalkeeper17 <- read.csv('goalkeeper17.csv')
-goalkeeper18 <- read.csv('goalkeeper18.csv')
-goalkeeper19 <- read.csv('goalkeeper19.csv')
+bundesliganames17 <- read.csv("16_17_bundesliganames.csv")
+bundesliganames18 <- read.csv("17_18_bundesliganames.csv")
+bundesliganames19 <- read.csv("18_19_bundesliganames.csv")
+standardbundesliga17 <- read.csv("standardbundesliga17.csv")
+standardbundesliga18 <- read.csv("standardbundesliga18.csv")
+standardbundesliga19 <- read.csv("standardbundesliga19.csv")
+bundesligatable17 <- read.csv("bundesligatable17.csv")
+bundesligatable18 <- read.csv("bundesligatable18.csv")
+bundesligatable19 <- read.csv("bundesligatable19.csv")
+goalkeeper_bundesliga17 <- read.csv('goalkeeper_bundesliga17.csv')
+goalkeeper_bundesliga18 <- read.csv('goalkeeper_bundesliga18.csv')
+goalkeeper_bundesliga19 <- read.csv('goalkeeper_bundesliga19.csv')
 ```
 
 
@@ -227,30 +227,30 @@ fifa19_names <- fifa19_clean %>%
 ##17
 
 ```{r}
-premnames17 <-premnames17 %>% 
+bundesliganames17 <-bundesliganames17 %>% 
   mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
   mutate(Player = str_replace_all(Player1, "-", " "))
 ```
 
 
 ```{r}
-prem17_names <- fifa17_names %>% 
-  filter(league == "Premier League") %>% 
+bundesliga17_names <- fifa17_names %>% 
+  filter(league == "Bundesliga") %>% 
   select(player_name, player_extended_name, overall, revision, position)
 ```
 
 
 
 ```{r}
-prem17 <- premnames17 %>%
-  inner_join(prem17_names, by = c("Player" = "player_extended_name")) %>% 
+bundesliga17 <- bundesliganames17 %>%
+  inner_join(bundesliga17_names, by = c("Player" = "player_extended_name")) %>% 
   select(-Player1, -player_name)
 ```
 
 
 ```{r}
-missing17 <- premnames17 %>%
-  left_join(prem17_names, by = c("Player" = "player_extended_name")) %>% 
+missing_bundesliga17 <- bundesliganames17 %>%
+  left_join(bundesliga17_names, by = c("Player" = "player_extended_name")) %>% 
   filter(is.na(player_name) == TRUE)
 ```
 
@@ -259,34 +259,34 @@ missing17 <- premnames17 %>%
 
 
 ```{r}
-not_missing_17 <- missing17 %>% 
+not_missing_bundesliga_17 <- missing_bundesliga17 %>% 
   select(-overall, -revision, -position) %>% 
-  left_join(prem17_names, by = c("Player" = "player_name")) 
+  left_join(bundesliga17_names, by = c("Player" = "player_name")) 
 ```
 
 
 ```{r}
 
-last_names17 <- not_missing_17 %>% 
+last_names_bundesliga17 <- not_missing_bundesliga_17 %>% 
   filter(is.na(overall) == TRUE) %>% 
   mutate(Player_short =  gsub(".* ", "", Player)) %>% 
-  mutate(Player_short = ifelse(Player_short == "Aanholt", "Van Aanholt", ifelse(Player_short == "Dijk", "Van Dijk", ifelse(Player_short == "min", "Son", ifelse(Player_short == "Prowse", "Ward-Prowse", ifelse(Player_short == "yueng", "Ki Sung Yueng", ifelse(Player_short == "yong", "Lee Chung Yong", ifelse(Player_short == "Cheek", "Loftus-Cheek", ifelse(Player_short == "Chamberlain", "Oxlade-Chamberlain", ifelse(Player_short == "Gea", "De Gea", ifelse(Player_short == "Traore", "Adama", Player_short))))))))))) %>% 
+  mutate() %>% 
   select(-player_name, -player_extended_name, -overall, -revision, - Player1, -position)
 
-not_real_name17 <- not_missing_17 %>% 
+not_real_name17 <- not_missing_bundesliga_17 %>% 
   filter(is.na(overall) == FALSE) %>% 
   select(-Player1, -player_name, -player_extended_name)
 ```
 
 
 ```{r}
-weird_names17 <- last_names17 %>% 
-  inner_join(prem17_names, by = c("Player_short" = "player_name")) %>% 
+weird_names17 <- last_names_bundesliga17 %>% 
+  inner_join(bundesliga17_names, by = c("Player_short" = "player_name")) %>% 
   select(-Player_short, -player_extended_name)
 ```
 
 ```{r}
-fifa17_prem_full <- prem17 %>%
+fifa17_bundesliga_full <- bundesliga17 %>%
   bind_rows(not_real_name17, weird_names17) %>% 
   distinct(Player, .keep_all = TRUE) %>% 
   select(Player, revision, position, Int, TklW, OG, PKcon)
@@ -294,26 +294,26 @@ fifa17_prem_full <- prem17 %>%
 
 
 ```{r}
-standardprem17 <- standardprem17 %>% 
+standardbundesliga17 <- standardbundesliga17 %>% 
   mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
   mutate(Player = str_replace_all(Player1, "-", " "))
 ```
 
 ```{r}
-fifa17_prem_standard_stats <- fifa17_prem_full %>% 
-  inner_join(standardprem17, by = "Player") %>% 
+fifa17_bundesliga_standard_stats <- fifa17_bundesliga_full %>% 
+  inner_join(standardbundesliga17, by = "Player") %>% 
   select(-Player1, -Pos) %>% 
   distinct(Player, .keep_all = TRUE)
 ```
 
 ```{r}
-fifa17_standard_plus_table <- fifa17_prem_standard_stats %>% 
-  inner_join(premtable17, by = "Squad")
+fifa17_standard_plus_table <- fifa17_bundesliga_standard_stats %>% 
+  inner_join(bundesligatable17, by = "Squad")
 ```
 
 
 ```{r}
-goalkeeper17 <- goalkeeper17 %>% 
+goalkeeper_bundesliga17 <- goalkeeper_bundesliga17 %>% 
   mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
   mutate(Player = str_replace_all(Player1, "-", " ")) %>% 
   rename(Pkatt_against = PKatt) %>% 
@@ -322,7 +322,7 @@ goalkeeper17 <- goalkeeper17 %>%
 
 ```{r}
 fifa17_modeling <- fifa17_standard_plus_table %>% 
-  left_join(goalkeeper17, by = "Player") %>% 
+  left_join(goalkeeper_bundesliga17, by = "Player") %>% 
   rename(minutes_played_divided_by90 = X90s, Non_PK_G = G.PK, G_plus_A_per90 = G.A, G_minus_Pk_per90 = G.PK.1, G_plus_A_minus_PK_per90 = G.A.PK, Save_percent = Save., CS_percent = CS., Pk_Save_percent = Save..1, G_per90 = Gls.1, A_per90 = Ast.1 ) %>% 
   select(-Matches.x, -Matches.y, -Player1) %>% 
   mutate(Nation = sub('.* ', '', Nation))
@@ -335,30 +335,30 @@ fifa17_modeling <- fifa17_standard_plus_table %>%
 
 
 ```{r}
-premnames18 <-premnames18 %>% 
+bundesliganames18 <-bundesliganames18 %>% 
   mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
   mutate(Player = str_replace_all(Player1, "-", " "))
 ```
 
 
 ```{r}
-prem18_names <- fifa18_names %>% 
-  filter(league == "Premier League") %>% 
+bundesliga18_names <- fifa18_names %>% 
+  filter(league == "Bundesliga") %>% 
   select(player_name, player_extended_name, overall, revision, position)
 ```
 
 
 
 ```{r}
-prem18 <- premnames18 %>%
-  inner_join(prem18_names, by = c("Player" = "player_extended_name")) %>% 
+bundesliga18 <- bundesliganames18 %>%
+  inner_join(bundesliga18_names, by = c("Player" = "player_extended_name")) %>% 
   select(-Player1, -player_name)
 ```
 
 
 ```{r}
-missing18 <- premnames18 %>%
-  left_join(prem18_names, by = c("Player" = "player_extended_name")) %>% 
+missing_bundesliga18 <- bundesliganames18 %>%
+  left_join(bundesliga18_names, by = c("Player" = "player_extended_name")) %>% 
   filter(is.na(player_name) == TRUE)
 ```
 
@@ -367,34 +367,34 @@ missing18 <- premnames18 %>%
 
 
 ```{r}
-not_missing_18 <- missing18 %>% 
+not_missing_bundesliga_18 <- missing_bundesliga18 %>% 
   select(-overall, -revision, -position) %>% 
-  left_join(prem18_names, by = c("Player" = "player_name")) 
+  left_join(bundesliga18_names, by = c("Player" = "player_name")) 
 ```
 
 
 ```{r}
 
-last_names18 <- not_missing_18 %>% 
+last_names_bundesliga18 <- not_missing_bundesliga_18 %>% 
   filter(is.na(overall) == TRUE) %>% 
   mutate(Player_short =  gsub(".* ", "", Player)) %>% 
   mutate(Player_short = ifelse(Player_short == "Aanholt", "Van Aanholt", ifelse(Player_short == "Dijk", "Van Dijk", ifelse(Player_short == "min", "Son", ifelse(Player_short == "Prowse", "Ward-Prowse", ifelse(Player_short == "yueng", "Ki Sung Yueng", ifelse(Player_short == "yong", "Lee Chung Yong", ifelse(Player_short == "Cheek", "Loftus-Cheek", ifelse(Player_short == "Chamberlain", "Oxlade-Chamberlain", ifelse(Player_short == "Gea", "De Gea", ifelse(Player_short == "Ginkel", "Van Ginkel", ifelse(Player_short == "Traore", "Adama", Player_short)))))))))))) %>% 
   select(-player_name, -player_extended_name, -overall, -revision, - Player1, -position)
 
-not_real_name18 <- not_missing_18 %>% 
+not_real_name18 <- not_missing_bundesliga_18 %>% 
   filter(is.na(overall) == FALSE) %>% 
   select(-Player1, -player_name, -player_extended_name)
 ```
 
 
 ```{r}
-weird_names18 <- last_names18 %>% 
-  inner_join(prem18_names, by = c("Player_short" = "player_name")) %>% 
+weird_names18 <- last_names_bundesliga18 %>% 
+  inner_join(bundesliga18_names, by = c("Player_short" = "player_name")) %>% 
   select(-Player_short, -player_extended_name)
 ```
 
 ```{r}
-fifa18_prem_full <- prem18 %>%
+fifa18_bundesliga_full <- bundesliga18 %>%
   bind_rows(not_real_name18, weird_names18) %>% 
   distinct(Player, .keep_all = TRUE) %>% 
   select(Player, revision, position, Int, TklW, OG, PKcon)
@@ -402,26 +402,26 @@ fifa18_prem_full <- prem18 %>%
 
 
 ```{r}
-standardprem18 <- standardprem18 %>% 
+standardbundesliga18 <- standardbundesliga18 %>% 
   mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
   mutate(Player = str_replace_all(Player1, "-", " "))
 ```
 
 ```{r}
-fifa18_prem_standard_stats <- fifa18_prem_full %>% 
-  inner_join(standardprem18, by = "Player") %>% 
+fifa18_bundesliga_standard_stats <- fifa18_bundesliga_full %>% 
+  inner_join(standardbundesliga18, by = "Player") %>% 
   select(-Player1, -Pos) %>% 
   distinct(Player, .keep_all = TRUE)
 ```
 
 ```{r}
-fifa18_standard_plus_table <- fifa18_prem_standard_stats %>% 
-  inner_join(premtable18, by = "Squad")
+fifa18_standard_plus_table <- fifa18_bundesliga_standard_stats %>% 
+  inner_join(bundesligatable18, by = "Squad")
 ```
 
 
 ```{r}
-goalkeeper18 <- goalkeeper18 %>% 
+goalkeeper_bundesliga18 <- goalkeeper_bundesliga18 %>% 
   mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
   mutate(Player = str_replace_all(Player1, "-", " ")) %>% 
   rename(Pkatt_against = PKatt) %>% 
@@ -430,7 +430,7 @@ goalkeeper18 <- goalkeeper18 %>%
 
 ```{r}
 fifa18_modeling <- fifa18_standard_plus_table %>% 
-  left_join(goalkeeper18, by = "Player") %>% 
+  left_join(goalkeeper_bundesliga18, by = "Player") %>% 
   rename(minutes_played_divided_by90 = X90s, Non_PK_G = G.PK, G_plus_A_per90 = G.A, G_minus_Pk_per90 = G.PK.1, G_plus_A_minus_PK_per90 = G.A.PK, Save_percent = Save., CS_percent = CS., Pk_Save_percent = Save..1, G_per90 = Gls.1, A_per90 = Ast.1 ) %>% 
   select(-Matches.x, -Matches.y, -Player1, -xG, -npxG, -xA, -npxG.1, -npxG.xA, -npxG.xA.1, -xG.1, -xA.1, -xG.xA, -Rk, -W.y) %>% 
   mutate(Nation = sub('.* ', '', Nation)) %>% 
@@ -440,30 +440,30 @@ fifa18_modeling <- fifa18_standard_plus_table %>%
 
 ##19
 ```{r}
-premnames19 <-premnames19 %>% 
+bundesliganames19 <-bundesliganames19 %>% 
   mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
   mutate(Player = str_replace_all(Player1, "-", " "))
 ```
 
 
 ```{r}
-prem19_names <- fifa19_names %>% 
-  filter(league == "Premier League") %>% 
+bundesliga19_names <- fifa19_names %>% 
+  filter(league == "Bundesliga") %>% 
   select(player_name, player_extended_name, overall, revision, position)
 ```
 
 
 
 ```{r}
-prem19 <- premnames19 %>%
-  inner_join(prem19_names, by = c("Player" = "player_extended_name")) %>% 
+bundesliga19 <- bundesliganames19 %>%
+  inner_join(bundesliga19_names, by = c("Player" = "player_extended_name")) %>% 
   select(-Player1, -player_name)
 ```
 
 
 ```{r}
-missing19 <- premnames19 %>%
-  left_join(prem19_names, by = c("Player" = "player_extended_name")) %>% 
+missing_bundesliga19 <- bundesliganames19 %>%
+  left_join(bundesliga19_names, by = c("Player" = "player_extended_name")) %>% 
   filter(is.na(player_name) == TRUE)
 ```
 
@@ -472,34 +472,34 @@ missing19 <- premnames19 %>%
 
 
 ```{r}
-not_missing_19 <- missing19 %>% 
+not_missing_bundesliga_19 <- missing_bundesliga19 %>% 
   select(-overall, -revision, -position) %>% 
-  left_join(prem19_names, by = c("Player" = "player_name")) 
+  left_join(bundesliga19_names, by = c("Player" = "player_name")) 
 ```
 
 
 ```{r}
 
-last_names19 <- not_missing_19 %>% 
+last_names_bundesliga19 <- not_missing_bundesliga_19 %>% 
   filter(is.na(overall) == TRUE) %>% 
   mutate(Player_short =  gsub(".* ", "", Player)) %>% 
   mutate(Player_short = ifelse(Player_short == "Aanholt", "Van Aanholt", ifelse(Player_short == "Dijk", "Van Dijk", ifelse(Player_short == "min", "Son", ifelse(Player_short == "Prowse", "Ward-Prowse", ifelse(Player_short == "yueng", "Ki Sung Yueng", ifelse(Player_short == "yong", "Lee Chung Yong", ifelse(Player_short == "Cheek", "Loftus-Cheek", ifelse(Player_short == "Chamberlain", "Oxlade-Chamberlain", ifelse(Player_short == "Gea", "De Gea", ifelse(Player_short == "Ginkel", "Van Ginkel", ifelse(Player_short == "Traore", "Adama", Player_short)))))))))))) %>% 
   select(-player_name, -player_extended_name, -overall, -revision, - Player1, -position)
 
-not_real_name19 <- not_missing_19 %>% 
+not_real_name19 <- not_missing_bundesliga_19 %>% 
   filter(is.na(overall) == FALSE) %>% 
   select(-Player1, -player_name, -player_extended_name)
 ```
 
 
 ```{r}
-weird_names19 <- last_names19 %>% 
-  inner_join(prem19_names, by = c("Player_short" = "player_name")) %>% 
+weird_names19 <- last_names_bundesliga19 %>% 
+  inner_join(bundesliga19_names, by = c("Player_short" = "player_name")) %>% 
   select(-Player_short, -player_extended_name)
 ```
 
 ```{r}
-fifa19_prem_full <- prem19 %>%
+fifa19_bundesliga_full <- bundesliga19 %>%
   bind_rows(not_real_name19, weird_names19) %>% 
   distinct(Player, .keep_all = TRUE) %>% 
   select(Player, revision, position, Int, TklW, OG, PKcon)
@@ -507,26 +507,26 @@ fifa19_prem_full <- prem19 %>%
 
 
 ```{r}
-standardprem19 <- standardprem19 %>% 
+standardbundesliga19 <- standardbundesliga19 %>% 
   mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
   mutate(Player = str_replace_all(Player1, "-", " "))
 ```
 
 ```{r}
-fifa19_prem_standard_stats <- fifa19_prem_full %>% 
-  inner_join(standardprem19, by = "Player") %>% 
+fifa19_bundesliga_standard_stats <- fifa19_bundesliga_full %>% 
+  inner_join(standardbundesliga19, by = "Player") %>% 
   select(-Player1, -Pos) %>% 
   distinct(Player, .keep_all = TRUE)
 ```
 
 ```{r}
-fifa19_standard_plus_table <- fifa19_prem_standard_stats %>% 
-  inner_join(premtable19, by = "Squad")
+fifa19_standard_plus_table <- fifa19_bundesliga_standard_stats %>% 
+  inner_join(bundesligatable19, by = "Squad")
 ```
 
 
 ```{r}
-goalkeeper19 <- goalkeeper19 %>% 
+goalkeeper_bundesliga19 <- goalkeeper_bundesliga19 %>% 
   mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
   mutate(Player = str_replace_all(Player1, "-", " ")) %>% 
   rename(Pkatt_against = PKatt) %>% 
@@ -535,44 +535,8 @@ goalkeeper19 <- goalkeeper19 %>%
 
 ```{r}
 fifa19_modeling <- fifa19_standard_plus_table %>% 
-  left_join(goalkeeper19, by = "Player") %>% 
+  left_join(goalkeeper_bundesliga19, by = "Player") %>% 
   rename(minutes_played_divided_by90 = X90s, Non_PK_G = G.PK, G_plus_A_per90 = G.A, G_minus_Pk_per90 = G.PK.1, G_plus_A_minus_PK_per90 = G.A.PK, Save_percent = Save., CS_percent = CS., Pk_Save_percent = Save..1, G_per90 = Gls.1, A_per90 = Ast.1) %>% 
   select(-Matches.x, -Matches.y, -Player1) %>% 
   mutate(Nation = sub('.* ', '', Nation))
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

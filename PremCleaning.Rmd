@@ -27,6 +27,7 @@ premnames19 <- read.csv("18_19_premnames.csv")
 standardprem17 <- read.csv("standardprem17.csv")
 standardprem18 <- read.csv("standardprem18.csv")
 standardprem19 <- read.csv("standardprem19.csv")
+premtable17 <- read.csv("premtable17.csv")
 ```
 
 

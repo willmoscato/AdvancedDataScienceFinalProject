@@ -84,6 +84,7 @@ fifa17_names <- fifa17_clean %>%
   mutate(player_extended_name = str_replace_all(player_extended_name, "i¯", "i")) %>% 
   mutate(player_extended_name = str_replace_all(player_extended_name, "i®", "i")) %>% 
   mutate(player_extended_name = str_replace_all(player_extended_name, "Ä", "c")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "i´", "o")) %>% 
   mutate(player_name = str_replace_all(player_name, "Ã€", "A")) %>% 
   mutate(player_name = str_replace_all(player_name, "Ã‰", "E")) %>%  
   mutate(player_name = str_replace_all(player_name, "Ã©", "e")) %>% 
@@ -110,7 +111,11 @@ fifa17_names <- fifa17_clean %>%
   mutate(player_name = str_replace_all(player_name, "Ä‡", "c")) %>% 
   mutate(player_name = str_replace_all(player_name, "Ã¡", "a")) %>% 
   mutate(player_name = str_replace_all(player_name, "Ã¯", "i")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ã©", "e"))
+  mutate(player_name = str_replace_all(player_name, "i‡", "C")) %>% 
+  mutate(player_name = str_replace_all(player_name, "i¤", "a")) %>% 
+  mutate(player_name = str_replace_all(player_name, "iŸ", "ss")) %>% 
+  mutate(player_name = str_replace_all(player_name, "S‚", "l")) %>% 
+  mutate(player_name = str_replace_all(player_name, "S„", "n"))
 ```
 
 
@@ -139,6 +144,7 @@ fifa18_names <- fifa18_clean %>%
   mutate(player_extended_name = str_replace_all(player_extended_name, "i¯", "i")) %>% 
   mutate(player_extended_name = str_replace_all(player_extended_name, "i®", "i")) %>% 
   mutate(player_extended_name = str_replace_all(player_extended_name, "Ä", "c")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "i´", "o")) %>%
   mutate(player_name = str_replace_all(player_name, "Ã€", "A")) %>% 
   mutate(player_name = str_replace_all(player_name, "Ã‰", "E")) %>%  
   mutate(player_name = str_replace_all(player_name, "Ã©", "e")) %>% 
@@ -165,7 +171,11 @@ fifa18_names <- fifa18_clean %>%
   mutate(player_name = str_replace_all(player_name, "Ä‡", "c")) %>% 
   mutate(player_name = str_replace_all(player_name, "Ã¡", "a")) %>% 
   mutate(player_name = str_replace_all(player_name, "Ã¯", "i")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ã©", "e"))
+  mutate(player_name = str_replace_all(player_name, "i‡", "C")) %>% 
+  mutate(player_name = str_replace_all(player_name, "i¤", "a")) %>% 
+  mutate(player_name = str_replace_all(player_name, "iŸ", "ss")) %>% 
+  mutate(player_name = str_replace_all(player_name, "S‚", "l")) %>% 
+  mutate(player_name = str_replace_all(player_name, "S„", "n"))
 ```
 
 
@@ -194,6 +204,7 @@ fifa19_names <- fifa19_clean %>%
   mutate(player_extended_name = str_replace_all(player_extended_name, "i¯", "i")) %>% 
   mutate(player_extended_name = str_replace_all(player_extended_name, "i®", "i")) %>% 
   mutate(player_extended_name = str_replace_all(player_extended_name, "Ä", "c")) %>% 
+  mutate(player_extended_name = str_replace_all(player_extended_name, "i´", "o")) %>%
   mutate(player_name = str_replace_all(player_name, "Ã€", "A")) %>% 
   mutate(player_name = str_replace_all(player_name, "Ã‰", "E")) %>%  
   mutate(player_name = str_replace_all(player_name, "Ã©", "e")) %>% 
@@ -220,7 +231,11 @@ fifa19_names <- fifa19_clean %>%
   mutate(player_name = str_replace_all(player_name, "Ä‡", "c")) %>% 
   mutate(player_name = str_replace_all(player_name, "Ã¡", "a")) %>% 
   mutate(player_name = str_replace_all(player_name, "Ã¯", "i")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ã©", "e"))
+  mutate(player_name = str_replace_all(player_name, "i‡", "C")) %>% 
+  mutate(player_name = str_replace_all(player_name, "i¤", "a")) %>% 
+  mutate(player_name = str_replace_all(player_name, "iŸ", "ss")) %>% 
+  mutate(player_name = str_replace_all(player_name, "S‚", "l")) %>% 
+  mutate(player_name = str_replace_all(player_name, "S„", "n"))
 ```
 
 
@@ -268,9 +283,9 @@ not_missing_bundesliga_17 <- missing_bundesliga17 %>%
 ```{r}
 
 last_names_bundesliga17 <- not_missing_bundesliga_17 %>% 
-  filter(is.na(overall) == TRUE) %>% 
+ filter(is.na(overall) == TRUE) %>% 
   mutate(Player_short =  gsub(".* ", "", Player)) %>% 
-  mutate(Player_short = Player_short) %>% 
+  mutate(Player_short = ifelse(Player_short == "Alcantara", "Thiago", ifelse(Player_short == "Barkok", "Aymen", ifelse(Player_short == "Harita", "Ben-Harita", ifelse(Player_short == "Blasis", "De Blasis", ifelse(Player_short == "Bracker", "Callsen-Bracker", ifelse(Player_short == "Cleber", "Cleber Reis", ifelse(Player_short =="won", "Ji Dong Won", ifelse(Player_short == "cheol", "Koo Ja Cheol", ifelse(Player_short == "ho", "Park Joo Ho", ifelse(Player_short == "Moting", "Choupo-Moting", ifelse(Player_short == "Engel", "Stroh-Engel", ifelse(Player_short == "Martinez", "Palacios Martinez", ifelse(Player_short == "Guzman", "De Guzman", ifelse(Player_short == "Jong", "De Jong", Player_short))))))))))))))) %>% 
   select(-player_name, -player_extended_name, -overall, -revision, - Player1, -position)
 
 not_real_name_bundesliga17 <- not_missing_bundesliga_17 %>% 
@@ -377,9 +392,9 @@ not_missing_bundesliga_18 <- missing_bundesliga18 %>%
 ```{r}
 
 last_names_bundesliga18 <- not_missing_bundesliga_18 %>% 
-  filter(is.na(overall) == TRUE) %>% 
+   filter(is.na(overall) == TRUE) %>% 
   mutate(Player_short =  gsub(".* ", "", Player)) %>% 
-  mutate(Player_short =  Player_short) %>% 
+  mutate(Player_short = ifelse(Player_short == "Alcantara", "Thiago", ifelse(Player_short == "Barkok", "Aymen", ifelse(Player_short == "Harita", "Ben-Harita", ifelse(Player_short == "Blasis", "De Blasis", ifelse(Player_short == "Bracker", "Callsen-Bracker", ifelse(Player_short == "Cleber", "Cleber Reis", ifelse(Player_short =="won", "Ji Dong Won", ifelse(Player_short == "cheol", "Koo Ja Cheol", ifelse(Player_short == "ho", "Park Joo Ho", ifelse(Player_short == "Moting", "Choupo-Moting", ifelse(Player_short == "Engel", "Stroh-Engel", ifelse(Player_short == "Martinez", "Palacios Martinez", ifelse(Player_short == "Guzman", "De Guzman", ifelse(Player_short == "Jong", "De Jong", Player_short))))))))))))))) %>% 
   select(-player_name, -player_extended_name, -overall, -revision, - Player1, -position)
 
 not_real_name_bundesliga18 <- not_missing_bundesliga_18 %>% 
@@ -484,7 +499,7 @@ not_missing_bundesliga_19 <- missing_bundesliga19 %>%
 last_names_bundesliga19 <- not_missing_bundesliga_19 %>% 
   filter(is.na(overall) == TRUE) %>% 
   mutate(Player_short =  gsub(".* ", "", Player)) %>% 
-  mutate(Player_short =  Player_short) %>% 
+  mutate(Player_short = ifelse(Player_short == "Alcantara", "Thiago", ifelse(Player_short == "Barkok", "Aymen", ifelse(Player_short == "Harita", "Ben-Harita", ifelse(Player_short == "Blasis", "De Blasis", ifelse(Player_short == "Bracker", "Callsen-Bracker", ifelse(Player_short == "Cleber", "Cleber Reis", ifelse(Player_short =="won", "Ji Dong Won", ifelse(Player_short == "cheol", "Koo Ja Cheol", ifelse(Player_short == "ho", "Park Joo Ho", ifelse(Player_short == "Moting", "Choupo-Moting", ifelse(Player_short == "Engel", "Stroh-Engel", ifelse(Player_short == "Martinez", "Palacios Martinez", ifelse(Player_short == "Guzman", "De Guzman", ifelse(Player_short == "Jong", "De Jong", ifelse(Player_short == "NDicka", "Ndicka", Player_short)))))))))))))))) %>% 
   select(-player_name, -player_extended_name, -overall, -revision, - Player1, -position)
 
 not_real_name_bundesliga19 <- not_missing_bundesliga_19 %>% 
@@ -548,4 +563,10 @@ dim(fifa17_modeling_bundesliga)
 dim(fifa18_modeling_bundesliga)
 dim(fifa19_modeling_bundesliga)
 ```
+
+```{r}
+fifa19_modeling_bundesliga %>% 
+  filter(revision == "TOTS")
+```
+
 

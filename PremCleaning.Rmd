@@ -325,8 +325,7 @@ fifa17_modeling <- fifa17_standard_plus_table %>%
   left_join(goalkeeper17, by = "Player") %>% 
   rename(minutes_played_divided_by90 = X90s, Non_PK_G = G.PK, G_plus_A_per90 = G.A, G_minus_Pk_per90 = G.PK.1, G_plus_A_minus_PK_per90 = G.A.PK, Save_percent = Save., CS_percent = CS., Pk_Save_percent = Save..1, G_per90 = Gls.1, A_per90 = Ast.1 ) %>% 
   select(-Matches.x, -Matches.y, -Player1) %>% 
-  mutate(Nation = sub('.* ', '', Nation)) %>% 
-  select(-Rk)
+  mutate(Nation = sub('.* ', '', Nation))
 ```
 
 
@@ -434,7 +433,7 @@ goalkeeper18 <- goalkeeper18 %>%
 fifa18_modeling <- fifa18_standard_plus_table %>% 
   left_join(goalkeeper18, by = "Player") %>% 
   rename(minutes_played_divided_by90 = X90s, Non_PK_G = G.PK, G_plus_A_per90 = G.A, G_minus_Pk_per90 = G.PK.1, G_plus_A_minus_PK_per90 = G.A.PK, Save_percent = Save., CS_percent = CS., Pk_Save_percent = Save..1, G_per90 = Gls.1, A_per90 = Ast.1 ) %>% 
-  select(-Matches.x, -Matches.y, -Player1, -xG, -npxG, -xA, -npxG.1, -npxG.xA, -npxG.xA.1, -xG.1, -xA.1, -xG.xA, -Rk) %>% 
+  select(-Matches.x, -Matches.y, -Player1, -xG, -npxG, -xA, -npxG.1, -npxG.xA, -npxG.xA.1, -xG.1, -xA.1, -xG.xA) %>% 
   mutate(Nation = sub('.* ', '', Nation))
 ```
 
@@ -540,8 +539,7 @@ fifa19_modeling <- fifa19_standard_plus_table %>%
   left_join(goalkeeper19, by = "Player") %>% 
   rename(minutes_played_divided_by90 = X90s, Non_PK_G = G.PK, G_plus_A_per90 = G.A, G_minus_Pk_per90 = G.PK.1, G_plus_A_minus_PK_per90 = G.A.PK, Save_percent = Save., CS_percent = CS., Pk_Save_percent = Save..1, G_per90 = Gls.1, A_per90 = Ast.1) %>% 
   select(-Matches.x, -Matches.y, -Player1) %>% 
-  mutate(Nation = sub('.* ', '', Nation)) %>% 
-  select(-Rk)
+  mutate(Nation = sub('.* ', '', Nation)) 
 ```
 
 

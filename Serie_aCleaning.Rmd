@@ -11,7 +11,6 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 library(tidyverse)
-library(dplyr)
 library(tidymodels)
 library(lubridate)
 ```
@@ -36,213 +35,6 @@ goalkeeper_serie_a19 <- read.csv('goalkeeper_serie_a19.csv')
 ```
 
 
-```{r}
-fifa17_clean <- fifa17 %>% 
-  filter(revision %in% c("Normal", "TOTS")) %>%
-  arrange(desc(overall)) %>% 
-  distinct(player_extended_name, .keep_all = TRUE)
-```
-
-```{r}
-fifa18_clean <- fifa18 %>% 
-  filter(revision %in% c("Normal", "TOTS")) %>%
-  arrange(desc(overall)) %>% 
-  distinct(player_extended_name, .keep_all = TRUE)
-```
-
-
-```{r}
-fifa19_clean <- fifa19 %>% 
-  filter(revision %in% c("Normal", "TOTS")) %>%
-  arrange(desc(overall)) %>% 
-  distinct(player_extended_name, .keep_all = TRUE)
-```
-
-
-```{r}
-fifa17_names <- fifa17_clean %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã€", "A")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã‰", "E")) %>%  
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã©", "e")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã¨", "e")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã¡", "a")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã", "A")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Å¡", "s")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã«", "e")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã¶", "o")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "i³", "o")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã", "i")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "°", "d")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "iº", "u")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "i£", "a")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "i¼", "u")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Å", "S")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã¼", "u")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "i–", "O")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "i³", "o")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "i½", "y")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "i¯", "i")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "i®", "i")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Ä", "c")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "i´", "o")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ã€", "A")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ã‰", "E")) %>%  
-  mutate(player_name = str_replace_all(player_name, "Ã©", "e")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ã¨", "e")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ã¡", "a")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ã", "A")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Å¡", "s")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ã«", "e")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ã¶", "o")) %>% 
-  mutate(player_name = str_replace_all(player_name, "i³", "o")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ã", "i")) %>% 
-  mutate(player_name = str_replace_all(player_name, "°", "d")) %>% 
-  mutate(player_name = str_replace_all(player_name, "iº", "u")) %>% 
-  mutate(player_name = str_replace_all(player_name, "i£", "a")) %>% 
-  mutate(player_name = str_replace_all(player_name, "i¼", "u")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Å", "S")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ã¼", "u")) %>% 
-  mutate(player_name = str_replace_all(player_name, "i–", "O")) %>% 
-  mutate(player_name = str_replace_all(player_name, "i³", "o")) %>% 
-  mutate(player_name = str_replace_all(player_name, "i½", "y")) %>% 
-  mutate(player_name = str_replace_all(player_name, "i¯", "i")) %>% 
-  mutate(player_name = str_replace_all(player_name, "i®", "i")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ä", "c")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ä‡", "c")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ã¡", "a")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ã¯", "i")) %>% 
-  mutate(player_name = str_replace_all(player_name, "i‡", "C")) %>% 
-  mutate(player_name = str_replace_all(player_name, "i¤", "a")) %>% 
-  mutate(player_name = str_replace_all(player_name, "iŸ", "ss")) %>% 
-  mutate(player_name = str_replace_all(player_name, "S‚", "l")) %>% 
-  mutate(player_name = str_replace_all(player_name, "S„", "n")) %>% 
-  mutate(player_name = str_replace_all(player_name, "S¾", "z")) %>% 
-  mutate(player_name = str_replace_all(player_name, "ÄŸ", "g"))
-```
-
-
-```{r}
-fifa18_names <- fifa18_clean %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã€", "A")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã‰", "E")) %>%  
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã©", "e")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã¨", "e")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã¡", "a")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã", "A")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Å¡", "s")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã«", "e")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã¶", "o")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "i³", "o")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã", "i")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "°", "d")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "iº", "u")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "i£", "a")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "i¼", "u")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Å", "S")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã¼", "u")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "i–", "O")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "i³", "o")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "i½", "y")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "i¯", "i")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "i®", "i")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Ä", "c")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "i´", "o")) %>%
-  mutate(player_name = str_replace_all(player_name, "Ã€", "A")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ã‰", "E")) %>%  
-  mutate(player_name = str_replace_all(player_name, "Ã©", "e")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ã¨", "e")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ã¡", "a")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ã", "A")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Å¡", "s")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ã«", "e")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ã¶", "o")) %>% 
-  mutate(player_name = str_replace_all(player_name, "i³", "o")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ã", "i")) %>% 
-  mutate(player_name = str_replace_all(player_name, "°", "d")) %>% 
-  mutate(player_name = str_replace_all(player_name, "iº", "u")) %>% 
-  mutate(player_name = str_replace_all(player_name, "i£", "a")) %>% 
-  mutate(player_name = str_replace_all(player_name, "i¼", "u")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Å", "S")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ã¼", "u")) %>% 
-  mutate(player_name = str_replace_all(player_name, "i–", "O")) %>% 
-  mutate(player_name = str_replace_all(player_name, "i³", "o")) %>% 
-  mutate(player_name = str_replace_all(player_name, "i½", "y")) %>% 
-  mutate(player_name = str_replace_all(player_name, "i¯", "i")) %>% 
-  mutate(player_name = str_replace_all(player_name, "i®", "i")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ä", "c")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ä‡", "c")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ã¡", "a")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ã¯", "i")) %>% 
-  mutate(player_name = str_replace_all(player_name, "i‡", "C")) %>% 
-  mutate(player_name = str_replace_all(player_name, "i¤", "a")) %>% 
-  mutate(player_name = str_replace_all(player_name, "iŸ", "ss")) %>% 
-  mutate(player_name = str_replace_all(player_name, "S‚", "l")) %>% 
-  mutate(player_name = str_replace_all(player_name, "S„", "n")) %>% 
-  mutate(player_name = str_replace_all(player_name, "S¾", "z")) %>% 
-  mutate(player_name = str_replace_all(player_name, "ÄŸ", "g"))
-```
-
-
-```{r}
-fifa19_names <- fifa19_clean %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã€", "A")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã‰", "E")) %>%  
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã©", "e")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã¨", "e")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã¡", "a")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã", "A")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Å¡", "s")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã«", "e")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã¶", "o")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "i³", "o")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã", "i")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "°", "d")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "iº", "u")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "i£", "a")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "i¼", "u")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Å", "S")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Ã¼", "u")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "i–", "O")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "i³", "o")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "i½", "y")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "i¯", "i")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "i®", "i")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "Ä", "c")) %>% 
-  mutate(player_extended_name = str_replace_all(player_extended_name, "i´", "o")) %>%
-  mutate(player_name = str_replace_all(player_name, "Ã€", "A")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ã‰", "E")) %>%  
-  mutate(player_name = str_replace_all(player_name, "Ã©", "e")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ã¨", "e")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ã¡", "a")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ã", "A")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Å¡", "s")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ã«", "e")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ã¶", "o")) %>% 
-  mutate(player_name = str_replace_all(player_name, "i³", "o")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ã", "i")) %>% 
-  mutate(player_name = str_replace_all(player_name, "°", "d")) %>% 
-  mutate(player_name = str_replace_all(player_name, "iº", "u")) %>% 
-  mutate(player_name = str_replace_all(player_name, "i£", "a")) %>% 
-  mutate(player_name = str_replace_all(player_name, "i¼", "u")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Å", "S")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ã¼", "u")) %>% 
-  mutate(player_name = str_replace_all(player_name, "i–", "O")) %>% 
-  mutate(player_name = str_replace_all(player_name, "i³", "o")) %>% 
-  mutate(player_name = str_replace_all(player_name, "i½", "y")) %>% 
-  mutate(player_name = str_replace_all(player_name, "i¯", "i")) %>% 
-  mutate(player_name = str_replace_all(player_name, "i®", "i")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ä", "c")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ä‡", "c")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ã¡", "a")) %>% 
-  mutate(player_name = str_replace_all(player_name, "Ã¯", "i")) %>% 
-  mutate(player_name = str_replace_all(player_name, "i‡", "C")) %>% 
-  mutate(player_name = str_replace_all(player_name, "i¤", "a")) %>% 
-  mutate(player_name = str_replace_all(player_name, "iŸ", "ss")) %>% 
-  mutate(player_name = str_replace_all(player_name, "S‚", "l")) %>% 
-  mutate(player_name = str_replace_all(player_name, "S„", "n")) %>% 
-  mutate(player_name = str_replace_all(player_name, "S¾", "z")) %>% 
-  mutate(player_name = str_replace_all(player_name, "ÄŸ", "g"))
-```
 
 
 ##17
@@ -456,7 +248,8 @@ fifa18_modeling_serie_a <- fifa18_standard_plus_table_serie_a %>%
   left_join(goalkeeper_serie_a18, by = "Player") %>% 
   rename(minutes_played_divided_by90 = X90s, Non_PK_G = G.PK, G_plus_A_per90 = G.A, G_minus_Pk_per90 = G.PK.1, G_plus_A_minus_PK_per90 = G.A.PK, Save_percent = Save., CS_percent = CS., Pk_Save_percent = Save..1, G_per90 = Gls.1, A_per90 = Ast.1 ) %>% 
   select(-Matches.x, -Matches.y, -Player1, -xG, -npxG, -xA, -npxG.1, -npxG.xA, -npxG.xA.1, -xG.1, -xA.1, -xG.xA) %>% 
-  mutate(Nation = sub('.* ', '', Nation))
+  mutate(Nation = sub('.* ', '', Nation)) %>% 
+  filter(Player != "Vanja Milinkovic Savic")
 ```
 
 
@@ -569,3 +362,9 @@ dim(fifa17_modeling_serie_a)
 dim(fifa18_modeling_serie_a)
 dim(fifa19_modeling_serie_a)
 ```
+
+```{r}
+fifa18_modeling_serie_a %>% 
+  filter(revision == "TOTS")
+```
+

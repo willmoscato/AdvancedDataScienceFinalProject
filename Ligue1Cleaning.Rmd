@@ -18,19 +18,19 @@ library(lubridate)
 
 
 ```{r}
-ligue1names17 <- read.csv("16_17_ligue1names.csv")
-ligue1names18 <- read.csv("17_18_ligue1names.csv")
-ligue1names19 <- read.csv("18_19_ligue1names.csv")
-standardligue1_17 <- read.csv("standardligue1_17.csv")
-standardligue1_18 <- read.csv("standardligue1_18.csv")
-standardligue1_19 <- read.csv("standardligue1_18.csv")
+ligue1_names17 <- read.csv("16_17_ligue1names.csv")
+ligue1_names18 <- read.csv("17_18_ligue1names.csv")
+ligue1_names19 <- read.csv("18_19_ligue1names.csv")
+standard_ligue1_17 <- read.csv("standardligue1_17.csv")
+standard_ligue1_18 <- read.csv("standardligue1_18.csv")
+standard_ligue1_19 <- read.csv("standardligue1_18.csv")
 ```
 
 
 ##17
 
 ```{r}
-ligue1names17 <-ligue1names17 %>% 
+ligue1_names17 <-ligue1_names17 %>% 
   mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
   mutate(Player = str_replace_all(Player1, "-", " "))
 ```
@@ -38,21 +38,21 @@ ligue1names17 <-ligue1names17 %>%
 
 ```{r}
 ligue1_17_names <- fifa17_names %>% 
-  filter(league == "Premier League") %>% 
+  filter(league == "Ligue 1") %>% 
   select(player_name, player_extended_name, overall, revision, position)
 ```
 
 
 
 ```{r}
-ligue1_17 <- ligue1names17 %>%
+ligue1_17 <- ligue1_names17 %>%
   inner_join(ligue1_17_names, by = c("Player" = "player_extended_name")) %>% 
   select(-Player1, -player_name)
 ```
 
 
 ```{r}
-missing17 <- ligue1names17 %>%
+missing_ligue1_17 <- ligue1_names17 %>%
   left_join(ligue1_17_names, by = c("Player" = "player_extended_name")) %>% 
   filter(is.na(player_name) == TRUE)
 ```
@@ -62,49 +62,48 @@ missing17 <- ligue1names17 %>%
 
 
 ```{r}
-not_missing_17 <- missing %>% 
+not_missing_ligue1_17 <- missing_ligue1_17 %>% 
   select(-overall, -revision, -position) %>% 
-  left_join(ligue1_16_names, by = c("Player" = "player_name")) 
+  left_join(ligue1_17_names, by = c("Player" = "player_name")) 
 ```
 
 
 ```{r}
-
-last_names17 <- not_missing_17 %>% 
+last_names_ligue1_17 <- not_missing_ligue1_17 %>% 
   filter(is.na(overall) == TRUE) %>% 
   mutate(Player_short =  gsub(".* ", "", Player)) %>% 
-  mutate(Player_short = ifelse(Player_short == "Aanholt", "Van Aanholt", ifelse(Player_short == "Dijk", "Van Dijk", ifelse(Player_short == "min", "Son", ifelse(Player_short == "Prowse", "Ward-Prowse", ifelse(Player_short == "yueng", "Ki Sung Yueng", ifelse(Player_short == "yong", "Lee Chung Yong", ifelse(Player_short == "Cheek", "Loftus-Cheek", ifelse(Player_short == "Chamberlain", "Oxlade-Chamberlain", ifelse(Player_short == "Gea", "De Gea", ifelse(Player_short == "Traore", "Adama", Player_short))))))))))) %>% 
+  mutate(Player_short = ifelse(Player_short == "Bennasser", "Ait Bennasser", ifelse(Player_short == "Akpro", "Akpa Akpro", ifelse(Player_short == "Ekotto", "Assou Ekotto", ifelse(Player_short == "Arfa", "Ben Arfa", ifelse(Player_short == "Khemis", "Ben Khemis", ifelse(Player_short == "Youssef", "Ben Youssef", ifelse(Player_short == "Moutou", "Bouka Moutou", ifelse(Player_short == "Anguissa", "Zambo Anguissa", ifelse(Player_short == "Assembe", "Ndy Assembe", ifelse(Player_short == "Bihan", "Le Bihan", ifelse(Player_short == "Borre", "Vanden Borre", ifelse(Player_short == "Catherine", "Theophile-Catherine", ifelse(Player_short == "Celso", "Lo Celso", ifelse(Player_short == "Ekambi", "Toko Ekambi", ifelse(Player_short == "Gabriel", "Pierre-Gabriel", ifelse(Player_short == "Ghazi", "El Ghazi", ifelse(Player_short == "Goff", "Le Goff", ifelse(Player_short == "hoon", "Chang-hoon", ifelse(Player_short == "Iseka", "Leya Iseka", ifelse(Player_short == "Kaoutari", "El Kaoutari", ifelse(Player_short == "King", "Musavu-King", ifelse(Player1 == "Dylan-Saint-Louis", Player_short == "Saint-Louis", ifelse(Player_short == "Marchand", "Le Marchand", ifelse(Player_short == "Celso", "Lo Celso", Player_short))))))))))))))))))))))))) %>% 
   select(-player_name, -player_extended_name, -overall, -revision, - Player1, -position)
 
-not_real_name17 <- not_missing_17 %>% 
+not_real_name_ligue1_17 <- not_missing_ligue1_17 %>% 
   filter(is.na(overall) == FALSE) %>% 
   select(-Player1, -player_name, -player_extended_name)
 ```
 
 
 ```{r}
-weird_names17 <- last_names17 %>% 
+weird_names_ligue1_17 <- last_names_ligue1_17 %>% 
   inner_join(ligue1_17_names, by = c("Player_short" = "player_name")) %>% 
   select(-Player_short, -player_extended_name)
 ```
 
 ```{r}
 fifa17_ligue1_full <- ligue1_17 %>%
-  bind_rows(not_real_name17, weird_names17) %>% 
+  bind_rows(not_real_name_ligue1_17, weird_names_ligue1_17) %>% 
   distinct(Player, .keep_all = TRUE) %>% 
   select(Player, revision, position, Int, TklW, OG, PKcon)
 ```
 
 
 ```{r}
-standardligue1_17 <- standardligue1_17 %>% 
+standard_ligue1_17 <- standard_ligue1_17 %>% 
   mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
   mutate(Player = str_replace_all(Player1, "-", " "))
 ```
 
 ```{r}
 fifa17_ligue1_standard_stats <- fifa17_ligue1_full %>% 
-  inner_join(standardligue1_17, by = "Player") %>% 
+  inner_join(standard_ligue1_17, by = "Player") %>% 
   select(-Player1, -Pos) %>% 
   distinct(Player, .keep_all = TRUE)
 ```
@@ -113,7 +112,7 @@ fifa17_ligue1_standard_stats <- fifa17_ligue1_full %>%
 
 
 ```{r}
-ligue1names18 <-ligue1names18 %>% 
+ligue1_names18 <-ligue1_names18 %>% 
   mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
   mutate(Player = str_replace_all(Player1, "-", " "))
 ```
@@ -121,21 +120,21 @@ ligue1names18 <-ligue1names18 %>%
 
 ```{r}
 ligue1_18_names <- fifa18_names %>% 
-  filter(league == "Premier League") %>% 
+  filter(league == "Ligue 1") %>% 
   select(player_name, player_extended_name, overall, revision, position)
 ```
 
 
 
 ```{r}
-ligue1_18 <- ligue1names18 %>%
+ligue1_18 <- ligue1_names18 %>%
   inner_join(ligue1_18_names, by = c("Player" = "player_extended_name")) %>% 
   select(-Player1, -player_name)
 ```
 
 
 ```{r}
-missing18 <- ligue1names18 %>%
+missing_ligue1_18 <- ligue1_names18 %>%
   left_join(ligue1_18_names, by = c("Player" = "player_extended_name")) %>% 
   filter(is.na(player_name) == TRUE)
 ```
@@ -145,49 +144,48 @@ missing18 <- ligue1names18 %>%
 
 
 ```{r}
-not_missing_18 <- missing %>% 
+not_missing_ligue1_18 <- missing_ligue1_18 %>% 
   select(-overall, -revision, -position) %>% 
   left_join(ligue1_18_names, by = c("Player" = "player_name")) 
 ```
 
 
 ```{r}
-
-last_names18 <- not_missing_18 %>% 
+last_names_ligue1_18 <- not_missing_ligue1_18 %>% 
   filter(is.na(overall) == TRUE) %>% 
   mutate(Player_short =  gsub(".* ", "", Player)) %>% 
   mutate(Player_short = ifelse(Player_short == "Aanholt", "Van Aanholt", ifelse(Player_short == "Dijk", "Van Dijk", ifelse(Player_short == "min", "Son", ifelse(Player_short == "Prowse", "Ward-Prowse", ifelse(Player_short == "yueng", "Ki Sung Yueng", ifelse(Player_short == "yong", "Lee Chung Yong", ifelse(Player_short == "Cheek", "Loftus-Cheek", ifelse(Player_short == "Chamberlain", "Oxlade-Chamberlain", ifelse(Player_short == "Gea", "De Gea", ifelse(Player_short == "Ginkel", "Van Ginkel", ifelse(Player_short == "Traore", "Adama", Player_short)))))))))))) %>% 
   select(-player_name, -player_extended_name, -overall, -revision, - Player1, -position)
 
-not_real_name18 <- not_missing_18 %>% 
+not_real_name_ligue1_18 <- not_missing_ligue1_18 %>% 
   filter(is.na(overall) == FALSE) %>% 
   select(-Player1, -player_name, -player_extended_name)
 ```
 
 
 ```{r}
-weird_names18 <- last_names18 %>% 
+weird_names_ligue1_18 <- last_names_ligue1_18 %>% 
   inner_join(ligue1_18_names, by = c("Player_short" = "player_name")) %>% 
   select(-Player_short, -player_extended_name)
 ```
 
 ```{r}
 fifa18_ligue1_full <- ligue1_18 %>%
-  bind_rows(not_real_name18, weird_names18) %>% 
+  bind_rows(not_real_name_ligue1_18, weird_names_ligue1_18) %>% 
   distinct(Player, .keep_all = TRUE) %>% 
   select(Player, revision, position, Int, TklW, OG, PKcon)
 ```
 
 
 ```{r}
-standardligue1_18 <- standardligue1_18 %>% 
+standard_ligue1_18 <- standard_ligue1_18 %>% 
   mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
   mutate(Player = str_replace_all(Player1, "-", " "))
 ```
 
 ```{r}
 fifa18_ligue1_standard_stats <- fifa18_ligue1_full %>% 
-  inner_join(standardligue1_18, by = "Player") %>% 
+  inner_join(standard_ligue1_18, by = "Player") %>% 
   select(-Player1, -Pos) %>% 
   distinct(Player, .keep_all = TRUE)
 ```
@@ -195,7 +193,7 @@ fifa18_ligue1_standard_stats <- fifa18_ligue1_full %>%
 
 ##19
 ```{r}
-ligue1names19 <-ligue1names19 %>% 
+ligue1_names19 <- ligue1_names19 %>% 
   mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
   mutate(Player = str_replace_all(Player1, "-", " "))
 ```
@@ -203,21 +201,21 @@ ligue1names19 <-ligue1names19 %>%
 
 ```{r}
 ligue1_19_names <- fifa19_names %>% 
-  filter(league == "Premier League") %>% 
+  filter(league == "Ligue 1") %>% 
   select(player_name, player_extended_name, overall, revision, position)
 ```
 
 
 
 ```{r}
-ligue1_19 <- ligue1names19 %>%
+ligue1_19 <- ligue1_names19 %>%
   inner_join(ligue1_19_names, by = c("Player" = "player_extended_name")) %>% 
   select(-Player1, -player_name)
 ```
 
 
 ```{r}
-missing19 <- ligue1names19 %>%
+missing_ligue1_19 <- ligue1_names19 %>%
   left_join(ligue1_19_names, by = c("Player" = "player_extended_name")) %>% 
   filter(is.na(player_name) == TRUE)
 ```
@@ -227,49 +225,48 @@ missing19 <- ligue1names19 %>%
 
 
 ```{r}
-not_missing_19 <- missing %>% 
+not_missing_ligue1_19 <- missing_ligue1_19 %>% 
   select(-overall, -revision, -position) %>% 
   left_join(ligue1_19_names, by = c("Player" = "player_name")) 
 ```
 
 
 ```{r}
-
-last_names19 <- not_missing_19 %>% 
+last_names_ligue1_19 <- not_missing_ligue1_19 %>% 
   filter(is.na(overall) == TRUE) %>% 
   mutate(Player_short =  gsub(".* ", "", Player)) %>% 
   mutate(Player_short = ifelse(Player_short == "Aanholt", "Van Aanholt", ifelse(Player_short == "Dijk", "Van Dijk", ifelse(Player_short == "min", "Son", ifelse(Player_short == "Prowse", "Ward-Prowse", ifelse(Player_short == "yueng", "Ki Sung Yueng", ifelse(Player_short == "yong", "Lee Chung Yong", ifelse(Player_short == "Cheek", "Loftus-Cheek", ifelse(Player_short == "Chamberlain", "Oxlade-Chamberlain", ifelse(Player_short == "Gea", "De Gea", ifelse(Player_short == "Ginkel", "Van Ginkel", ifelse(Player_short == "Traore", "Adama", Player_short)))))))))))) %>% 
   select(-player_name, -player_extended_name, -overall, -revision, - Player1, -position)
 
-not_real_name19 <- not_missing_19 %>% 
+not_real_name_ligue1_19 <- not_missing_ligue1_19 %>% 
   filter(is.na(overall) == FALSE) %>% 
   select(-Player1, -player_name, -player_extended_name)
 ```
 
 
 ```{r}
-weird_names19 <- last_names19 %>% 
+weird_names_ligue1_19 <- last_names_ligue1_19 %>% 
   inner_join(ligue1_19_names, by = c("Player_short" = "player_name")) %>% 
   select(-Player_short, -player_extended_name)
 ```
 
 ```{r}
 fifa19_ligue1_full <- ligue1_19 %>%
-  bind_rows(not_real_name19, weird_names19) %>% 
+  bind_rows(not_real_name_ligue1_19, weird_ligue1_names19) %>% 
   distinct(Player, .keep_all = TRUE) %>% 
   select(Player, revision, position, Int, TklW, OG, PKcon)
 ```
 
 
 ```{r}
-standardligue1_19 <- standardligue1_19 %>% 
+standard_ligue1_19 <- standard_ligue1_19 %>% 
   mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
   mutate(Player = str_replace_all(Player1, "-", " "))
 ```
 
 ```{r}
 fifa19_ligue1_standard_stats <- fifa19_ligue1_full %>% 
-  inner_join(standardligue1_19, by = "Player") %>% 
+  inner_join(standard_ligue1_19, by = "Player") %>% 
   select(-Player1, -Pos) %>% 
   distinct(Player, .keep_all = TRUE)
 ```

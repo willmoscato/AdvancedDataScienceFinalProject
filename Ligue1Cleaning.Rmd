@@ -11,7 +11,6 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 library(tidyverse)
-library(dplyr)
 library(tidymodels)
 library(lubridate)
 ```
@@ -72,7 +71,7 @@ not_missing_ligue1_17 <- missing_ligue1_17 %>%
 last_names_ligue1_17 <- not_missing_ligue1_17 %>%  
   filter(is.na(overall) == TRUE) %>% 
   mutate(Player_short =  gsub(".* ", "", Player)) %>% 
-  mutate(Player_short = ifelse(Player_short == "Bennasser", "Ait Bennasser", ifelse(Player_short == "Akpro", "Akpa Akpro", ifelse(Player_short == "Ekotto", "Assou Ekotto", ifelse(Player_short == "Arfa", "Ben Arfa", ifelse(Player_short == "Khemis", "Ben Khemis", ifelse(Player_short == "Youssef", "Ben Youssef", ifelse(Player_short == "Moutou", "Bouka Moutou", ifelse(Player_short == "Anguissa", "Zambo Anguissa", ifelse(Player_short == "Assembe", "Ndy Assembe", ifelse(Player_short == "Bihan", "Le Bihan", ifelse(Player_short == "Borre", "Vanden Borre", ifelse(Player_short == "Catherine", "Theophile-Catherine", ifelse(Player_short == "Celso", "Lo Celso", ifelse(Player_short == "Ekambi", "Toko Ekambi", ifelse(Player_short == "Gabriel", "Pierre-Gabriel", ifelse(Player_short == "Ghazi", "El Ghazi", ifelse(Player_short == "Goff", "Le Goff", ifelse(Player_short == "hoon", "Chang-hoon", ifelse(Player_short == "Iseka", "Leya Iseka", ifelse(Player_short == "Kaoutari", "El Kaoutari", ifelse(Player_short == "King", "Musavu-King", ifelse(Player1 == "Dylan-Saint-Louis", Player_short == "Saint-Louis", ifelse(Player_short == "Marchand", "Le Marchand", ifelse(Player_short == "Celso", "Lo Celso", Player_short))))))))))))))))))))))))) %>% 
+  mutate(Player_short = ifelse(Player_short == "NDoye", "N'Doye", ifelse(Player_short == "Henrique", "Dalbert", ifelse(Player_short == "Catherine", "Theophile-Catherine", ifelse(Player_short == "Diop", "Issa", ifelse(Player_short == "Maximin", "Saint-Maximin", ifelse(Player_short == "Melou", "Lees-Melou", ifelse(Player_short == "Ekambi", "Toko-Ekambi", ifelse(Player_short == "Moura", "Lucas", ifelse(Player_short == "Paquet", "Monnet-Paquet", ifelse(Player_short == "Nguette", "N'Guette", ifelse(Player_short == "Mbiwa", "Yanga-M'Biwa", ifelse(Player_short == "Preville", "De Preville", ifelse(Player_short == "Assembe", "Ndy Assembe", ifelse(Player_short == "Anguissa", "Zambo Anguissa", ifelse(Player_short == "Lang", "Adam", ifelse(Player_short == "Mbappe", "Mbappe Lottin", ifelse(Player_short == "Ekotto", "Assou-Ekotto", ifelse(Player_short == "Mbengue", "M'Bengue", ifelse(Player_short == "NJie", "N'Jie", ifelse(Player_short == "Ghazi", "El Ghazi", ifelse(Player_short == "Ruf", "Saint-Ruf", ifelse(Player_short == "Bamba", "Abdoulaye", ifelse(Player_short == "Aliadiere", "Jeremie", ifelse(Player_short == "Dolly", "Keagan", ifelse(Player_short == "NDoram", "N'Doram", ifelse(Player_short == "King", "Musavu-King", ifelse(Player_short == "hoon", "Chang-Hoon", Player_short)))))))))))))))))))))))))))) %>% 
   select(-player_name, -player_extended_name, -overall, -revision, - Player1, -position)
 
 not_real_name_ligue1_17 <- not_missing_ligue1_17 %>% 
@@ -120,7 +119,7 @@ ligue1_names18 <-ligue1_names18 %>%
 
 ```{r}
 ligue1_18_names <- fifa18_names %>% 
-  filter(league == "Ligue 1") %>% 
+  filter(league == "Ligue 1 Conforama") %>% 
   select(player_name, player_extended_name, overall, revision, position)
 ```
 
@@ -154,7 +153,7 @@ not_missing_ligue1_18 <- missing_ligue1_18 %>%
 last_names_ligue1_18 <- not_missing_ligue1_18 %>% 
   filter(is.na(overall) == TRUE) %>% 
   mutate(Player_short =  gsub(".* ", "", Player)) %>% 
-  mutate(Player_short = ifelse(Player_short == "Aanholt", "Van Aanholt", ifelse(Player_short == "Dijk", "Van Dijk", ifelse(Player_short == "min", "Son", ifelse(Player_short == "Prowse", "Ward-Prowse", ifelse(Player_short == "yueng", "Ki Sung Yueng", ifelse(Player_short == "yong", "Lee Chung Yong", ifelse(Player_short == "Cheek", "Loftus-Cheek", ifelse(Player_short == "Chamberlain", "Oxlade-Chamberlain", ifelse(Player_short == "Gea", "De Gea", ifelse(Player_short == "Ginkel", "Van Ginkel", ifelse(Player_short == "Traore", "Adama", Player_short)))))))))))) %>% 
+  mutate(Player_short = ifelse(Player_short == "NDoye", "N'Doye", ifelse(Player_short == "Henrique", "Dalbert", ifelse(Player_short == "Catherine", "Theophile-Catherine", ifelse(Player_short == "Diop", "Issa", ifelse(Player_short == "Maximin", "Saint-Maximin", ifelse(Player_short == "Melou", "Lees-Melou", ifelse(Player_short == "Ekambi", "Toko-Ekambi", ifelse(Player_short == "Moura", "Lucas", ifelse(Player_short == "Paquet", "Monnet-Paquet", ifelse(Player_short == "Nguette", "N'Guette", ifelse(Player_short == "Mbiwa", "Yanga-M'Biwa", ifelse(Player_short == "Preville", "De Preville", ifelse(Player_short == "Assembe", "Ndy Assembe", ifelse(Player_short == "Anguissa", "Zambo Anguissa", ifelse(Player_short == "Lang", "Adam", ifelse(Player_short == "Mbappe", "Mbappe Lottin", ifelse(Player_short == "Ekotto", "Assou-Ekotto", ifelse(Player_short == "Mbengue", "M'Bengue", ifelse(Player_short == "NJie", "N'Jie", ifelse(Player_short == "Ghazi", "El Ghazi", ifelse(Player_short == "Ruf", "Saint-Ruf", ifelse(Player_short == "Bamba", "Abdoulaye", ifelse(Player_short == "Aliadiere", "Jeremie", ifelse(Player_short == "Dolly", "Keagan", ifelse(Player_short == "NDoram", "N'Doram", ifelse(Player_short == "King", "Musavu-King", ifelse(Player_short == "hoon", "Chang-Hoon", Player_short)))))))))))))))))))))))))))) %>% 
   select(-player_name, -player_extended_name, -overall, -revision, - Player1, -position)
 
 not_real_name_ligue1_18 <- not_missing_ligue1_18 %>% 

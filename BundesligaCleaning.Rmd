@@ -17,9 +17,6 @@ library(lubridate)
 
 
 ```{r}
-fifa17 <- read.csv("fut_bin17_players.csv")
-fifa18 <- read.csv("fut_bin18_players.csv")
-fifa19 <- read.csv("fut_bin19_players.csv")
 bundesliganames17 <- read.csv("16_17_bundesliganames.csv")
 bundesliganames18 <- read.csv("17_18_bundesliganames.csv")
 bundesliganames19 <- read.csv("18_19_bundesliganames.csv")
@@ -363,7 +360,7 @@ dim(fifa19_modeling_bundesliga)
 ```
 
 ```{r}
-fifa19_modeling_bundesliga %>% 
+fifa17_modeling_bundesliga %>% 
   filter(revision == "TOTS")
 ```
 

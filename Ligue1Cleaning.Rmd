@@ -69,7 +69,7 @@ not_missing_ligue1_17 <- missing_ligue1_17 %>%
 
 
 ```{r}
-last_names_ligue1_17 <- not_missing_ligue1_17 %>% 
+last_names_ligue1_17 <- not_missing_ligue1_17 %>%  
   filter(is.na(overall) == TRUE) %>% 
   mutate(Player_short =  gsub(".* ", "", Player)) %>% 
   mutate(Player_short = ifelse(Player_short == "Bennasser", "Ait Bennasser", ifelse(Player_short == "Akpro", "Akpa Akpro", ifelse(Player_short == "Ekotto", "Assou Ekotto", ifelse(Player_short == "Arfa", "Ben Arfa", ifelse(Player_short == "Khemis", "Ben Khemis", ifelse(Player_short == "Youssef", "Ben Youssef", ifelse(Player_short == "Moutou", "Bouka Moutou", ifelse(Player_short == "Anguissa", "Zambo Anguissa", ifelse(Player_short == "Assembe", "Ndy Assembe", ifelse(Player_short == "Bihan", "Le Bihan", ifelse(Player_short == "Borre", "Vanden Borre", ifelse(Player_short == "Catherine", "Theophile-Catherine", ifelse(Player_short == "Celso", "Lo Celso", ifelse(Player_short == "Ekambi", "Toko Ekambi", ifelse(Player_short == "Gabriel", "Pierre-Gabriel", ifelse(Player_short == "Ghazi", "El Ghazi", ifelse(Player_short == "Goff", "Le Goff", ifelse(Player_short == "hoon", "Chang-hoon", ifelse(Player_short == "Iseka", "Leya Iseka", ifelse(Player_short == "Kaoutari", "El Kaoutari", ifelse(Player_short == "King", "Musavu-King", ifelse(Player1 == "Dylan-Saint-Louis", Player_short == "Saint-Louis", ifelse(Player_short == "Marchand", "Le Marchand", ifelse(Player_short == "Celso", "Lo Celso", Player_short))))))))))))))))))))))))) %>% 

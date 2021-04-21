@@ -1,0 +1,43 @@
+Player,Nation,Pos,Squad,Age,Born,MP,Starts,Min,90s,GA,GA90,SoTA,Saves,Save%,W,D,L,CS,CS%,PKatt,PKA,PKsv,PKm,Save%,Matches
+Alisson\Alisson,br BRA,GK,Roma,24,1992,37,37,3330,37,28,0.76,135,107,81.5,22,8,7,17,45.9,5,3,2,0,40,Matches
+Nícolas Andrade\Nicolas-Andrade,br BRA,GK,Hellas Verona,29,1988,36,36,3240,36,71,1.97,231,167,71.9,7,4,25,7,19.4,8,6,2,0,25,Matches
+Vid Belec\Vid-Belec,si SVN,GK,Sampdoria,27,1990,2,2,180,2,5,2.5,15,11,73.3,0,0,2,0,0,1,1,0,0,0,Matches
+Vid Belec\Vid-Belec,si SVN,GK,Benevento,27,1990,13,13,1113,12.4,32,2.59,73,51,60.3,2,0,10,1,7.7,3,3,0,0,0,Matches
+Etrit Berisha\Etrit-Berisha,al ALB,GK,Atalanta,28,1989,31,31,2790,31,34,1.1,99,66,66.7,13,10,8,8,25.8,2,1,1,0,50,Matches
+Albano Bizzarri\Albano-Bizzarri,ar ARG,GK,Udinese,39,1977,32,32,2880,32,52,1.62,137,91,63.5,11,4,17,8,25,5,2,2,1,50,Matches
+Alberto Brignoli\Alberto-Brignoli,it ITA,GK,Benevento,25,1991,13,11,1126,12.5,31,2.48,71,42,59.2,1,2,10,2,18.2,4,2,0,2,0,Matches
+Gianluigi Buffon\Gianluigi-Buffon,it ITA,GK,Juventus,39,1978,21,21,1862,20.7,14,0.68,58,48,81,17,2,2,11,52.4,4,3,1,0,25,Matches
+Andrea Consigli\Andrea-Consigli,it ITA,GK,Sassuolo,30,1987,37,37,3316,36.8,58,1.57,172,117,67.4,11,10,16,10,27,3,2,1,0,33.3,Matches
+Alex Cordaz\Alex-Cordaz,it ITA,GK,Crotone,34,1983,38,38,3420,38,66,1.74,199,138,69.8,9,8,21,5,13.2,8,6,1,1,14.3,Matches
+Angelo da Costa Júnior\Angelo-da-Costa-Junior,br BRA,GK,Bologna,33,1983,4,4,360,4,5,1.25,16,12,75,1,0,3,1,25,1,1,0,0,0,Matches
+Alessio Cragno\Alessio-Cragno,it ITA,GK,Cagliari,23,1994,29,29,2536,28.2,47,1.67,121,80,66.1,7,4,17,7,24.1,10,6,2,2,25,Matches
+Luca Crosta\Luca-Crosta,it ITA,GK,Cagliari,19,1998,1,1,90,1,3,3,2,0,0,0,0,1,0,0,1,1,0,0,0,Matches
+Gianluigi Donnarumma\Gianluigi-Donnarumma,it ITA,GK,Milan,18,1999,38,38,3420,38,42,1.11,131,92,69.5,18,10,10,12,31.6,3,2,0,1,0,Matches
+Bart?omiej Dr?gowski\Bartlomiej-Dragowski,pl POL,GK,Fiorentina,19,1997,3,1,217,2.4,8,3.32,18,10,55.6,0,0,2,0,0,0,0,0,0,,Matches
+Pierluigi Gollini\Pierluigi-Gollini,it ITA,GK,Atalanta,22,1995,7,7,622,6.9,4,0.58,17,13,76.5,3,2,2,3,42.9,0,0,0,0,,Matches
+Alfred Gomis\Alfred-Gomis,sn SEN,GK,SPAL,23,1993,26,25,2261,25.1,43,1.71,136,99,72.8,6,7,12,3,12,7,6,1,0,14.3,Matches
+Samir Handanovi?\Samir-Handanovic,si SVN,GK,Inter,33,1984,38,38,3420,38,30,0.79,119,94,76.5,20,12,6,17,44.7,2,2,0,0,0,Matches
+Eugenio Lamanna\Eugenio-Lamanna,it ITA,GK,Genoa,27,1989,1,1,90,1,1,1,3,2,66.7,0,0,1,0,0,0,0,0,0,,Matches
+Gabriele Marchegiani\Gabriele-Marchegiani,it ITA,GK,SPAL,21,1996,1,0,1,0,0,0,0,0,,0,0,0,0,,0,0,0,0,,Matches
+Alex Meret\Alex-Meret,it ITA,GK,SPAL,20,1997,13,13,1158,12.9,16,1.24,56,45,76.8,2,7,4,4,30.8,6,3,2,1,40,Matches
+Vanja Milinkovi?-Savi?\Vanja-Milinkovic-Savic,rs SRB,GK,Torino,20,1997,1,1,90,1,1,1,4,3,75,1,0,0,0,0,0,0,0,0,,Matches
+Antonio Mirante\Antonio-Mirante,it ITA,GK,Bologna,34,1983,33,33,2970,33,46,1.39,143,100,69.2,10,5,18,7,21.2,3,2,0,1,0,Matches
+Gianluca Pegolo\Gianluca-Pegolo,it ITA,GK,Sassuolo,36,1981,2,1,104,1.2,1,0.87,5,5,80,0,0,1,0,0,0,0,0,0,,Matches
+Mattia Perin\Mattia-Perin,it ITA,GK,Genoa,24,1992,37,37,3330,37,42,1.14,167,131,77.2,11,8,18,12,32.4,4,4,0,0,0,Matches
+Carlo Pinsoglio\Carlo-Pinsoglio,it ITA,GK,Juventus,27,1990,1,0,28,0.3,1,3.21,2,1,50,0,0,0,0,,0,0,0,0,,Matches
+Christian Puggioni\Christian-Puggioni,it ITA,GK,Benevento,36,1981,14,14,1179,13.1,26,1.98,59,37,64.4,3,1,9,2,14.3,6,5,0,1,0,Matches
+Christian Puggioni\Christian-Puggioni,it ITA,GK,Sampdoria,36,1981,9,9,810,9,12,1.33,49,40,81.6,5,2,2,5,55.6,3,3,0,0,0,Matches
+Rafael\Rafael,br BRA,GK,Cagliari,35,1982,10,8,794,8.8,11,1.25,39,28,74.4,4,2,3,1,12.5,1,1,0,0,0,Matches
+Pepe Reina\Pepe-Reina,es ESP,GK,Napoli,34,1982,37,37,3330,37,29,0.78,98,70,72.4,28,6,3,18,48.6,2,2,0,0,0,Matches
+Francesco Rossi\Francesco-Rossi,it ITA,GK,Atalanta,26,1991,1,0,8,0.1,1,11.25,2,1,50,0,0,0,0,,0,0,0,0,,Matches
+Antonio Santurro\Antonio-Santurro,it ITA,GK,Bologna,25,1992,1,1,90,1,1,1,5,4,80,0,1,0,0,0,0,0,0,0,,Matches
+Simone Scuffet\Simone-Scuffet,it ITA,GK,Udinese,21,1996,6,6,540,6,11,1.83,26,16,57.7,1,0,5,1,16.7,1,0,1,0,100,Matches
+Luigi Sepe\Luigi-Sepe,it ITA,GK,Napoli,26,1991,1,1,90,1,0,0,1,1,100,0,1,0,1,100,0,0,0,0,,Matches
+Marco Silvestri\Marco-Silvestri,it ITA,GK,Hellas Verona,26,1991,2,2,180,2,7,3.5,25,18,72,0,0,2,0,0,0,0,0,0,,Matches
+Salvatore Sirigu\Salvatore-Sirigu,it ITA,GK,Torino,30,1987,37,37,3330,37,45,1.22,160,120,75,12,15,10,10,27,8,5,3,0,37.5,Matches
+?ukasz Skorupski\Lukasz-Skorupski,pl POL,GK,Roma,26,1991,1,1,90,1,0,0,3,3,100,1,0,0,1,100,0,0,0,0,,Matches
+Stefano Sorrentino\Stefano-Sorrentino,it ITA,GK,Chievo,38,1979,38,38,3420,38,59,1.55,180,126,69.4,10,10,18,7,18.4,8,4,3,1,42.9,Matches
+Marco Sportiello\Marco-Sportiello,it ITA,GK,Fiorentina,25,1992,37,37,3202,35.6,38,1.07,134,95,73.1,16,9,11,14,37.8,3,2,1,0,33.3,Matches
+Thomas Strakosha\Thomas-Strakosha,al ALB,GK,Lazio,22,1995,38,38,3420,38,49,1.29,153,112,73.9,21,9,8,11,28.9,11,9,1,1,10,Matches
+Wojciech Szcz?sny\Wojciech-Szczesny,pl POL,GK,Juventus,27,1990,17,17,1530,17,9,0.53,34,24,73.5,13,3,1,11,64.7,0,0,0,0,,Matches
+Emiliano Viviano\Emiliano-Viviano,it ITA,GK,Sampdoria,31,1985,27,27,2430,27,43,1.59,129,89,68.2,11,4,12,6,22.2,6,2,4,0,66.7,Matches

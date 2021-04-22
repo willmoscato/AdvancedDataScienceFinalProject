@@ -39,8 +39,10 @@ prem_modeling %>%
 ```
 ```{r}
 prem_modeling_outfield <- prem_modeling %>% 
-  filter(position %in% c("ST", "CF", "RW", "LW")) %>% 
-  #mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", position))) %>% 
+  filter(position != "GK") %>% 
+  #filter(position %in% c("RB", "LB", "CB", "RWB", "LWB")) %>% 
+  filter(minutes_played_divided_by90 >= 20) %>% 
+  mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", position))) %>% 
   select(-Goals_allowed, -GA90, -SoTA, -Saves, -Save_percent, -W, -L, -D, -CS, -CS_percent, -Pkatt_against, -PKA, -PKsv, -Pk_Save_percent, -PKm)
 ```
 
@@ -57,6 +59,7 @@ prem_testing <- testing(prem_split)
 ```{r}
 prem_lasso_recipe <- recipe(revision ~ . , data = prem_training) %>% 
   step_rm(Player, Nation, Squad, Age, Born, position) %>%
+  step_upsample(revision, over_ratio = 0.2) %>% 
   step_normalize(all_predictors(),
                  -all_nominal()) %>% 
   step_dummy(all_nominal(),

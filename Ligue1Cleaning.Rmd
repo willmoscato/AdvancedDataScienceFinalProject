@@ -17,18 +17,18 @@ library(lubridate)
 
 
 ```{r}
-ligue1_names17 <- read.csv("16_17_ligue1names.csv")
-ligue1_names18 <- read.csv("17_18_ligue1names.csv")
-ligue1_names19 <- read.csv("18_19_ligue1names.csv")
-standard_ligue1_17 <- read.csv("standardligue1_17.csv")
-standard_ligue1_18 <- read.csv("standardligue1_18.csv")
-standard_ligue1_19 <- read.csv("standardligue1_18.csv")
-ligue1table17 <- read.csv("ligue1table17.csv")
-ligue1table18 <- read.csv("ligue1table18.csv")
-ligue1table19 <- read.csv("ligue1table19.csv")
-ligue1goalkeeper17 <- read.csv("ligue1goalkeeper17.csv")
-ligue1goalkeeper18 <- read.csv("ligue1goalkeeper18.csv")
-ligue1goalkeeper19 <- read.csv("ligue1goalkeeper19.csv")
+ligue1_names17 <- read_csv("16_17_ligue1names.csv")
+ligue1_names18 <- read_csv("17_18_ligue1names.csv")
+ligue1_names19 <- read_csv("18_19_ligue1names.csv")
+standard_ligue1_17 <- read_csv("standardligue1_17.csv")
+standard_ligue1_18 <- read_csv("standardligue1_18.csv")
+standard_ligue1_19 <- read_csv("standardligue1_19.csv")
+ligue1table17 <- read_csv("ligue1table17.csv")
+ligue1table18 <- read_csv("ligue1table18.csv")
+ligue1table19 <- read_csv("ligue1table19.csv")
+ligue1goalkeeper17 <- read_csv("ligue1goalkeeper17.csv")
+ligue1goalkeeper18 <- read_csv("ligue1goalkeeper18.csv")
+ligue1goalkeeper19 <- read_csv("ligue1goalkeeper19.csv")
 ```
 
 
@@ -115,6 +115,11 @@ fifa17_ligue1_standard_stats <- fifa17_ligue1_full %>%
 
 
 ```{r}
+ligue1table17 <- ligue1table17 %>% 
+  select(-MP, -W, -L, -D, -Notes, -`Top Team Scorer`, -Goalkeeper)
+```
+
+```{r}
 ligue1_fifa17_standard_plus_table <- fifa17_ligue1_standard_stats %>% 
   inner_join(ligue1table17, by = "Squad")
 ```
@@ -125,13 +130,13 @@ ligue1goalkeeper17 <- ligue1goalkeeper17 %>%
   mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
   mutate(Player = str_replace_all(Player1, "-", " ")) %>% 
   rename(Pkatt_against = PKatt) %>% 
-  rename(Goals_allowed = GA)
+  rename(Goals_allowed = GA) %>% 
+  select(-`90s`, -Pos, -Nation, -Squad, -MP, -Starts, -Min, -Age, -Born, -Rk)
 ```
 
 ```{r}
 ligue1_fifa17_modeling <- ligue1_fifa17_standard_plus_table %>% 
   left_join(ligue1goalkeeper17, by = "Player") %>% 
-  rename(minutes_played_divided_by90 = X90s, Non_PK_G = G.PK, G_plus_A_per90 = G.A, G_minus_Pk_per90 = G.PK.1, G_plus_A_minus_PK_per90 = G.A.PK, Save_percent = Save., CS_percent = CS., Pk_Save_percent = Save..1, G_per90 = Gls.1, A_per90 = Ast.1 ) %>% 
   select(-Matches.x, -Matches.y, -Player1) %>% 
   mutate(Nation = sub('.* ', '', Nation))
 ```
@@ -215,8 +220,14 @@ standard_ligue1_18 <- standard_ligue1_18 %>%
 ```{r}
 fifa18_ligue1_standard_stats <- fifa18_ligue1_full %>% 
   inner_join(standard_ligue1_18, by = "Player") %>% 
-  select(-Player1, -Pos) %>% 
+  select(-Player1, -Pos, -Rk) %>% 
   distinct(Player, .keep_all = TRUE)
+```
+
+
+```{r}
+ligue1table18 <- ligue1table18 %>% 
+  select(-MP, -W, -L, -D, -Notes, -`Top Team Scorer`, -Goalkeeper)
 ```
 
 ```{r}
@@ -230,14 +241,14 @@ ligue1goalkeeper18 <- ligue1goalkeeper18 %>%
   mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
   mutate(Player = str_replace_all(Player1, "-", " ")) %>% 
   rename(Pkatt_against = PKatt) %>% 
-  rename(Goals_allowed = GA)
+  rename(Goals_allowed = GA) %>% 
+  select(-`90s`, -Pos, -Nation, -Squad, -MP, -Starts, -Min, -Age, -Born, -Rk)
 ```
 
 ```{r}
 ligue1_fifa18_modeling <- ligue1_fifa18_standard_plus_table %>% 
   left_join(ligue1goalkeeper18, by = "Player") %>% 
-  rename(minutes_played_divided_by90 = X90s, Non_PK_G = G.PK, G_plus_A_per90 = G.A, G_minus_Pk_per90 = G.PK.1, G_plus_A_minus_PK_per90 = G.A.PK, Save_percent = Save., CS_percent = CS., Pk_Save_percent = Save..1, G_per90 = Gls.1, A_per90 = Ast.1 ) %>% 
-  select(-Matches.x, -Matches.y, -Player1) %>% 
+  select(-Matches.x, -Matches.y, -Player1, -xG, -npxG, -xA, -npxG_1, -`npxG+xA`, -`npxG+xA_1`, -xG_1, -xA_1, -`xG+xA`, -Starts) %>% 
   mutate(Nation = sub('.* ', '', Nation))
 ```
 
@@ -246,7 +257,7 @@ ligue1_fifa18_modeling <- ligue1_fifa18_standard_plus_table %>%
 ```{r}
 ligue1_names19 <- ligue1_names19 %>% 
   mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
-  mutate(Player = str_replace_all(Player1, "-", " "))
+  mutate(Player = str_replace_all(Player1, "-", " ")) 
 ```
 
 
@@ -286,7 +297,7 @@ not_missing_ligue1_19 <- missing_ligue1_19 %>%
 last_names_ligue1_19 <- not_missing_ligue1_19 %>% 
   filter(is.na(overall) == TRUE) %>% 
   mutate(Player_short =  gsub(".* ", "", Player)) %>% 
-  mutate(Player_short = ifelse(Player_short == "Maximin", "Saint-Maximin", ifelse(Player_short == "Melou", "Lees-Melou", ifelse(Player_short == "Paquet", "Monnet-Paquet", ifelse(Player_short == "Preville", "De Preville", ifelse(Player_short == "NJie", "N'Jie", ifelse(Player_short == "NDoram", "N'Doram", ifelse(Player_short == "hoon", "Chang-Hoon", ifelse(Player_short == "Amian", "Amian Adou", ifelse(Player_short == "Costa", "Da Costa", ifelse(Player_short == "MVila", "M'Vila", ifelse(Player_short == "jun", "Suk Hyun Jun", ifelse(Player_short == "Gabriel", "Pierre-Gabriel", ifelse(Player_short == "Adelaide", "Reine-Adelaide", ifelse(Player_short == "NDoye", "N'Doye", ifelse(Player_short == "Barbosa", "Danilo", ifelse(Player_short == "Car", "Caleta-Car", ifelse(Player_short == "Neymar", "Neymar Jr", ifelse(Player_short == "Martins", "Gelson Martins", ifelse(Player_short == "Fabregas", "Cesc Fabregas", ifelse(Player_short == "Moting", "Choupo-Moting", ifelse(Player_short == "Mbia", "M'Bia", Player_short)))))))))))))))))))))) %>%  
+  mutate(Player_short = ifelse(Player_short == "Maximin", "Saint-Maximin", ifelse(Player_short == "Melou", "Lees-Melou", ifelse(Player_short == "Paquet", "Monnet-Paquet", ifelse(Player_short == "Preville", "De Preville", ifelse(Player_short == "NJie", "N'Jie", ifelse(Player_short == "NDoram", "N'Doram", ifelse(Player_short == "hoon", "Chang-Hoon", ifelse(Player_short == "Amian", "Amian Adou", ifelse(Player_short == "Costa", "Da Costa", ifelse(Player_short == "MVila", "M'Vila", ifelse(Player_short == "jun", "Suk Hyun Jun", ifelse(Player_short == "Gabriel", "Pierre-Gabriel", ifelse(Player_short == "Adelaide", "Reine-Adelaide", ifelse(Player_short == "NDoye", "N'Doye", ifelse(Player_short == "Barbosa", "Danilo", ifelse(Player_short == "Car", "Caleta-Car", ifelse(Player_short == "Neymar", "Neymar Jr", ifelse(Player_short == "Martins", "Gelson Martins", ifelse(Player_short == "Fabregas", "Cesc Fabregas", ifelse(Player_short == "Moting", "Choupo-Moting", ifelse(Player_short == "Mbia", "M'Bia", ifelse(Player_short == "Attal", "Atal", Player_short))))))))))))))))))))))) %>%  
   select(-player_name, -player_extended_name, -overall, -revision, - Player1, -position)
 
 not_real_name_ligue1_19 <- not_missing_ligue1_19 %>% 
@@ -318,14 +329,20 @@ standard_ligue1_19 <- standard_ligue1_19 %>%
 ```{r}
 fifa19_ligue1_standard_stats <- fifa19_ligue1_full %>% 
   inner_join(standard_ligue1_19, by = "Player") %>% 
-  select(-Player1, -Pos) %>% 
+  select(-Player1, -Pos, -Rk) %>% 
   distinct(Player, .keep_all = TRUE)
 ```
 
 
 ```{r}
+ligue1table19 <- ligue1table19 %>% 
+  select(-MP, -W, -L, -D, -Notes, -`Top Team Scorer`, -Goalkeeper)
+```
+
+
+```{r}
 ligue1_fifa19_standard_plus_table <- fifa19_ligue1_standard_stats %>% 
-  inner_join(ligue1table19, by = "Squad")
+  inner_join(ligue1table19, by = "Squad") 
 ```
 
 
@@ -334,16 +351,27 @@ ligue1goalkeeper19 <- ligue1goalkeeper19 %>%
   mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
   mutate(Player = str_replace_all(Player1, "-", " ")) %>% 
   rename(Pkatt_against = PKatt) %>% 
-  rename(Goals_allowed = GA)
+  rename(Goals_allowed = GA) %>% 
+  select(-`90s`, -Pos, -Nation, -Squad, -MP, -Starts, -Min, -Age, -Born, -Rk)
 ```
 
 ```{r}
 ligue1_fifa19_modeling <- ligue1_fifa19_standard_plus_table %>% 
   left_join(ligue1goalkeeper19, by = "Player") %>% 
-  rename(minutes_played_divided_by90 = X90s, Non_PK_G = G.PK, G_plus_A_per90 = G.A, G_minus_Pk_per90 = G.PK.1, G_plus_A_minus_PK_per90 = G.A.PK, Save_percent = Save., CS_percent = CS., Pk_Save_percent = Save..1, G_per90 = Gls.1, A_per90 = Ast.1 ) %>% 
-  select(-Matches.x, -Matches.y, -Player1) %>% 
+  select(-Matches.x, -Matches.y, -Player1, -xG, -npxG, -xA, -npxG_1, -`npxG+xA`, -`npxG+xA_1`, -xG_1, -xA_1, -`xG+xA`, -Starts) %>% 
   mutate(Nation = sub('.* ', '', Nation))
 ```
+
+```{r}
+dim(ligue1_fifa17_modeling)
+dim(ligue1_fifa18_modeling)
+dim(ligue1_fifa19_modeling)
+```
+```{r}
+ligue1_fifa19_modeling %>% 
+  filter(revision == "TOTS")
+```
+
 
 
 

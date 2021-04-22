@@ -1,0 +1,253 @@
+---
+title: "Moscato Exploratory"
+author: "Will Moscato"
+date: "4/22/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(tidymodels)
+library(lubridate)
+library(vip)
+library(stacks)
+library(DALEX)
+library(DALEXtra)
+```
+
+
+```{r}
+prem_modeling <- fifa17_modeling %>% 
+  bind_rows(fifa18_modeling, fifa19_modeling)
+```
+
+
+```{r}
+prem_modeling %>% 
+  ggplot(aes(x = Gls, fill = revision)) +
+  geom_density(alpha = 0.5)
+```
+
+```{r}
+prem_modeling %>% 
+  ggplot(aes(x = Rk, fill = revision)) +
+  geom_density(alpha = 0.5)
+```
+```{r}
+prem_modeling_outfield <- prem_modeling %>% 
+  filter(position %in% c("ST", "CF", "RW", "LW")) %>% 
+  #mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", position))) %>% 
+  select(-Goals_allowed, -GA90, -SoTA, -Saves, -Save_percent, -W, -L, -D, -CS, -CS_percent, -Pkatt_against, -PKA, -PKsv, -Pk_Save_percent, -PKm)
+```
+
+
+```{r}
+set.seed(494)
+prem_split <- initial_split(prem_modeling_outfield, prop = .5, strata = "revision")
+prem_training <- training(prem_split)
+prem_testing <- testing(prem_split)
+```
+
+
+
+```{r}
+prem_lasso_recipe <- recipe(revision ~ . , data = prem_training) %>% 
+  step_rm(Player, Nation, Squad, Age, Born, position) %>%
+  step_normalize(all_predictors(),
+                 -all_nominal()) %>% 
+  step_dummy(all_nominal(),
+             -all_outcomes())
+
+prem_lasso_recipe %>% 
+  prep(prem_training) %>% 
+  juice()
+```
+
+
+
+```{r}
+prem_lasso <- logistic_reg(mixture = 1) %>% 
+  set_engine("glmnet") %>% 
+  set_args(penalty = tune()) %>% 
+  set_mode("classification")
+
+prem_lasso
+
+prem_lasso_wf <- 
+  workflow() %>% 
+  add_recipe(prem_lasso_recipe) %>% 
+  add_model(prem_lasso)
+
+prem_lasso_wf
+```
+
+```{r}
+set.seed(494) # for reproducibility
+prem_cv <- vfold_cv(prem_training, v = 5)
+
+penalty_grid <- grid_regular(penalty(),
+                             levels = 10)
+
+penalty_grid
+
+prem_lasso_tune <- 
+  prem_lasso_wf %>% 
+  tune_grid(
+    resamples = prem_cv,
+    grid = penalty_grid
+    )
+
+prem_lasso_tune
+```
+
+```{r}
+prem_lasso_tune %>% 
+  show_best(metric = "accuracy")
+```
+
+```{r}
+
+best <- prem_lasso_tune %>% 
+  select_best(metric = "accuracy")
+```
+
+```{r}
+prem_lasso_final_wf <- prem_lasso_wf %>% 
+  finalize_workflow(best)
+
+prem_lasso_final_wf
+```
+```{r}
+prem_lasso_final_mod <- prem_lasso_final_wf %>% 
+  fit(data = prem_training)
+
+prem_lasso_final_mod %>% 
+  pull_workflow_fit() %>% 
+  tidy() 
+```
+
+```{r}
+prem_lasso_final_mod %>% 
+  pull_workflow_fit() %>% 
+  vip()
+```
+
+
+```{r}
+prem_lasso_test <- prem_lasso_final_wf %>% 
+  last_fit(prem_split)
+
+prem_lasso_test %>% 
+  collect_metrics()
+```
+
+
+```{r}
+preds <- prem_lasso_test %>% 
+  collect_predictions()
+
+preds %>% 
+  conf_mat(revision, .pred_class)
+```
+
+```{r}
+ranger_recipe <- recipe(revision ~., data = prem_training) %>% 
+  step_rm(Player, Nation, Squad, Age, Born, position) %>% 
+  step_mutate_at(all_numeric(), fn = ~as.numeric(.))
+
+ranger_recipe %>% 
+  prep(prem_training) %>% 
+  juice()
+```
+
+
+```{r}
+prem_ranger <- rand_forest(mtry = tune(), 
+              min_n = tune(), 
+              trees = 100) %>% 
+  set_mode("classification") %>% 
+  set_engine("ranger")
+
+prem_ranger_wf <- 
+  workflow() %>% 
+  add_recipe(ranger_recipe) %>% 
+  add_model(prem_ranger) 
+
+prem_ranger_wf
+```
+
+
+```{r}
+set.seed(494)
+
+rf_grid <- grid_regular(min_n(), finalize(mtry(), prem_training %>% select(-revision)), levels = 3)
+
+ctrl_res <- control_stack_grid()
+
+ranger_cv <- prem_ranger_wf %>% 
+  tune_grid(resamples = prem_cv,
+           grid = rf_grid,
+           control = ctrl_res)
+
+collect_metrics(ranger_cv)
+```
+
+
+```{r}
+best1 <- ranger_cv %>% 
+  select_best(metric = "accuracy")
+
+prem_ranger_final_wf<- prem_ranger_wf %>% 
+  finalize_workflow(best1)
+```
+
+```{r}
+ranger_fit <- prem_ranger_final_wf %>% 
+  fit(prem_training)
+
+
+rf_explain <- 
+  explain_tidymodels(
+    model = ranger_fit,
+    data = prem_training %>% select(-revision), 
+    y = as.numeric(prem_training$revision == "TOTS"),
+    label = "rf"
+  )
+```
+
+```{r}
+rf_var_imp <- 
+  model_parts(
+    rf_explain
+    )
+
+plot(rf_var_imp)
+```
+
+
+
+
+
+```{r}
+prem_ranger_test <- prem_ranger_final_wf %>% 
+  last_fit(prem_split)
+
+prem_ranger_test %>% 
+  collect_metrics()
+```
+
+```{r}
+preds1 <- prem_ranger_test %>% 
+  collect_predictions()
+
+preds1 %>% 
+  conf_mat(revision, .pred_class)
+```
+
+
+
+

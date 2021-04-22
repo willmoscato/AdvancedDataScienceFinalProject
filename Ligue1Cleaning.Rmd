@@ -336,10 +336,6 @@ fifa19_ligue1_standard_stats <- fifa19_ligue1_full %>%
 ```
 
 
-```{r}
-ligue1table19 <- ligue1table19 %>% 
-  select(-MP, -W, -L, -D, -Notes, -Top.Team.Scorer, -Goalkeeper)
-```
 
 
 ```{r}

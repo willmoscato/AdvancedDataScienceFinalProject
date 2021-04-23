@@ -22,7 +22,8 @@ library(DALEXtra)
 
 ```{r}
 prem_modeling <- fifa17_modeling %>% 
-  bind_rows(fifa18_modeling, fifa19_modeling)
+  bind_rows(fifa18_modeling, fifa19_modeling) %>% 
+  mutate(revision = as.factor(revision), Nation = as.factor(Nation))
 ```
 
 
@@ -38,10 +39,17 @@ prem_modeling %>%
   geom_density(alpha = 0.5)
 ```
 ```{r}
+prem_modeling %>% 
+  ggplot(aes(x = minutes_played_divided_by90, fill = revision)) +
+  geom_density(alpha = 0.5)
+```
+
+
+```{r}
 prem_modeling_outfield <- prem_modeling %>% 
   filter(position != "GK") %>% 
-  #filter(position %in% c("RB", "LB", "CB", "RWB", "LWB")) %>% 
-  filter(minutes_played_divided_by90 >= 20) %>% 
+  #filter(position %in% c("ST", "LW", "RW", "CF")) %>% 
+  filter(minutes_played_divided_by90 >= 19) %>% 
   mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", position))) %>% 
   select(-Goals_allowed, -GA90, -SoTA, -Saves, -Save_percent, -W, -L, -D, -CS, -CS_percent, -Pkatt_against, -PKA, -PKsv, -Pk_Save_percent, -PKm)
 ```
@@ -58,8 +66,8 @@ prem_testing <- testing(prem_split)
 
 ```{r}
 prem_lasso_recipe <- recipe(revision ~ . , data = prem_training) %>% 
-  step_rm(Player, Nation, Squad, Age, Born, position) %>%
-  step_upsample(revision, over_ratio = .5) %>% 
+  step_rm(Player, Nation, Squad, Born) %>%
+  step_upsample(revision, over_ratio = .34) %>% 
   step_normalize(all_predictors(),
                  -all_nominal()) %>% 
   step_dummy(all_nominal(),
@@ -157,10 +165,28 @@ preds %>%
   conf_mat(revision, .pred_class)
 ```
 
+
+```{r}
+lasso_test <- prem_testing %>% 
+  bind_cols(predict(prem_lasso_final_mod, new_data = prem_testing, type = "prob")) %>% 
+  bind_cols(predict(prem_lasso_final_mod, new_data = prem_testing)) 
+```
+
+```{r}
+lasso_test %>% 
+  conf_mat(revision, .pred_class)
+```
+
+```{r}
+lasso_test %>% 
+  filter(revision != .pred_class)
+```
+
+
 ```{r}
 ranger_recipe <- recipe(revision ~., data = prem_training) %>% 
-  step_rm(Player, Nation, Squad, Age, Born, position) %>% 
-  #step_upsample(revision, over_ratio = .8) %>% 
+  step_rm(Player, Squad, Born, Gls, Ast) %>% 
+  step_upsample(revision, over_ratio = .33) %>% 
   step_mutate_at(all_numeric(), fn = ~as.numeric(.))
 
 ranger_recipe %>% 
@@ -251,6 +277,23 @@ preds1 <- prem_ranger_test %>%
 preds1 %>% 
   conf_mat(revision, .pred_class)
 ```
+
+```{r}
+ranger_test <- prem_testing %>% 
+  bind_cols(predict(ranger_fit, new_data = prem_testing, type = "prob")) %>% 
+  bind_cols(predict(ranger_fit, new_data = prem_testing)) 
+```
+
+```{r}
+ranger_test %>% 
+  conf_mat(revision, .pred_class)
+```
+
+```{r}
+ranger_test %>% 
+  filter(revision != .pred_class)
+```
+
 
 
 

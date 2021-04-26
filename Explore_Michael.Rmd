@@ -458,7 +458,7 @@ prem_modeling_outfield %>%
 
 ```{r}
 set.seed(494)
-prem_split <- initial_split(prem_modeling_outfield, prop = .75, strata = "revision")
+prem_split <- initial_split(prem_modeling_outfield, prop = .5, strata = "revision")
 prem_training <- training(prem_split)
 prem_testing <- testing(prem_split)
 ```
@@ -572,7 +572,7 @@ lasso_test %>%
 
 ```{r}
 lasso_test %>% 
-  filter(.pred_class == 'TOTS') 
+  filter(.pred_class == 'Normal', revision == 'TOTS') 
 ```
 
 

@@ -442,23 +442,23 @@ step_up_sample(var, over_ratio = 0:1)
 prem_modeling_outfield <- prem_modeling %>% 
   filter(position != "GK") %>% 
   filter(MP >= 19) %>% 
+  mutate(points = Gls + Ast) %>%
   mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", position))) %>% 
   mutate(position = ifelse(position == 'CF', 'ST', position)) %>%
   #mutate(position = ifelse(position %in% c('CAM', 'CDM'), 'CM', position)) %>%
-  #filter(position %in% c("ST", "LW", "RW", 'CAM')) %>%
+  filter(position %in% c("ST", "LW", "RW", 'CAM')) %>%
   mutate(position = as.factor(position)) %>%
-  select(-Goals_allowed, -GA90, -SoTA, -Saves, -Save_percent, -W, -L, -D, -CS, -CS_percent, -Pkatt_against, -PKA, -PKsv, -Pk_Save_percent, -PKm, -Born, -Rk)
+  select(-Goals_allowed, -GA90, -SoTA, -Saves, -Save_percent, -W, -L, -D, -CS, -CS_percent, -Pkatt_against, -PKA, -PKsv, -Pk_Save_percent, -PKm, -Born, -Rk, -G_plus_A_minus_PK_per90, -G_plus_A_per90, -G_per90, -A_per90, -G_minus_Pk_per90, -minutes_played_divided_by90)
 ```
 
 ```{r}
 prem_modeling_outfield %>%
-  group_by(position) %>%
-  summarise(total = n())
+  filter(is.na(points))
 ```
 
 ```{r}
 set.seed(494)
-prem_split <- initial_split(prem_modeling_outfield, prop = .75, strata = "revision")
+prem_split <- initial_split(prem_modeling_outfield, prop = .5, strata = "revision")
 prem_training <- training(prem_split)
 prem_testing <- testing(prem_split)
 ```
@@ -572,9 +572,16 @@ lasso_test %>%
 
 ```{r}
 lasso_test %>% 
-  filter(.pred_class != revision) 
+  arrange(desc(.pred_TOTS)) %>%
+  select(Player, revision, position, points, .pred_TOTS)
 ```
 
+```{r}
+prem_modeling_outfield %>%
+  filter(revision == 'TOTS',
+         position %in% c('RW', 'ST', 'LW', 'CF')) %>%
+  summarise(total = mean(points))
+```
 
 
 

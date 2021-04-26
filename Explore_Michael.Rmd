@@ -445,7 +445,7 @@ prem_modeling_outfield <- prem_modeling %>%
   mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", position))) %>% 
   mutate(position = ifelse(position == 'CF', 'ST', position)) %>%
   #mutate(position = ifelse(position %in% c('CAM', 'CDM'), 'CM', position)) %>%
-  filter(position %in% c("ST", "LW", "RW", 'CAM')) %>%
+  #filter(position %in% c("ST", "LW", "RW", 'CAM')) %>%
   mutate(position = as.factor(position)) %>%
   select(-Goals_allowed, -GA90, -SoTA, -Saves, -Save_percent, -W, -L, -D, -CS, -CS_percent, -Pkatt_against, -PKA, -PKsv, -Pk_Save_percent, -PKm, -Born, -Rk)
 ```
@@ -572,7 +572,7 @@ lasso_test %>%
 
 ```{r}
 lasso_test %>% 
-  filter(.pred_class == 'TOTS') 
+  filter(.pred_class != revision) 
 ```
 
 

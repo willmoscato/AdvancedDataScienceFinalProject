@@ -1,0 +1,294 @@
+---
+title: "DenzlerExplore"
+author: "Alexander Denzler"
+date: "4/26/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(tidymodels)
+library(vip)
+library(stacks)
+library(DALEX)
+library(DALEXtra)
+```
+
+```{r}
+ligue1_modeling <- ligue1_fifa17_modeling %>% 
+  bind_rows(ligue1_fifa18_modeling, ligue1_fifa19_modeling) %>% 
+  mutate(revision = as.factor(revision), Nation = as.factor(Nation))
+```
+
+
+```{r}
+ligue1_modeling %>% 
+  ggplot(aes(x = Gls, fill = revision)) +
+  geom_density(alpha = 0.5)
+```
+
+```{r}
+ligue1_modeling %>% 
+  ggplot(aes(x = Rk, fill = revision)) +
+  geom_density(alpha = 0.5)
+```
+
+```{r}
+ligue1_modeling %>% 
+  ggplot(aes(x = minutes_played_divided_by90, fill = revision)) +
+  geom_density(alpha = 0.5)
+```
+
+
+```{r}
+ligue1_modeling_outfield <- ligue1_modeling %>% 
+  filter(position != "GK") %>% 
+  filter(minutes_played_divided_by90 >= 19) %>% 
+  mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", position))) %>% 
+  select(-Goals_allowed, -GA90, -SoTA, -Saves, -Save_percent, -W, -L, -D, -CS, -CS_percent, -Pkatt_against, -PKA, -PKsv, -Pk_Save_percent, -PKm)
+```
+
+
+```{r}
+set.seed(494)
+ligue1_split <- initial_split(ligue1_modeling_outfield, prop = .5, strata = "revision")
+ligue1_training <- training(ligue1_split)
+ligue1_testing <- testing(ligue1_split)
+```
+
+
+
+```{r}
+ligue1_lasso_recipe <- recipe(revision ~ . , data = ligue1_training) %>% 
+  step_rm(Player, Nation, Squad, Born) %>%
+  step_upsample(revision, over_ratio = .34) %>% 
+  step_normalize(all_predictors(),
+                 -all_nominal()) %>% 
+  step_dummy(all_nominal(),
+             -all_outcomes())
+
+ligue1_lasso_recipe %>% 
+  prep(ligue1_training) %>% 
+  juice()
+```
+
+
+
+```{r}
+ligue1_lasso <- logistic_reg(mixture = 1) %>% 
+  set_engine("glmnet") %>% 
+  set_args(penalty = tune()) %>% 
+  set_mode("classification")
+
+ligue1_lasso
+
+ligue1_lasso_wf <- 
+  workflow() %>% 
+  add_recipe(ligue1_lasso_recipe) %>% 
+  add_model(ligue1_lasso)
+
+ligue1_lasso_wf
+```
+
+```{r}
+set.seed(494) # for reproducibility
+ligue1_cv <- vfold_cv(ligue1_training, v = 5)
+
+ligue1_penalty_grid <- grid_regular(penalty(),
+                                    levels = 10)
+
+ligue1_penalty_grid
+
+ligue1_lasso_tune <- 
+  ligue1_lasso_wf %>% 
+  tune_grid(
+    resamples = ligue1_cv,
+    grid = ligue1_penalty_grid
+    )
+
+ligue1_lasso_tune
+```
+
+```{r}
+ligue1_lasso_tune %>% 
+  show_best(metric = "accuracy")
+```
+
+```{r}
+ligue1_best <- ligue1_lasso_tune %>% 
+  select_best(metric = "accuracy")
+```
+
+```{r}
+ligue1_lasso_final_wf <- ligue1_lasso_wf %>% 
+  finalize_workflow(best)
+
+ligue1_lasso_final_wf
+```
+
+```{r}
+ligue1_lasso_final_mod <- ligue1_lasso_final_wf %>% 
+  fit(data = ligue1_training)
+
+ligue1_lasso_final_mod %>% 
+  pull_workflow_fit() %>% 
+  tidy() 
+```
+
+```{r}
+ligue1_lasso_final_mod %>% 
+  pull_workflow_fit() %>% 
+  vip()
+```
+
+
+```{r}
+ligue1_lasso_test <- ligue1_lasso_final_wf %>% 
+  last_fit(ligue1_split)
+
+ligue1_lasso_test %>% 
+  collect_metrics()
+```
+
+
+```{r}
+ligue1_preds <- ligue1_lasso_test %>% 
+  collect_predictions()
+
+ligue1_preds %>% 
+  conf_mat(revision, .pred_class)
+```
+
+
+```{r}
+ligue1_lasso_test <- ligue1_testing %>% 
+  bind_cols(predict(ligue1_lasso_final_mod, new_data = ligue1_testing, type = "prob")) %>% 
+  bind_cols(predict(ligue1_lasso_final_mod, new_data = ligue1_testing)) 
+```
+
+```{r}
+ligue1_lasso_test %>% 
+  conf_mat(revision, .pred_class)
+```
+
+```{r}
+ligue1_lasso_test %>% 
+  filter(revision != .pred_class)
+```
+
+
+```{r}
+ligue1_ranger_recipe <- recipe(revision ~., data = ligue1_training) %>% 
+  step_rm(Player, Squad, Born, Gls, Ast) %>% 
+  step_upsample(revision, over_ratio = .33) %>% 
+  step_mutate_at(all_numeric(), fn = ~as.numeric(.))
+
+ligue1_ranger_recipe %>% 
+  prep(ligue1_training) %>% 
+  juice()
+```
+
+
+```{r}
+ligue1_ranger <- rand_forest(mtry = tune(), 
+              min_n = tune(), 
+              trees = 100) %>% 
+  set_mode("classification") %>% 
+  set_engine("ranger")
+
+ligue1_ranger_wf <- 
+  workflow() %>% 
+  add_recipe(ligue1_ranger_recipe) %>% 
+  add_model(ligue1_ranger) 
+
+ligue1_ranger_wf
+```
+
+
+```{r}
+set.seed(494)
+
+ligue1_rf_grid <- grid_regular(min_n(), finalize(mtry(), ligue1_training %>% select(-revision)), levels = 3)
+
+ligue1_ctrl_res <- control_stack_grid()
+
+ligue1_ranger_cv <- ligue1_ranger_wf %>% 
+  tune_grid(resamples = ligue1_cv,
+           grid = ligue1_rf_grid,
+           control = ligue1_ctrl_res)
+
+collect_metrics(ligue1_ranger_cv)
+```
+
+
+```{r}
+ligue1_best1 <- ligue1_ranger_cv %>% 
+  select_best(metric = "accuracy")
+
+ligue1_ranger_final_wf<- ligue1_ranger_wf %>% 
+  finalize_workflow(ligue1_best1)
+```
+
+```{r}
+ligue1_ranger_fit <- ligue1_ranger_final_wf %>% 
+  fit(ligue1_training)
+
+
+ligue1_rf_explain <- 
+  explain_tidymodels(
+    model = ligue1_ranger_fit,
+    data = ligue1_training %>% select(-revision), 
+    y = as.numeric(ligue1_training$revision == "TOTS"),
+    label = "rf"
+  )
+```
+
+```{r}
+ligue1_rf_var_imp <- 
+  model_parts(
+    ligue1_rf_explain
+    )
+
+plot(ligue1_rf_var_imp)
+```
+
+
+```{r}
+ligue1_ranger_test <- ligue1_ranger_final_wf %>% 
+  last_fit(ligue1_split)
+
+ligue1_ranger_test %>% 
+  collect_metrics()
+```
+
+```{r}
+ligue1_preds1 <- ligue1_ranger_test %>% 
+  collect_predictions()
+
+ligue1_preds1 %>% 
+  conf_mat(revision, .pred_class)
+```
+
+```{r}
+ligue1_ranger_test <- ligue1_testing %>% 
+  bind_cols(predict(ligue1_ranger_fit, new_data = ligue1_testing, type = "prob")) %>% 
+  bind_cols(predict(ligue1_ranger_fit, new_data = ligue1_testing)) 
+```
+
+```{r}
+ligue1_ranger_test %>% 
+  conf_mat(revision, .pred_class)
+```
+
+```{r}
+ligue1_ranger_test %>% 
+  filter(revision != .pred_class)
+```
+
+
+
+

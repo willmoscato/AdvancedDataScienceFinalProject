@@ -17,6 +17,7 @@ library(vip)
 library(stacks)
 library(DALEX)
 library(DALEXtra)
+library(themis)
 ```
 
 
@@ -48,7 +49,7 @@ prem_modeling %>%
 ```{r}
 prem_modeling_outfield <- prem_modeling %>% 
   filter(position != "GK") %>% 
-  #filter(position %in% c("ST", "LW", "RW", "CF")) %>% 
+  #filter(position %in% c("ST", "LW", "RW", "CF", "CAM")) %>% 
   filter(minutes_played_divided_by90 >= 19) %>% 
   mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", position))) %>% 
   select(-Goals_allowed, -GA90, -SoTA, -Saves, -Save_percent, -W, -L, -D, -CS, -CS_percent, -Pkatt_against, -PKA, -PKsv, -Pk_Save_percent, -PKm)
@@ -66,8 +67,8 @@ prem_testing <- testing(prem_split)
 
 ```{r}
 prem_lasso_recipe <- recipe(revision ~ . , data = prem_training) %>% 
-  step_rm(Player, Nation, Squad, Born) %>%
-  step_upsample(revision, over_ratio = .34) %>% 
+  step_rm(Player, Nation, Squad, Born, Min, MP, G_per90, A_per90, Non_PK_G, G_plus_A_per90, G_minus_Pk_per90, G_plus_A_minus_PK_per90) %>%
+  step_upsample(revision, over_ratio = .35) %>% 
   step_normalize(all_predictors(),
                  -all_nominal()) %>% 
   step_dummy(all_nominal(),
@@ -185,7 +186,7 @@ lasso_test %>%
 
 ```{r}
 ranger_recipe <- recipe(revision ~., data = prem_training) %>% 
-  step_rm(Player, Squad, Born, Gls, Ast) %>% 
+  step_rm(Player, Squad, Born, Nation) %>% 
   step_upsample(revision, over_ratio = .33) %>% 
   step_mutate_at(all_numeric(), fn = ~as.numeric(.))
 

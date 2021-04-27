@@ -27,22 +27,54 @@ prem_modeling <- fifa17_modeling %>%
   mutate(revision = as.factor(revision), Nation = as.factor(Nation))
 ```
 
+```{r}
+prem_modeling %>% 
+  select(where(is.numeric)) %>% 
+  pivot_longer(cols = everything(),
+               names_to = "variable", 
+               values_to = "value") %>% 
+  ggplot(aes(x = value)) +
+  geom_histogram(bins = 30) +
+  facet_wrap(vars(variable), 
+             scales = "free")
+```
+
+```{r}
+prem_modeling %>% 
+  ggplot(aes(x = revision, fill = revision)) +
+  geom_bar() +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold"))
+```
+
+
 
 ```{r}
 prem_modeling %>% 
   ggplot(aes(x = Gls, fill = revision)) +
-  geom_density(alpha = 0.5)
+  geom_density(alpha = 0.5) +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
+  xlab("Goals")
 ```
 
 ```{r}
 prem_modeling %>% 
   ggplot(aes(x = Rk, fill = revision)) +
-  geom_density(alpha = 0.5)
+  geom_density(alpha = 0.5) +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
+  xlab("Table Position")
 ```
 ```{r}
 prem_modeling %>% 
   ggplot(aes(x = minutes_played_divided_by90, fill = revision)) +
-  geom_density(alpha = 0.5)
+  geom_density(alpha = 0.5) +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
+  xlab("Total Minutes Played Dived by 90 (Full Games Played)")
+```
+```{r}
+prem_modeling %>% 
+  ggplot(aes(x = position, fill = revision)) +
+  geom_bar(position = "dodge") +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold"))
 ```
 
 

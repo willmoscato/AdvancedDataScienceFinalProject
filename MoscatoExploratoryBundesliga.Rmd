@@ -1,0 +1,345 @@
+---
+title: "Moscato Exploratory Bundesliga"
+author: "Will Moscato"
+date: "4/28/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(tidymodels)
+library(lubridate)
+library(vip)
+library(stacks)
+library(DALEX)
+library(DALEXtra)
+library(themis)
+```
+
+
+```{r}
+fifa19_modeling_bundeslia <- fifa19_modeling_bundeslia %>%
+  mutate(Player = paste(Player, '19'))
+
+fifa18_modeling_bundesliga <- fifa18_modeling_bundesliga %>%
+  mutate(Player = paste(Player, '18'))
+
+fifa17_modeling_bundesliga <- fifa17_modeling_bundesliga %>%
+  mutate(Player = paste(Player, '17'))
+
+
+
+bundesliga_modeling <- fifa17_modeling_bundesliga%>% 
+  bind_rows(fifa18_modeling_bundesliga, fifa19_modeling_bundesliga) %>% 
+  mutate(revision = as.factor(revision), Nation = as.factor(Nation))
+```
+
+```{r}
+bundesliga_modeling %>% 
+  select(where(is.numeric)) %>% 
+  pivot_longer(cols = everything(),
+               names_to = "variable", 
+               values_to = "value") %>% 
+  ggplot(aes(x = value)) +
+  geom_histogram(bins = 30) +
+  facet_wrap(vars(variable), 
+             scales = "free")
+```
+
+```{r}
+bundesliga_modeling %>% 
+  ggplot(aes(x = revision, fill = revision)) +
+  geom_bar() +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold"))
+```
+
+
+
+```{r}
+bundesliga_modeling %>% 
+  ggplot(aes(x = Gls, fill = revision)) +
+  geom_density(alpha = 0.5) +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
+  xlab("Goals")
+```
+
+```{r}
+bundesliga_modeling %>% 
+  ggplot(aes(x = Rk, fill = revision)) +
+  geom_density(alpha = 0.5) +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
+  xlab("Table Position")
+```
+```{r}
+bundesliga_modeling %>% 
+  ggplot(aes(x = minutes_played_divided_by90, fill = revision)) +
+  geom_density(alpha = 0.5) +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
+  xlab("Total Minutes Played Dived by 90 (Full Games Played)")
+```
+```{r}
+bundesliga_modeling %>% 
+  ggplot(aes(x = position, fill = revision)) +
+  geom_bar(position = "dodge") +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold"))
+```
+
+
+```{r}
+bundesliga_modeling_outfield <- bundesliga_modeling %>% 
+  filter(position != "GK") %>% 
+  #filter(position %in% c("ST", "LW", "RW", "CF", "CAM")) %>% 
+  filter(minutes_played_divided_by90 >= 19) %>% 
+  mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", ifelse(position == "RW", "RM", ifelse(position == "LW", "LM", position))))) %>% 
+  select(-Goals_allowed, -GA90, -SoTA, -Saves, -Save_percent, -W, -L, -D, -CS, -CS_percent, -Pkatt_against, -PKA, -PKsv, -Pk_Save_percent, -PKm)
+```
+
+
+```{r}
+set.seed(494)
+bundesliga_split <- initial_split(bundesliga_modeling_outfield, prop = .75, strata = "revision")
+bundesliga_training <- training(bundesliga_split)
+bundesliga_testing <- testing(bundesliga_split)
+```
+
+
+
+```{r}
+bundesliga_lasso_recipe <- recipe(revision ~ . , data = bundesliga_training) %>% 
+  step_rm(Player, Nation, Squad, Born, G_per90, A_per90, minutes_played_divided_by90) %>%
+  step_upsample(revision, over_ratio = .5) %>% 
+  step_normalize(all_predictors(),
+                 -all_nominal()) %>% 
+  step_dummy(all_nominal(),
+             -all_outcomes())
+
+bundesliga_lasso_recipe %>% 
+  prep(bundesliga_training) %>% 
+  juice()
+```
+
+
+
+```{r}
+bundesliga_lasso <- logistic_reg(mixture = 1) %>% 
+  set_engine("glmnet") %>% 
+  set_args(penalty = tune()) %>% 
+  set_mode("classification")
+
+bundesliga_lasso
+
+bundesliga_lasso_wf <- 
+  workflow() %>% 
+  add_recipe(bundesliga_lasso_recipe) %>% 
+  add_model(bundesliga_lasso)
+
+bundesliga_lasso_wf
+```
+
+```{r}
+set.seed(494) # for reproducibility
+bundesliga_cv <- vfold_cv(bundesliga_training, v = 5)
+
+penalty_grid <- grid_regular(penalty(),
+                             levels = 10)
+
+penalty_grid
+
+bundesliga_lasso_tune <- 
+  bundesliga_lasso_wf %>% 
+  tune_grid(
+    resamples = bundesliga_cv,
+    grid = penalty_grid
+    )
+
+bundesliga_lasso_tune
+```
+
+```{r}
+bundesliga_lasso_tune %>% 
+  show_best(metric = "accuracy")
+```
+
+```{r}
+
+bundesliga_best <- bundesliga_lasso_tune %>% 
+  select_best(metric = "accuracy")
+```
+
+```{r}
+bundesliga_lasso_final_wf <- bundesliga_lasso_wf %>% 
+  finalize_workflow(bundesliga_best)
+
+bundesliga_lasso_final_wf
+```
+```{r}
+bundesliga_lasso_final_mod <- bundesliga_lasso_final_wf %>% 
+  fit(data = bundesliga_training)
+
+bundesliga_lasso_final_mod %>% 
+  pull_workflow_fit() %>% 
+  tidy() 
+```
+
+```{r}
+bundesliga_lasso_final_mod %>% 
+  pull_workflow_fit() %>% 
+  vip()
+```
+
+
+```{r}
+bundesliga_lasso_test <- bundesliga_lasso_final_wf %>% 
+  last_fit(bundesliga_split)
+
+bundesliga_lasso_test %>% 
+  collect_metrics()
+```
+
+
+```{r}
+bundesliga_preds <- bundesliga_lasso_test %>% 
+  collect_predictions()
+
+bundesliga_preds %>% 
+  conf_mat(revision, .pred_class)
+```
+
+
+```{r}
+bundesliga_lasso_test <- bundesliga_testing %>% 
+  bind_cols(predict(bundesliga_lasso_final_mod, new_data = bundesliga_testing, type = "prob")) %>% 
+  bind_cols(predict(bundesliga_lasso_final_mod, new_data = bundesliga_testing)) 
+```
+
+```{r}
+bundesliga_lasso_test %>% 
+  conf_mat(revision, .pred_class)
+```
+
+```{r}
+bundesliga_lasso_test %>% 
+  filter(revision != .pred_class)
+```
+
+
+```{r}
+bundesliga_ranger_recipe <- recipe(revision ~., data = bundesliga_training) %>% 
+  step_rm(Player, Nation, Squad, Born, G_per90, A_per90, minutes_played_divided_by90) %>% 
+  step_upsample(revision, over_ratio = .5) %>% 
+  step_mutate_at(all_numeric(), fn = ~as.numeric(.))
+
+bundesliga_ranger_recipe %>% 
+  prep(bundesliga_training) %>% 
+  juice()
+```
+
+
+```{r}
+bundesliga_ranger <- rand_forest(mtry = tune(), 
+              min_n = tune(), 
+              trees = 100) %>% 
+  set_mode("classification") %>% 
+  set_engine("ranger")
+
+bundesliga_ranger_wf <- 
+  workflow() %>% 
+  add_recipe(bundesliga_ranger_recipe) %>% 
+  add_model(bundesliga_ranger) 
+
+bundesliga_ranger_wf
+```
+
+
+```{r}
+set.seed(494)
+
+bundesliga_rf_grid <- grid_regular(min_n(), finalize(mtry(), bundesliga_training %>% select(-revision)), levels = 3)
+
+ctrl_res <- control_stack_grid()
+
+bundesliga_ranger_cv <- bundesliga_ranger_wf %>% 
+  tune_grid(resamples = bundesliga_cv,
+           grid = bundesliga_rf_grid,
+           control = ctrl_res)
+
+collect_metrics(bundesliga_ranger_cv)
+```
+
+
+```{r}
+bundesliga_best1 <- bundesliga_ranger_cv %>% 
+  select_best(metric = "accuracy")
+
+bundesliga_ranger_final_wf<- bundesliga_ranger_wf %>% 
+  finalize_workflow(bundesliga_best1)
+```
+
+```{r}
+set.seed(494)
+bundesliga_ranger_fit <- bundesliga_ranger_final_wf %>% 
+  fit(bundesliga_training)
+
+
+bundesliga_rf_explain <- 
+  explain_tidymodels(
+    model = bundesliga_ranger_fit,
+    data = bundesliga_training %>% select(-revision), 
+    y = as.numeric(bundesliga_training$revision == "TOTS"),
+    label = "rf"
+  )
+```
+
+```{r}
+bundesliga_rf_var_imp <- 
+  model_parts(
+    bundesliga_rf_explain
+    )
+
+plot(bundesliga_rf_var_imp)
+```
+
+
+
+
+
+```{r}
+bundesliga_ranger_test <- bundesliga_ranger_final_wf %>% 
+  last_fit(bundesliga_split)
+
+bundesliga_ranger_test %>% 
+  collect_metrics()
+```
+
+```{r}
+preds1 <- bundesliga_ranger_test %>% 
+  collect_predictions()
+
+preds1 %>% 
+  conf_mat(revision, .pred_class)
+```
+
+```{r}
+bundesliga_ranger_test <- bundesliga_testing %>% 
+  bind_cols(predict(bundesliga_ranger_fit, new_data = bundesliga_testing, type = "prob")) %>% 
+  bind_cols(predict(bundesliga_ranger_fit, new_data = bundesliga_testing)) 
+```
+
+```{r}
+bundesliga_ranger_test %>% 
+  conf_mat(revision, .pred_class)
+```
+
+```{r}
+bundesliga_ranger_test %>% 
+  filter(revision != .pred_class)
+```
+
+
+
+
+

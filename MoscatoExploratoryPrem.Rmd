@@ -22,6 +22,17 @@ library(themis)
 
 
 ```{r}
+fifa19_modeling <- fifa19_modeling %>%
+  mutate(Player = paste(Player, '19'))
+
+fifa18_modeling <- fifa18_modeling %>%
+  mutate(Player = paste(Player, '18'))
+
+fifa17_modeling <- fifa17_modeling %>%
+  mutate(Player = paste(Player, '17'))
+
+
+
 prem_modeling <- fifa17_modeling %>% 
   bind_rows(fifa18_modeling, fifa19_modeling) %>% 
   mutate(revision = as.factor(revision), Nation = as.factor(Nation))
@@ -211,7 +222,7 @@ prem_lasso_test %>%
 ```
 
 ```{r}
-lasso_test %>% 
+prem_lasso_test %>% 
   filter(revision != .pred_class)
 ```
 
@@ -305,10 +316,10 @@ prem_ranger_test %>%
 ```
 
 ```{r}
-preds1 <- prem_ranger_test %>% 
+prem_preds1 <- prem_ranger_test %>% 
   collect_predictions()
 
-preds1 %>% 
+prem_preds1 %>% 
   conf_mat(revision, .pred_class)
 ```
 

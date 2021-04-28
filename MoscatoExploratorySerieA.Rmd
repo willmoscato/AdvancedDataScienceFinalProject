@@ -1,0 +1,345 @@
+---
+title: "Moscato Serie A Exploratory"
+author: "Will Moscato"
+date: "4/28/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(tidymodels)
+library(lubridate)
+library(vip)
+library(stacks)
+library(DALEX)
+library(DALEXtra)
+library(themis)
+```
+
+
+```{r}
+fifa19_modeling_serie_a2 <- fifa19_modeling_serie_a %>%
+  mutate(Player = paste(Player, '19'))
+
+fifa18_modeling_serie_a2 <- fifa18_modeling_serie_a %>%
+  mutate(Player = paste(Player, '18'))
+
+fifa17_modeling_serie_a2 <- fifa17_modeling_serie_a %>%
+  mutate(Player = paste(Player, '17'))
+
+
+
+serie_a_modeling <- fifa17_modeling_serie_a2%>% 
+  bind_rows(fifa18_modeling_serie_a2, fifa19_modeling_serie_a2) %>% 
+  mutate(revision = as.factor(revision), Nation = as.factor(Nation))
+```
+
+```{r}
+serie_a_modeling %>% 
+  select(where(is.numeric)) %>% 
+  pivot_longer(cols = everything(),
+               names_to = "variable", 
+               values_to = "value") %>% 
+  ggplot(aes(x = value)) +
+  geom_histogram(bins = 30) +
+  facet_wrap(vars(variable), 
+             scales = "free")
+```
+
+```{r}
+serie_a_modeling %>% 
+  ggplot(aes(x = revision, fill = revision)) +
+  geom_bar() +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold"))
+```
+
+
+
+```{r}
+serie_a_modeling %>% 
+  ggplot(aes(x = Gls, fill = revision)) +
+  geom_density(alpha = 0.5) +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
+  xlab("Goals")
+```
+
+```{r}
+serie_a_modeling %>% 
+  ggplot(aes(x = Rk, fill = revision)) +
+  geom_density(alpha = 0.5) +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
+  xlab("Table Position")
+```
+```{r}
+serie_a_modeling %>% 
+  ggplot(aes(x = minutes_played_divided_by90, fill = revision)) +
+  geom_density(alpha = 0.5) +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
+  xlab("Total Minutes Played Dived by 90 (Full Games Played)")
+```
+```{r}
+serie_a_modeling %>% 
+  ggplot(aes(x = position, fill = revision)) +
+  geom_bar(position = "dodge") +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold"))
+```
+
+
+```{r}
+serie_a_modeling_outfield <- serie_a_modeling %>% 
+  filter(position != "GK") %>% 
+  #filter(position %in% c("ST", "LW", "RW", "CF", "CAM")) %>% 
+  filter(minutes_played_divided_by90 >= 19) %>% 
+  mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", ifelse(position == "RW", "RM", ifelse(position == "LW", "LM", position))))) %>% 
+  select(-Goals_allowed, -GA90, -SoTA, -Saves, -Save_percent, -W, -L, -D, -CS, -CS_percent, -Pkatt_against, -PKA, -PKsv, -Pk_Save_percent, -PKm)
+```
+
+
+```{r}
+set.seed(494)
+serie_a_split <- initial_split(serie_a_modeling_outfield, prop = .75, strata = "revision")
+serie_a_training <- training(serie_a_split)
+serie_a_testing <- testing(serie_a_split)
+```
+
+
+
+```{r}
+serie_a_lasso_recipe <- recipe(revision ~ . , data = serie_a_training) %>% 
+  step_rm(Player, Nation, Squad, Born, G_per90, A_per90, minutes_played_divided_by90) %>%
+  step_upsample(revision, over_ratio = .4) %>% 
+  step_normalize(all_predictors(),
+                 -all_nominal()) %>% 
+  step_dummy(all_nominal(),
+             -all_outcomes())
+
+serie_a_lasso_recipe %>% 
+  prep(serie_a_training) %>% 
+  juice()
+```
+
+
+
+```{r}
+serie_a_lasso <- logistic_reg(mixture = 1) %>% 
+  set_engine("glmnet") %>% 
+  set_args(penalty = tune()) %>% 
+  set_mode("classification")
+
+serie_a_lasso
+
+serie_a_lasso_wf <- 
+  workflow() %>% 
+  add_recipe(serie_a_lasso_recipe) %>% 
+  add_model(serie_a_lasso)
+
+serie_a_lasso_wf
+```
+
+```{r}
+set.seed(494) # for reproducibility
+serie_a_cv <- vfold_cv(serie_a_training, v = 5)
+
+penalty_grid <- grid_regular(penalty(),
+                             levels = 10)
+
+penalty_grid
+
+serie_a_lasso_tune <- 
+  serie_a_lasso_wf %>% 
+  tune_grid(
+    resamples = serie_a_cv,
+    grid = penalty_grid
+    )
+
+serie_a_lasso_tune
+```
+
+```{r}
+serie_a_lasso_tune %>% 
+  show_best(metric = "accuracy")
+```
+
+```{r}
+
+serie_a_best <- serie_a_lasso_tune %>% 
+  select_best(metric = "accuracy")
+```
+
+```{r}
+serie_a_lasso_final_wf <- serie_a_lasso_wf %>% 
+  finalize_workflow(serie_a_best)
+
+serie_a_lasso_final_wf
+```
+```{r}
+serie_a_lasso_final_mod <- serie_a_lasso_final_wf %>% 
+  fit(data = serie_a_training)
+
+serie_a_lasso_final_mod %>% 
+  pull_workflow_fit() %>% 
+  tidy() 
+```
+
+```{r}
+serie_a_lasso_final_mod %>% 
+  pull_workflow_fit() %>% 
+  vip()
+```
+
+
+```{r}
+serie_a_lasso_test <- serie_a_lasso_final_wf %>% 
+  last_fit(serie_a_split)
+
+serie_a_lasso_test %>% 
+  collect_metrics()
+```
+
+
+```{r}
+serie_a_preds <- serie_a_lasso_test %>% 
+  collect_predictions()
+
+serie_a_preds %>% 
+  conf_mat(revision, .pred_class)
+```
+
+
+```{r}
+serie_a_lasso_test <- serie_a_testing %>% 
+  bind_cols(predict(serie_a_lasso_final_mod, new_data = serie_a_testing, type = "prob")) %>% 
+  bind_cols(predict(serie_a_lasso_final_mod, new_data = serie_a_testing)) 
+```
+
+```{r}
+serie_a_lasso_test %>% 
+  conf_mat(revision, .pred_class)
+```
+
+```{r}
+serie_a_lasso_test %>% 
+  filter(revision != .pred_class)
+```
+
+
+```{r}
+serie_a_ranger_recipe <- recipe(revision ~., data = serie_a_training) %>% 
+  step_rm(Player, Nation, Squad, Born, G_per90, A_per90, minutes_played_divided_by90) %>% 
+  step_upsample(revision, over_ratio = .4) %>% 
+  step_mutate_at(all_numeric(), fn = ~as.numeric(.))
+
+serie_a_ranger_recipe %>% 
+  prep(serie_a_training) %>% 
+  juice()
+```
+
+
+```{r}
+serie_a_ranger <- rand_forest(mtry = tune(), 
+              min_n = tune(), 
+              trees = 100) %>% 
+  set_mode("classification") %>% 
+  set_engine("ranger")
+
+serie_a_ranger_wf <- 
+  workflow() %>% 
+  add_recipe(serie_a_ranger_recipe) %>% 
+  add_model(serie_a_ranger) 
+
+serie_a_ranger_wf
+```
+
+
+```{r}
+set.seed(494)
+
+serie_a_rf_grid <- grid_regular(min_n(), finalize(mtry(), serie_a_training %>% select(-revision)), levels = 3)
+
+ctrl_res <- control_stack_grid()
+
+serie_a_ranger_cv <- serie_a_ranger_wf %>% 
+  tune_grid(resamples = serie_a_cv,
+           grid = serie_a_rf_grid,
+           control = ctrl_res)
+
+collect_metrics(serie_a_ranger_cv)
+```
+
+
+```{r}
+serie_a_best1 <- serie_a_ranger_cv %>% 
+  select_best(metric = "accuracy")
+
+serie_a_ranger_final_wf<- serie_a_ranger_wf %>% 
+  finalize_workflow(serie_a_best1)
+```
+
+```{r}
+set.seed(494)
+serie_a_ranger_fit <- serie_a_ranger_final_wf %>% 
+  fit(serie_a_training)
+
+
+serie_a_rf_explain <- 
+  explain_tidymodels(
+    model = serie_a_ranger_fit,
+    data = serie_a_training %>% select(-revision), 
+    y = as.numeric(serie_a_training$revision == "TOTS"),
+    label = "rf"
+  )
+```
+
+```{r}
+serie_a_rf_var_imp <- 
+  model_parts(
+    serie_a_rf_explain
+    )
+
+plot(serie_a_rf_var_imp)
+```
+
+
+
+
+
+```{r}
+serie_a_ranger_test <- serie_a_ranger_final_wf %>% 
+  last_fit(serie_a_split)
+
+serie_a_ranger_test %>% 
+  collect_metrics()
+```
+
+```{r}
+preds1 <- serie_a_ranger_test %>% 
+  collect_predictions()
+
+preds1 %>% 
+  conf_mat(revision, .pred_class)
+```
+
+```{r}
+serie_a_ranger_test <- serie_a_testing %>% 
+  bind_cols(predict(serie_a_ranger_fit, new_data = serie_a_testing, type = "prob")) %>% 
+  bind_cols(predict(serie_a_ranger_fit, new_data = serie_a_testing)) 
+```
+
+```{r}
+serie_a_ranger_test %>% 
+  conf_mat(revision, .pred_class)
+```
+
+```{r}
+serie_a_ranger_test %>% 
+  filter(revision != .pred_class)
+```
+
+
+
+
+

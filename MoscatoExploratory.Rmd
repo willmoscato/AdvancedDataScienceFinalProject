@@ -99,8 +99,8 @@ prem_testing <- testing(prem_split)
 
 ```{r}
 prem_lasso_recipe <- recipe(revision ~ . , data = prem_training) %>% 
-  step_rm(Player, Nation, Squad, Born, Gls, Ast, Non_PK_G, Min) %>%
-  step_upsample(revision, over_ratio = .4) %>% 
+  step_rm(Player, Nation, Squad, Born, G_per90, A_per90, minutes_played_divided_by90) %>%
+  step_upsample(revision, over_ratio = .33) %>% 
   step_normalize(all_predictors(),
                  -all_nominal()) %>% 
   step_dummy(all_nominal(),
@@ -219,7 +219,7 @@ lasso_test %>%
 ```{r}
 ranger_recipe <- recipe(revision ~., data = prem_training) %>% 
   step_rm(Player, Nation, Squad, Born, G_per90, A_per90, minutes_played_divided_by90) %>% 
-  step_upsample(revision, over_ratio = .3) %>% 
+  step_upsample(revision, over_ratio = .33) %>% 
   step_mutate_at(all_numeric(), fn = ~as.numeric(.))
 
 ranger_recipe %>% 

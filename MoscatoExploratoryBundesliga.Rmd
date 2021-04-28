@@ -22,7 +22,7 @@ library(themis)
 
 
 ```{r}
-fifa19_modeling_bundeslia <- fifa19_modeling_bundeslia %>%
+fifa19_modeling_bundeslia <- fifa19_modeling_bundesliga %>%
   mutate(Player = paste(Player, '19'))
 
 fifa18_modeling_bundesliga <- fifa18_modeling_bundesliga %>%

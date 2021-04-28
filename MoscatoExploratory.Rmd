@@ -155,13 +155,13 @@ prem_lasso_tune %>%
 
 ```{r}
 
-best <- prem_lasso_tune %>% 
+prem_best <- prem_lasso_tune %>% 
   select_best(metric = "accuracy")
 ```
 
 ```{r}
 prem_lasso_final_wf <- prem_lasso_wf %>% 
-  finalize_workflow(best)
+  finalize_workflow(prem_best)
 
 prem_lasso_final_wf
 ```
@@ -191,22 +191,22 @@ prem_lasso_test %>%
 
 
 ```{r}
-preds <- prem_lasso_test %>% 
+prem_preds <- prem_lasso_test %>% 
   collect_predictions()
 
-preds %>% 
+prem_preds %>% 
   conf_mat(revision, .pred_class)
 ```
 
 
 ```{r}
-lasso_test <- prem_testing %>% 
+prem_lasso_test <- prem_testing %>% 
   bind_cols(predict(prem_lasso_final_mod, new_data = prem_testing, type = "prob")) %>% 
   bind_cols(predict(prem_lasso_final_mod, new_data = prem_testing)) 
 ```
 
 ```{r}
-lasso_test %>% 
+prem_lasso_test %>% 
   conf_mat(revision, .pred_class)
 ```
 
@@ -217,12 +217,12 @@ lasso_test %>%
 
 
 ```{r}
-ranger_recipe <- recipe(revision ~., data = prem_training) %>% 
+prem_ranger_recipe <- recipe(revision ~., data = prem_training) %>% 
   step_rm(Player, Nation, Squad, Born, G_per90, A_per90, minutes_played_divided_by90) %>% 
   step_upsample(revision, over_ratio = .33) %>% 
   step_mutate_at(all_numeric(), fn = ~as.numeric(.))
 
-ranger_recipe %>% 
+prem_ranger_recipe %>% 
   prep(prem_training) %>% 
   juice()
 ```
@@ -237,7 +237,7 @@ prem_ranger <- rand_forest(mtry = tune(),
 
 prem_ranger_wf <- 
   workflow() %>% 
-  add_recipe(ranger_recipe) %>% 
+  add_recipe(prem_ranger_recipe) %>% 
   add_model(prem_ranger) 
 
 prem_ranger_wf
@@ -247,36 +247,36 @@ prem_ranger_wf
 ```{r}
 set.seed(494)
 
-rf_grid <- grid_regular(min_n(), finalize(mtry(), prem_training %>% select(-revision)), levels = 3)
+prem_rf_grid <- grid_regular(min_n(), finalize(mtry(), prem_training %>% select(-revision)), levels = 3)
 
 ctrl_res <- control_stack_grid()
 
-ranger_cv <- prem_ranger_wf %>% 
+prem_ranger_cv <- prem_ranger_wf %>% 
   tune_grid(resamples = prem_cv,
-           grid = rf_grid,
+           grid = prem_rf_grid,
            control = ctrl_res)
 
-collect_metrics(ranger_cv)
+collect_metrics(prem_ranger_cv)
 ```
 
 
 ```{r}
-best1 <- ranger_cv %>% 
+prem_best1 <- prem_ranger_cv %>% 
   select_best(metric = "accuracy")
 
 prem_ranger_final_wf<- prem_ranger_wf %>% 
-  finalize_workflow(best1)
+  finalize_workflow(prem_best1)
 ```
 
 ```{r}
 set.seed(494)
-ranger_fit <- prem_ranger_final_wf %>% 
+prem_ranger_fit <- prem_ranger_final_wf %>% 
   fit(prem_training)
 
 
-rf_explain <- 
+prem_rf_explain <- 
   explain_tidymodels(
-    model = ranger_fit,
+    model = prem_ranger_fit,
     data = prem_training %>% select(-revision), 
     y = as.numeric(prem_training$revision == "TOTS"),
     label = "rf"
@@ -284,12 +284,12 @@ rf_explain <-
 ```
 
 ```{r}
-rf_var_imp <- 
+prem_rf_var_imp <- 
   model_parts(
-    rf_explain
+    prem_rf_explain
     )
 
-plot(rf_var_imp)
+plot(prem_rf_var_imp)
 ```
 
 
@@ -313,18 +313,18 @@ preds1 %>%
 ```
 
 ```{r}
-ranger_test <- prem_testing %>% 
-  bind_cols(predict(ranger_fit, new_data = prem_testing, type = "prob")) %>% 
-  bind_cols(predict(ranger_fit, new_data = prem_testing)) 
+prem_ranger_test <- prem_testing %>% 
+  bind_cols(predict(prem_ranger_fit, new_data = prem_testing, type = "prob")) %>% 
+  bind_cols(predict(prem_ranger_fit, new_data = prem_testing)) 
 ```
 
 ```{r}
-ranger_test %>% 
+prem_ranger_test %>% 
   conf_mat(revision, .pred_class)
 ```
 
 ```{r}
-ranger_test %>% 
+prem_ranger_test %>% 
   filter(revision != .pred_class)
 ```
 

@@ -64,8 +64,8 @@ ligue1_testing <- testing(ligue1_split)
 
 ```{r}
 ligue1_lasso_recipe <- recipe(revision ~ . , data = ligue1_training) %>% 
-  step_rm(Player, Nation, Squad, Born) %>%
-  step_upsample(revision, over_ratio = .34) %>% 
+  step_rm(Player, Nation, Squad, Born, minutes_played_divided_by90, G_per90, A_per90) %>%
+  step_upsample(revision, over_ratio = .38) %>% 
   step_normalize(all_predictors(),
                  -all_nominal()) %>% 
   step_dummy(all_nominal(),

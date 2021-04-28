@@ -22,19 +22,19 @@ library(themis)
 
 
 ```{r}
-fifa19_modeling_bundeslia <- fifa19_modeling_bundesliga %>%
+fifa19_modeling_bundesliga2 <- fifa19_modeling_bundesliga %>%
   mutate(Player = paste(Player, '19'))
 
-fifa18_modeling_bundesliga <- fifa18_modeling_bundesliga %>%
+fifa18_modeling_bundesliga2 <- fifa18_modeling_bundesliga %>%
   mutate(Player = paste(Player, '18'))
 
-fifa17_modeling_bundesliga <- fifa17_modeling_bundesliga %>%
+fifa17_modeling_bundesliga2 <- fifa17_modeling_bundesliga %>%
   mutate(Player = paste(Player, '17'))
 
 
 
-bundesliga_modeling <- fifa17_modeling_bundesliga%>% 
-  bind_rows(fifa18_modeling_bundesliga, fifa19_modeling_bundesliga) %>% 
+bundesliga_modeling <- fifa17_modeling_bundesliga2%>% 
+  bind_rows(fifa18_modeling_bundesliga2, fifa19_modeling_bundesliga2) %>% 
   mutate(revision = as.factor(revision), Nation = as.factor(Nation))
 ```
 

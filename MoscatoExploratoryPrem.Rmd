@@ -22,19 +22,19 @@ library(themis)
 
 
 ```{r}
-fifa19_modeling <- fifa19_modeling %>%
+fifa19_modeling2 <- fifa19_modeling %>%
   mutate(Player = paste(Player, '19'))
 
-fifa18_modeling <- fifa18_modeling %>%
+fifa18_modeling2 <- fifa18_modeling %>%
   mutate(Player = paste(Player, '18'))
 
-fifa17_modeling <- fifa17_modeling %>%
+fifa17_modeling2 <- fifa17_modeling %>%
   mutate(Player = paste(Player, '17'))
 
 
 
-prem_modeling <- fifa17_modeling %>% 
-  bind_rows(fifa18_modeling, fifa19_modeling) %>% 
+prem_modeling <- fifa17_modeling2 %>% 
+  bind_rows(fifa18_modeling2, fifa19_modeling2) %>% 
   mutate(revision = as.factor(revision), Nation = as.factor(Nation))
 ```
 

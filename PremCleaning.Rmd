@@ -20,6 +20,7 @@ library(lubridate)
 fifa17 <- read_csv("fut_bin17_players.csv")
 fifa18 <- read_csv("fut_bin18_players.csv")
 fifa19 <- read_csv("fut_bin19_players.csv")
+fifa21 <- read_csv("fut_bin21_players.csv")
 premnames17 <- read.csv("16_17_premnames.csv")
 premnames18 <- read.csv("17_18_premnames.csv")
 premnames19 <- read.csv("18_19_premnames.csv")
@@ -32,6 +33,9 @@ premtable19 <- read.csv("premtable19.csv")
 premgoalkeeper17 <- read.csv('goalkeeper17.csv')
 premgoalkeeper18 <- read.csv('goalkeeper18.csv')
 premgoalkeeper19 <- read.csv('goalkeeper19.csv')
+premnames21 <- read.csv("20_21_premnames.csv")
+standardprem21 <- read.csv("standardprem21.csv")
+premtable21 <- read.csv("premtable21.csv")
 ```
 
 
@@ -59,6 +63,16 @@ fifa19_clean <- fifa19 %>%
 
 
 ```{r}
+fifa21_clean <- fifa21 %>% 
+  mutate(revision = ifelse(revision == "Rare", "Normal", ifelse(revision == "Non-Rare", "Normal", revision))) %>% 
+  filter(revision %in% c("Normal", "TOTS")) %>%
+  arrange(desc(overall)) %>% 
+  distinct(player_extended_name, .keep_all = TRUE)
+```
+
+
+
+```{r}
 fifa17_names <- fifa17_clean %>% 
   mutate(player_extended_name = stringi::stri_trans_general(player_extended_name, "Latin-ASCII")) %>% 
    mutate(player_name = stringi::stri_trans_general(player_name, "Latin-ASCII"))
@@ -77,6 +91,13 @@ fifa19_names <- fifa19_clean %>%
   mutate(player_extended_name = stringi::stri_trans_general(player_extended_name, "Latin-ASCII")) %>% 
    mutate(player_name = stringi::stri_trans_general(player_name, "Latin-ASCII"))
 ```
+
+```{r}
+fifa21_names <- fifa21_clean %>% 
+  mutate(player_extended_name = stringi::stri_trans_general(player_extended_name, "Latin-ASCII")) %>% 
+   mutate(player_name = stringi::stri_trans_general(player_name, "Latin-ASCII"))
+```
+
 
 
 ##17
@@ -419,7 +440,106 @@ fifa17_modeling %>%
 
 
 
+## 21 testing 
 
+```{r}
+premnames21 <-premnames21 %>% 
+  mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
+  mutate(Player = str_replace_all(Player1, "-", " "))
+```
+
+
+```{r}
+prem21_names <- fifa21_names %>% 
+  filter(league == "Premier League") %>% 
+  select(player_name, player_extended_name, overall, revision, position)
+```
+
+
+
+```{r}
+prem21 <- premnames21 %>%
+  inner_join(prem21_names, by = c("Player" = "player_extended_name")) %>% 
+  select(-Player1, -player_name)
+```
+
+
+```{r}
+missing21 <- premnames21 %>%
+  left_join(prem21_names, by = c("Player" = "player_extended_name")) %>% 
+  filter(is.na(player_name) == TRUE)
+```
+
+
+
+
+
+```{r}
+not_missing_21 <- missing21 %>% 
+  select(-overall, -revision, -position) %>% 
+  left_join(prem19_names, by = c("Player" = "player_name")) 
+```
+
+
+```{r}
+
+last_names21 <- not_missing_21 %>% 
+  filter(is.na(overall) == TRUE) %>% 
+  mutate(Player_short =  gsub(".* ", "", Player)) %>% 
+  mutate(Player_short = ifelse(Player_short == "Aanholt", "Van Aanholt", ifelse(Player_short == "Dijk", "Van Dijk", ifelse(Player_short == "min", "Son", ifelse(Player_short == "Prowse", "Ward-Prowse", ifelse(Player_short == "yueng", "Ki Sung Yueng", ifelse(Player_short == "yong", "Lee Chung Yong", ifelse(Player_short == "Cheek", "Loftus-Cheek", ifelse(Player_short == "Chamberlain", "Oxlade-Chamberlain", ifelse(Player_short == "Gea", "De Gea", ifelse(Player_short == "Ginkel", "Van Ginkel", ifelse(Player_short == "Traore", "Adama",ifelse(Player_short == "Bissaka", "Wan-Bissaka", Player_short))))))))))))) %>% 
+  select(-player_name, -player_extended_name, -overall, -revision, - Player1, -position)
+
+not_real_name21 <- not_missing_21 %>% 
+  filter(is.na(overall) == FALSE) %>% 
+  select(-Player1, -player_name, -player_extended_name)
+```
+
+
+```{r}
+weird_names21 <- last_names21 %>% 
+  inner_join(prem21_names, by = c("Player_short" = "player_name")) %>% 
+  select(-Player_short, -player_extended_name)
+```
+
+```{r}
+fifa21_prem_full <- prem21 %>%
+  bind_rows(not_real_name21, weird_names21) %>% 
+  distinct(Player, .keep_all = TRUE) %>% 
+  select(Player, revision, position, Int, TklW, OG, PKcon)
+```
+
+
+```{r}
+standardprem21 <- standardprem21 %>% 
+  mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
+  mutate(Player = str_replace_all(Player1, "-", " "))
+```
+
+```{r}
+fifa21_prem_standard_stats <- fifa21_prem_full %>% 
+  inner_join(standardprem21, by = "Player") %>% 
+  select(-Player1, -Pos) %>% 
+  distinct(Player, .keep_all = TRUE)
+```
+
+```{r}
+fifa21_standard_plus_table <- fifa21_prem_standard_stats %>% 
+  inner_join(premtable21, by = "Squad")
+```
+
+
+
+
+```{r}
+fifa21_modeling <- fifa21_standard_plus_table %>% 
+   rename(minutes_played_divided_by90 = X90s, Non_PK_G = G.PK, G_plus_A_per90 = G.A, G_minus_Pk_per90 = G.PK.1, G_plus_A_minus_PK_per90 = G.A.PK, G_per90 = Gls.1, A_per90 = Ast.1) %>% 
+  mutate(Nation = sub('.* ', '', Nation)) 
+```
+
+
+```{r}
+dim(fifa21_modeling)
+```
 
 
 

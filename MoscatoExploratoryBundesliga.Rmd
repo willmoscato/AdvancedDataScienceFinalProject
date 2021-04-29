@@ -110,7 +110,7 @@ bundesliga_testing <- testing(bundesliga_split)
 
 ```{r}
 bundesliga_lasso_recipe <- recipe(revision ~ . , data = bundesliga_training) %>% 
-  step_rm(Player, Nation, Squad, Born, G_per90, A_per90, minutes_played_divided_by90) %>%
+  step_rm(Player, Nation, Squad, G_per90, A_per90, minutes_played_divided_by90, Age, Attendance) %>%
   step_upsample(revision, over_ratio = .5) %>% 
   step_normalize(all_predictors(),
                  -all_nominal()) %>% 
@@ -229,7 +229,7 @@ bundesliga_lasso_test %>%
 
 ```{r}
 bundesliga_ranger_recipe <- recipe(revision ~., data = bundesliga_training) %>% 
-  step_rm(Player, Nation, Squad, Born, G_per90, A_per90, minutes_played_divided_by90) %>% 
+  step_rm(Player, Nation, Squad, G_per90, A_per90, minutes_played_divided_by90, Attendance, Born) %>% 
   step_upsample(revision, over_ratio = .5) %>% 
   step_mutate_at(all_numeric(), fn = ~as.numeric(.))
 

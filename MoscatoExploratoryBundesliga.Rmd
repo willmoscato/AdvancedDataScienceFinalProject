@@ -111,7 +111,7 @@ bundesliga_testing <- testing(bundesliga_split)
 ```{r}
 bundesliga_lasso_recipe <- recipe(revision ~ . , data = bundesliga_training) %>% 
   step_rm(Player, Nation, Squad, G_per90, A_per90, minutes_played_divided_by90, Born, Attendance) %>%
-  step_upsample(revision, over_ratio = .5) %>% 
+  step_upsample(revision, over_ratio = .4) %>% 
   step_normalize(all_predictors(),
                  -all_nominal()) %>% 
   step_dummy(all_nominal(),
@@ -230,7 +230,7 @@ bundesliga_lasso_test %>%
 ```{r}
 bundesliga_ranger_recipe <- recipe(revision ~., data = bundesliga_training) %>% 
   step_rm(Player, Nation, Squad, G_per90, A_per90, minutes_played_divided_by90, Attendance, Born) %>% 
-  step_upsample(revision, over_ratio = .5) %>% 
+  step_upsample(revision, over_ratio = .55) %>% 
   step_mutate_at(all_numeric(), fn = ~as.numeric(.))
 
 bundesliga_ranger_recipe %>% 
@@ -337,6 +337,33 @@ bundesliga_ranger_test %>%
 ```{r}
 bundesliga_ranger_test %>% 
   filter(revision != .pred_class)
+```
+
+```{r}
+bundesliga_modeling21 <- fifa21_modeling_bundesliga %>% 
+  mutate(revision = as.factor(revision), Nation = as.factor(Nation), Age = as.integer(Age))
+```
+
+```{r}
+bundesliga_modeling_outfield21 <- bundesliga_modeling21 %>% 
+  filter(position != "GK") %>% 
+  #filter(position %in% c("ST", "LW", "RW", "CF", "CAM")) %>% 
+  filter(minutes_played_divided_by90 >= 19) %>% 
+  mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", ifelse(position == "RW", "RM", ifelse(position == "LW", "LM", position)))))
+```
+
+
+```{r}
+bundesliga_ranger_test21 <- bundesliga_modeling_outfield21 %>% 
+  bind_cols(predict(bundesliga_ranger_fit, new_data = bundesliga_modeling_outfield21, type = "prob")) %>% 
+  bind_cols(predict(bundesliga_ranger_fit, new_data = bundesliga_modeling_outfield21)) 
+```
+
+
+```{r}
+bundesliga_lasso_test21 <- bundesliga_modeling_outfield21 %>% 
+  bind_cols(predict(bundesliga_lasso_final_mod, new_data = bundesliga_modeling_outfield21, type = "prob")) %>% 
+  bind_cols(predict(bundesliga_lasso_final_mod, new_data = bundesliga_modeling_outfield21)) 
 ```
 
 

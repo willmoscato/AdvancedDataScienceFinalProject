@@ -343,7 +343,7 @@ la_liga_ranger_test %>%
 
 
 ```{r}
-la_liga_modeling21 <- fifa21_modeling %>% 
+la_liga_modeling21 <- fifa21_modeling_la_liga %>% 
   mutate(revision = as.factor(revision), Nation = as.factor(Nation), Age = as.integer(Age))
 ```
 

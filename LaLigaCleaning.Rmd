@@ -456,7 +456,7 @@ fifa21_la_liga_standard_stats <- fifa21_la_liga_full %>%
 ```
 
 ```{r}
-fifa21_standard_plus_table <- fifa21_la_liga_standard_stats %>% 
+fifa21_standard_plus_table_la_liga <- fifa21_la_liga_standard_stats %>% 
   inner_join(la_ligatable21, by = "Squad")
 ```
 
@@ -464,7 +464,7 @@ fifa21_standard_plus_table <- fifa21_la_liga_standard_stats %>%
 
 
 ```{r}
-fifa21_modeling <- fifa21_standard_plus_table %>% 
+fifa21_modeling_la_liga <- fifa21_standard_plus_table_la_liga %>% 
    rename(minutes_played_divided_by90 = X90s, Non_PK_G = G.PK, G_plus_A_per90 = G.A, G_minus_Pk_per90 = G.PK.1, G_plus_A_minus_PK_per90 = G.A.PK, G_per90 = Gls.1, A_per90 = Ast.1) %>% 
   mutate(Nation = sub('.* ', '', Nation)) 
 ```

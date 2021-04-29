@@ -447,7 +447,7 @@ fifa17_modeling %>%
 ```{r}
 premnames21 <-premnames21 %>% 
   mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
-  mutate(Player = str_replace_all(Player1, "-", " "))
+  mutate(Player = str_replace_all(Player1, "-", " ")) 
 ```
 
 
@@ -514,7 +514,8 @@ fifa21_prem_full <- prem21 %>%
 ```{r}
 standardprem21 <- standardprem21 %>% 
   mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
-  mutate(Player = str_replace_all(Player1, "-", " "))
+  mutate(Player = str_replace_all(Player1, "-", " ")) %>% 
+  mutate(Age = gsub("-.*", "", Age))
 ```
 
 ```{r}

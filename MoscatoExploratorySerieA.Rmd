@@ -110,7 +110,7 @@ serie_a_testing <- testing(serie_a_split)
 
 ```{r}
 serie_a_lasso_recipe <- recipe(revision ~ . , data = serie_a_training) %>% 
-  step_rm(Player, Nation, Squad, Born, G_per90, A_per90, minutes_played_divided_by90) %>%
+  step_rm(Player, Nation, Squad, Born, G_per90, A_per90, minutes_played_divided_by90, Attendance) %>%
   step_upsample(revision, over_ratio = .4) %>% 
   step_normalize(all_predictors(),
                  -all_nominal()) %>% 
@@ -229,7 +229,7 @@ serie_a_lasso_test %>%
 
 ```{r}
 serie_a_ranger_recipe <- recipe(revision ~., data = serie_a_training) %>% 
-  step_rm(Player, Nation, Squad, Born, G_per90, A_per90, minutes_played_divided_by90) %>% 
+  step_rm(Player, Nation, Squad, Born, G_per90, A_per90, minutes_played_divided_by90, Attendance) %>% 
   step_upsample(revision, over_ratio = .4) %>% 
   step_mutate_at(all_numeric(), fn = ~as.numeric(.))
 

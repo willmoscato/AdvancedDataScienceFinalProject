@@ -110,7 +110,7 @@ bundesliga_testing <- testing(bundesliga_split)
 
 ```{r}
 bundesliga_lasso_recipe <- recipe(revision ~ . , data = bundesliga_training) %>% 
-  step_rm(Player, Nation, Squad, G_per90, A_per90, minutes_played_divided_by90, Age, Attendance) %>%
+  step_rm(Player, Nation, Squad, G_per90, A_per90, minutes_played_divided_by90, Born, Attendance) %>%
   step_upsample(revision, over_ratio = .5) %>% 
   step_normalize(all_predictors(),
                  -all_nominal()) %>% 

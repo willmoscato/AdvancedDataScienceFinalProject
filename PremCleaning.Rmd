@@ -65,6 +65,8 @@ fifa19_clean <- fifa19 %>%
 ```{r}
 fifa21_clean <- fifa21 %>% 
   mutate(revision = ifelse(revision == "Rare", "Normal", ifelse(revision == "Non-Rare", "Normal", revision))) %>% 
+  mutate(club = ifelse(player_name == "Rúben Dias", "Manchester City", ifelse(player_extended_name == "Wesley Fofana", "Leicester City", club))) %>% 
+  mutate(league = ifelse(player_name == "Rúben Dias", "Premier League", ifelse(player_extended_name == "Wesley Fofana", "Premier League", league))) %>% 
   filter(revision %in% c("Normal", "TOTS")) %>%
   arrange(desc(overall)) %>% 
   distinct(player_extended_name, .keep_all = TRUE)
@@ -254,7 +256,7 @@ not_missing_18 <- missing18 %>%
 last_names18 <- not_missing_18 %>% 
   filter(is.na(overall) == TRUE) %>% 
   mutate(Player_short =  gsub(".* ", "", Player)) %>% 
-  mutate(Player_short = ifelse(Player_short == "Aanholt", "Van Aanholt", ifelse(Player_short == "Dijk", "Van Dijk", ifelse(Player_short == "min", "Son", ifelse(Player_short == "Prowse", "Ward-Prowse", ifelse(Player_short == "yueng", "Ki Sung Yueng", ifelse(Player_short == "yong", "Lee Chung Yong", ifelse(Player_short == "Cheek", "Loftus-Cheek", ifelse(Player_short == "Chamberlain", "Oxlade-Chamberlain", ifelse(Player_short == "Gea", "De Gea", ifelse(Player_short == "Ginkel", "Van Ginkel", ifelse(Player_short == "Traore", "Adama", ifelse(Player_short == "Bissaka", "Wan-Bissaka",Player_short))))))))))))) %>% 
+  mutate(Player_short = ifelse(Player_short == "Aanholt", "Van Aanholt", ifelse(Player_short == "Dijk", "Van Dijk", ifelse(Player_short == "min", "Son", ifelse(Player_short == "Prowse", "Ward-Prowse", ifelse(Player_short == "yueng", "Ki Sung Yueng", ifelse(Player_short == "yong", "Lee Chung Yong", ifelse(Player_short == "Cheek", "Loftus-Cheek", ifelse(Player_short == "Chamberlain", "Oxlade-Chamberlain", ifelse(Player_short == "Gea", "De Gea", ifelse(Player_short == "Ginkel", "Van Ginkel", ifelse(Player_short == "Traore", "Adama", ifelse(Player_short == "Bissaka", "Wan-Bissaka", Player_short))))))))))))) %>% 
   select(-player_name, -player_extended_name, -overall, -revision, - Player1, -position)
 
 not_real_name18 <- not_missing_18 %>% 
@@ -486,7 +488,7 @@ not_missing_21 <- missing21 %>%
 last_names21 <- not_missing_21 %>% 
   filter(is.na(overall) == TRUE) %>% 
   mutate(Player_short =  gsub(".* ", "", Player)) %>% 
-  mutate(Player_short = ifelse(Player_short == "Aanholt", "Van Aanholt", ifelse(Player_short == "Dijk", "Van Dijk", ifelse(Player_short == "min", "Son", ifelse(Player_short == "Prowse", "Ward-Prowse", ifelse(Player_short == "yueng", "Ki Sung Yueng", ifelse(Player_short == "yong", "Lee Chung Yong", ifelse(Player_short == "Cheek", "Loftus-Cheek", ifelse(Player_short == "Chamberlain", "Oxlade-Chamberlain", ifelse(Player_short == "Gea", "De Gea", ifelse(Player_short == "Ginkel", "Van Ginkel", ifelse(Player_short == "Traore", "Adama",ifelse(Player_short == "Bissaka", "Wan-Bissaka", Player_short))))))))))))) %>% 
+  mutate(Player_short = ifelse(Player_short == "Aanholt", "Van Aanholt", ifelse(Player_short == "Dijk", "Van Dijk", ifelse(Player_short == "min", "Son", ifelse(Player_short == "Prowse", "Ward-Prowse", ifelse(Player_short == "yueng", "Ki Sung Yueng", ifelse(Player_short == "yong", "Lee Chung Yong", ifelse(Player_short == "Cheek", "Loftus-Cheek", ifelse(Player_short == "Chamberlain", "Oxlade-Chamberlain", ifelse(Player_short == "Gea", "De Gea", ifelse(Player_short == "Ginkel", "Van Ginkel", ifelse(Player_short == "Traore", "Adama",ifelse(Player_short == "Bissaka", "Wan-Bissaka", ifelse(Player_short == "Dias", "Ruben Dias", Player_short)))))))))))))) %>% 
   select(-player_name, -player_extended_name, -overall, -revision, - Player1, -position)
 
 not_real_name21 <- not_missing_21 %>% 

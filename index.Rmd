@@ -66,6 +66,9 @@ The video game FIFA, which is developed by Electronic Arts (EA) Sports, has beco
 
 ## Methods and Materials
 
+**Materials**: We retrieved complete player datasets for FIFA 17, FIFA 18, and FIFA 19 from [here](). We retrieved real life statistics from the 2016-2017, 2017-2018, and 2018-2019 seasons from [fbref.com](https://fbref.com/en/). We did not use data from the 2019-2020 season because COVID-19 caused each season to prematurely end in March of 2020.
+
+**Methods**: 
 
 
 

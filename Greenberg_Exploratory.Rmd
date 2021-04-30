@@ -1,0 +1,381 @@
+---
+title: "Greenberg_Exploratory"
+author: "Jake Greenberg"
+date: "4/29/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+---
+title: "Moscato Exploratory"
+author: "Will Moscato"
+date: "4/22/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(tidymodels)
+library(lubridate)
+library(vip)
+library(stacks)
+library(DALEX)
+library(DALEXtra)
+library(themis)
+```
+
+
+```{r}
+fifa19_modeling2 <- fifa19_modeling %>%
+  mutate(Player = paste(Player, '19'))
+
+fifa18_modeling2 <- fifa18_modeling %>%
+  mutate(Player = paste(Player, '18'))
+
+fifa17_modeling2 <- fifa17_modeling %>%
+  mutate(Player = paste(Player, '17'))
+
+
+
+prem_modeling <- fifa17_modeling2 %>% 
+  bind_rows(fifa18_modeling2, fifa19_modeling2) %>% 
+  mutate(revision = as.factor(revision), Nation = as.factor(Nation))
+```
+
+```{r}
+prem_modeling %>% 
+  select(where(is.numeric)) %>% 
+  pivot_longer(cols = everything(),
+               names_to = "variable", 
+               values_to = "value") %>% 
+  ggplot(aes(x = value)) +
+  geom_histogram(bins = 30) +
+  facet_wrap(vars(variable), 
+             scales = "free")
+```
+
+```{r}
+prem_modeling %>% 
+  ggplot(aes(x = revision, fill = revision)) +
+  geom_bar() +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold"))
+```
+
+
+
+```{r}
+prem_modeling %>% 
+  ggplot(aes(x = Gls, fill = revision)) +
+  geom_density(alpha = 0.5) +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
+  xlab("Goals")
+```
+
+```{r}
+prem_modeling %>% 
+  ggplot(aes(x = Rk, fill = revision)) +
+  geom_density(alpha = 0.5) +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
+  xlab("Table Position")
+```
+```{r}
+prem_modeling %>% 
+  ggplot(aes(x = minutes_played_divided_by90, fill = revision)) +
+  geom_density(alpha = 0.5) +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
+  xlab("Total Minutes Played Dived by 90 (Full Games Played)")
+```
+```{r}
+prem_modeling %>% 
+  ggplot(aes(x = position, fill = revision)) +
+  geom_bar(position = "dodge") +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold"))
+```
+
+
+```{r}
+prem_modeling_outfield <- prem_modeling %>% 
+  filter(position != "GK") %>% 
+  #filter(position %in% c("ST", "LW", "RW", "CF", "CAM")) %>% 
+  filter(minutes_played_divided_by90 >= 19) %>% 
+  mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", position))) %>% 
+  select(-Goals_allowed, -GA90, -SoTA, -Saves, -Save_percent, -W, -L, -D, -CS, -CS_percent, -Pkatt_against, -PKA, -PKsv, -Pk_Save_percent, -PKm)
+```
+
+
+```{r}
+set.seed(494)
+prem_split <- initial_split(prem_modeling_outfield, prop = .75, strata = "revision")
+prem_training <- training(prem_split)
+prem_testing <- testing(prem_split)
+```
+
+
+```{r}
+prem_lasso_recipe <- recipe(revision ~ . , data = prem_training) %>% 
+  step_rm(Player, Nation, Squad, G_per90, A_per90, minutes_played_divided_by90, Attendance, Born) %>%
+  step_upsample(revision, over_ratio = .4) %>% 
+  step_normalize(all_predictors(),
+                 -all_nominal()) %>% 
+  step_dummy(all_nominal(),
+             -all_outcomes())
+
+prem_lasso_recipe %>% 
+  prep(prem_training) %>% 
+  juice()
+```
+
+
+
+```{r}
+prem_lasso <- logistic_reg(mixture = 1) %>% 
+  set_engine("glmnet") %>% 
+  set_args(penalty = tune()) %>% 
+  set_mode("classification")
+
+prem_lasso
+
+prem_lasso_wf <- 
+  workflow() %>% 
+  add_recipe(prem_lasso_recipe) %>% 
+  add_model(prem_lasso)
+
+prem_lasso_wf
+```
+
+```{r}
+set.seed(494) # for reproducibility
+prem_cv <- vfold_cv(prem_training, v = 5)
+
+penalty_grid <- grid_regular(penalty(),
+                             levels = 10)
+
+penalty_grid
+
+prem_lasso_tune <- 
+  prem_lasso_wf %>% 
+  tune_grid(
+    resamples = prem_cv,
+    grid = penalty_grid
+    )
+
+prem_lasso_tune
+```
+
+```{r}
+prem_lasso_tune %>% 
+  show_best(metric = "accuracy")
+```
+
+```{r}
+
+prem_best <- prem_lasso_tune %>% 
+  select_best(metric = "accuracy")
+```
+
+```{r}
+prem_lasso_final_wf <- prem_lasso_wf %>% 
+  finalize_workflow(prem_best)
+
+prem_lasso_final_wf
+```
+```{r}
+prem_lasso_final_mod <- prem_lasso_final_wf %>% 
+  fit(data = prem_training)
+
+prem_lasso_final_mod %>% 
+  pull_workflow_fit() %>% 
+  tidy() 
+```
+
+```{r}
+prem_lasso_final_mod %>% 
+  pull_workflow_fit() %>% 
+  vip()
+```
+
+
+```{r}
+prem_lasso_test <- prem_lasso_final_wf %>% 
+  last_fit(prem_split)
+
+prem_lasso_test %>% 
+  collect_metrics()
+```
+
+
+```{r}
+prem_preds <- prem_lasso_test %>% 
+  collect_predictions()
+
+prem_preds %>% 
+  conf_mat(revision, .pred_class)
+```
+
+
+```{r}
+prem_lasso_test <- prem_testing %>% 
+  bind_cols(predict(prem_lasso_final_mod, new_data = prem_testing, type = "prob")) %>% 
+  bind_cols(predict(prem_lasso_final_mod, new_data = prem_testing)) 
+```
+
+```{r}
+prem_lasso_test %>% 
+  conf_mat(revision, .pred_class)
+```
+
+```{r}
+prem_lasso_test %>% 
+  filter(revision != .pred_class)
+```
+
+
+```{r}
+prem_ranger_recipe <- recipe(revision ~., data = prem_training) %>% 
+  step_rm(Player, Nation, Squad, G_per90, A_per90, minutes_played_divided_by90, Attendance, Born) %>% 
+  step_upsample(revision, over_ratio = .4) %>% 
+  step_mutate_at(all_numeric(), fn = ~as.numeric(.))
+
+prem_ranger_recipe %>% 
+  prep(prem_training) %>% 
+  juice()
+```
+
+
+```{r}
+prem_ranger <- rand_forest(mtry = tune(), 
+              min_n = tune(), 
+              trees = 100) %>% 
+  set_mode("classification") %>% 
+  set_engine("ranger")
+
+prem_ranger_wf <- 
+  workflow() %>% 
+  add_recipe(prem_ranger_recipe) %>% 
+  add_model(prem_ranger) 
+
+prem_ranger_wf
+```
+
+
+```{r}
+set.seed(494)
+
+prem_rf_grid <- grid_regular(min_n(), finalize(mtry(), prem_training %>% select(-revision)), levels = 3)
+
+ctrl_res <- control_stack_grid()
+
+prem_ranger_cv <- prem_ranger_wf %>% 
+  tune_grid(resamples = prem_cv,
+           grid = prem_rf_grid,
+           control = ctrl_res)
+
+collect_metrics(prem_ranger_cv)
+```
+
+
+```{r}
+prem_best1 <- prem_ranger_cv %>% 
+  select_best(metric = "accuracy")
+
+prem_ranger_final_wf<- prem_ranger_wf %>% 
+  finalize_workflow(prem_best1)
+```
+
+```{r}
+set.seed(494)
+prem_ranger_fit <- prem_ranger_final_wf %>% 
+  fit(prem_training)
+
+
+prem_rf_explain <- 
+  explain_tidymodels(
+    model = prem_ranger_fit,
+    data = prem_training %>% select(-revision), 
+    y = as.numeric(prem_training$revision == "TOTS"),
+    label = "rf"
+  )
+```
+
+```{r}
+prem_rf_var_imp <- 
+  model_parts(
+    prem_rf_explain
+    )
+
+plot(prem_rf_var_imp)
+```
+
+
+
+
+
+```{r}
+prem_ranger_test <- prem_ranger_final_wf %>% 
+  last_fit(prem_split)
+
+prem_ranger_test %>% 
+  collect_metrics()
+```
+
+```{r}
+prem_preds1 <- prem_ranger_test %>% 
+  collect_predictions()
+
+prem_preds1 %>% 
+  conf_mat(revision, .pred_class)
+```
+
+```{r}
+prem_ranger_test <- prem_testing %>% 
+  bind_cols(predict(prem_ranger_fit, new_data = prem_testing, type = "prob")) %>% 
+  bind_cols(predict(prem_ranger_fit, new_data = prem_testing)) 
+```
+
+```{r}
+prem_ranger_test %>% 
+  conf_mat(revision, .pred_class)
+```
+
+```{r}
+prem_ranger_test %>% 
+  filter(revision != .pred_class)
+```
+
+
+
+
+```{r}
+prem_modeling21 <- fifa21_modeling %>% 
+  mutate(revision = as.factor(revision), Nation = as.factor(Nation), Age = as.integer(Age))
+```
+
+```{r}
+prem_modeling_outfield21 <- prem_modeling21 %>% 
+  filter(position != "GK") %>% 
+  #filter(position %in% c("ST", "LW", "RW", "CF", "CAM")) %>% 
+  filter(minutes_played_divided_by90 >= 19) %>% 
+  mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", position)))
+```
+
+
+```{r}
+prem_ranger_test21 <- prem_modeling_outfield21 %>% 
+  bind_cols(predict(prem_ranger_fit, new_data = prem_modeling_outfield21, type = "prob")) %>% 
+  bind_cols(predict(prem_ranger_fit, new_data = prem_modeling_outfield21)) 
+```
+
+
+```{r}
+prem_lasso_test21 <- prem_modeling_outfield21 %>% 
+  bind_cols(predict(prem_lasso_final_mod, new_data = prem_modeling_outfield21, type = "prob")) %>% 
+  bind_cols(predict(prem_lasso_final_mod, new_data = prem_modeling_outfield21)) 
+```
+

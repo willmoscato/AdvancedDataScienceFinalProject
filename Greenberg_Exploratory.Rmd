@@ -88,28 +88,48 @@ prem_goals_logo
 ```
 
 ```{r}
-prem_modeling %>% 
+prem_tablepos_density <- prem_modeling %>% 
   rename(Revision = revision) %>% 
   ggplot(aes(x = Rk, fill = Revision)) +
   geom_density(alpha = 0.5) +
   scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
-  labs(x = "Table Position", y = "Density", title = "Density Plot of Premier League Table Position by Revision Status", subtitle = "Players on teams with higher table position make up a substantial proportion of the Premier League TOTS dataset") + 
-theme(plot.subtitle = element_text(hjust = .3, size = 10), plot.title = element_text(hjust = .1, size = 13.5))
+  labs(x = "Table Position", y = "Density", title = "Density Plot of Premier League Table Position by Revision Status", subtitle = "Players on winning teams (lower table position) make up a substantial proportion of the Premier League TOTS dataset") + 
+theme(plot.subtitle = element_text(hjust = .4, size = 10), plot.title = element_text(hjust = .1, size = 13.5))
 
+prem_tablepos_logo <- ggdraw() + draw_image("https://www.fifplay.com/img/public/premier-league-2-logo.png", x = .42, y = .2, scale = .25) + 
+  draw_plot(prem_tablepos_density)
+
+prem_tablepos_logo
 ```
 
 ```{r}
-prem_modeling %>% 
-  ggplot(aes(x = minutes_played_divided_by90, fill = revision)) +
+# IS THIS AN INDIVIDUAL OR TEAM RATE STAT OR (Minutes Played Per Contest of the Team or just Minutes Played Per Match Played in by Player)???? Could be different for small sample size players 
+prem_mppn_density <- prem_modeling %>% 
+  rename(Revision = revision) %>% 
+  ggplot(aes(x = minutes_played_divided_by90, fill = Revision)) +
   geom_density(alpha = 0.5) +
   scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
-  xlab("Total Minutes Played Dived by 90 (Full Games Played)")
+  labs(x = "Total Minutes Played Dived by 90 (Full Games Played)", y = "Density", title = "Density Plot of Minutes Played (Per 90 Minutes) by Revision Status", subtitle = "Players who accrue more minutes per contest ") + 
+theme(plot.subtitle = element_text(hjust = .3, size = 10), plot.title = element_text(hjust = .1, size = 13.5))
+
+prem_mppn_logo <- ggdraw() + draw_image("https://www.fifplay.com/img/public/premier-league-2-logo.png", x = .42, y = .2, scale = .25) + 
+  draw_plot(prem_mppn_density)
+
+prem_mppn_logo
 ```
+
 ```{r}
-prem_modeling %>% 
-  ggplot(aes(x = position, fill = revision)) +
-  geom_bar(position = "dodge") +
-  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold"))
+prem_positions <- prem_modeling %>% 
+  rename(Revision = revision) %>% 
+  ggplot(aes(x = position, fill = Revision)) +
+  geom_bar(position = "identity") +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
+  labs(x = "Position", y = "Count", title = "Positional Breakdown Within Premier League Dataset")
+
+prem_positions_logo <- ggdraw() + draw_image("https://www.fifplay.com/img/public/premier-league-2-logo.png", x = .42, y = .22, scale = .25) + 
+  draw_plot(prem_positions)
+
+prem_positions_logo
 ```
 
 

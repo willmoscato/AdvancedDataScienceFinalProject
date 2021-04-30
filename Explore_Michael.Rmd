@@ -452,18 +452,11 @@ prem_modeling_outfield <- prem_modeling %>%
 ```
 
 ```{r}
-prem_modeling_outfield %>%
-  filter(is.na(points))
-```
-
-```{r}
 set.seed(494)
 prem_split <- initial_split(prem_modeling_outfield, prop = .5, strata = "revision")
 prem_training <- training(prem_split)
 prem_testing <- testing(prem_split)
 ```
-
-
 
 ```{r}
 prem_lasso_recipe <- recipe(revision ~ . , data = prem_training) %>% 
@@ -478,7 +471,6 @@ prem_lasso_recipe %>%
   prep(prem_training) %>% 
   juice()
 ```
-
 
 ```{r}
 prem_lasso <- logistic_reg(mixture = 1) %>% 

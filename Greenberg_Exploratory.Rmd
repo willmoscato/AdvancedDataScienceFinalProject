@@ -9,17 +9,6 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
----
-title: "Moscato Exploratory"
-author: "Will Moscato"
-date: "4/22/2021"
-output: html_document
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
 ```{r}
 library(tidyverse)
 library(tidymodels)
@@ -63,9 +52,16 @@ prem_modeling %>%
 
 ```{r}
 prem_modeling %>% 
-  ggplot(aes(x = revision, fill = revision)) +
+# CHANGES:
+  rename(Revision = revision) %>% 
+  ggplot(aes(x = Revision, fill = Revision)) +
   geom_bar() +
-  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold"))
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
+
+  # CHANGES
+  
+  labs(x = "Revision", title = "Proportion of Revisions Within Dataset Selected for TOTS") +
+  theme_classic()
 ```
 
 

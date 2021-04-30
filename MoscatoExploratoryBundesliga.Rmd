@@ -348,7 +348,7 @@ bundesliga_modeling21 <- fifa21_modeling_bundesliga %>%
 bundesliga_modeling_outfield21 <- bundesliga_modeling21 %>% 
   filter(position != "GK") %>% 
   #filter(position %in% c("ST", "LW", "RW", "CF", "CAM")) %>% 
-  filter(minutes_played_divided_by90 >= 19) %>% 
+  filter(minutes_played_divided_by90 >= 18) %>% 
   mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", ifelse(position == "RW", "RM", ifelse(position == "LW", "LM", position)))))
 ```
 

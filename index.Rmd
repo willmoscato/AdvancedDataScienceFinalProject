@@ -1,0 +1,142 @@
+---
+title: "Predicting EA Sports FIFA Team of the Season in Europe's Five Leagues"
+output: html_document
+---
+
+## Table of Contents
+
+---------------------
+
+### Introduction
+
+----------------
+
+### Methods and Materials
+
+-------------------------
+
+### English Premier League
+
+--------------------------
+
+### La Liga (Spain)
+
+-------------------
+
+### French Ligue 1
+
+------------------
+
+### German Bundesliga
+
+---------------------
+
+### Italian Serie A
+
+-------------------
+
+
+
+
+
+\
+\
+
+
+
+
+
+
+
+## Introduction
+
+
+
+
+
+
+
+\
+\
+
+
+
+
+
+## Methods and Materials
+
+
+
+
+
+
+
+\
+\
+
+
+
+
+
+## English Premier League
+
+
+
+
+
+\
+\
+
+
+
+
+## La Liga (Spain)
+
+
+
+
+
+\
+\
+
+
+
+
+## French Ligue 1
+
+
+
+
+
+
+\
+\
+
+
+
+
+## German Bundesliga
+
+
+
+
+
+\
+\
+
+
+
+
+
+## Italian Serie A
+
+
+
+
+
+
+
+
+
+
+

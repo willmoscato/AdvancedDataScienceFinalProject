@@ -18,6 +18,10 @@ library(stacks)
 library(DALEX)
 library(DALEXtra)
 library(themis)
+
+# CHANGES
+
+library(cowplot)
 ```
 
 
@@ -51,17 +55,21 @@ prem_modeling %>%
 ```
 
 ```{r}
-prem_modeling %>% 
+theme_set(theme_cowplot())
+prem_prop <- prem_modeling %>% 
 # CHANGES:
   rename(Revision = revision) %>% 
   ggplot(aes(x = Revision, fill = Revision)) +
   geom_bar() +
   scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
-
   # CHANGES
-  
-  labs(x = "Revision", title = "Proportion of Revisions Within Dataset Selected for TOTS") +
-  theme_classic()
+  labs(x = "Revision", y = "Count", title = "Proportion of Revisions Within Premier League Dataset Selected for TOTS") +
+  theme(plot.title = element_text(hjust = .2, size = 13.5)) +
+  geom_vline(xintercept = 0, linetype = "dotted") 
+prem_prop_logo <- ggdraw() + draw_image("https://www.fifplay.com/img/public/premier-league-2-logo.png", x = .42, y = .23, scale = .25) + 
+  draw_plot(prem_prop)
+
+prem_prop_logo
 ```
 
 

@@ -10,6 +10,12 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
-fifa
+fifa19_ligue1_standard_stats
 ```
+
+fifa19_standard_plus_table
+```
+
+Filter out players who really play (GS or MPG??)
+characters into factors
 

@@ -29,6 +29,10 @@ serie_atable19 <- read.csv("serie_atable19.csv")
 goalkeeper_serie_a17 <- read.csv('goalkeeper_serie_a17.csv')
 goalkeeper_serie_a18 <- read.csv('goalkeeper_serie_a18.csv')
 goalkeeper_serie_a19 <- read.csv('goalkeeper_serie_a19.csv')
+serie_anames21 <- read.csv("20_21_serie_anames.csv")
+standardserie_a21 <- read.csv("standardserie_a21.csv")
+serie_atable21 <- read.csv("serie_atable21.csv")
+
 ```
 
 
@@ -365,5 +369,108 @@ dim(fifa19_modeling_serie_a)
 ```{r}
 fifa17_modeling_serie_a %>% 
   filter(revision == "TOTS")
+```
+
+
+## 21 testing 
+
+```{r}
+serie_anames21 <-serie_anames21 %>% 
+  mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
+  mutate(Player = str_replace_all(Player1, "-", " ")) 
+```
+
+
+```{r}
+serie_a21_names <- fifa21_names %>% 
+  filter(league == "Serie A TIM") %>% 
+  select(player_name, player_extended_name, overall, revision, position)
+```
+
+
+
+```{r}
+serie_a21 <- serie_anames21 %>%
+  inner_join(serie_a21_names, by = c("Player" = "player_extended_name")) %>% 
+  select(-Player1, -player_name)
+```
+
+
+```{r}
+missing21 <- serie_anames21 %>%
+  left_join(serie_a21_names, by = c("Player" = "player_extended_name")) %>% 
+  filter(is.na(player_name) == TRUE)
+```
+
+
+
+
+
+```{r}
+not_missing_21 <- missing21 %>% 
+  select(-overall, -revision, -position) %>% 
+  left_join(serie_a19_names, by = c("Player" = "player_name")) 
+```
+
+
+```{r}
+
+last_names21 <- not_missing_21 %>% 
+  filter(is.na(overall) == TRUE) %>% 
+  mutate(Player_short =  gsub(".* ", "", Player)) %>% 
+ mutate(Player_short = ifelse(Player_short == "Kadhim", "Adnan", ifelse(Player_short == "Balde", "Balde Diao", ifelse(Player_short == "Barbosa", "Gabriel", ifelse(Player_short == "Cabral", "Rafael", ifelse(Player_short == "Chiesa", "Federico", ifelse(Player_short == "Junior", "Da Costa", ifelse(Player_short == "DAlessandro", "D'Alessandro", ifelse(Player_short == "DAmbrosio", "D'Ambrosio", ifelse(Player_short == "Maio", "De Maio", ifelse(Player_short == "DellOrco", "Dell'Orco", ifelse(Player_short == "Roberto", "Di Roberto", ifelse(Player_short == "Guzman", "De Guzman", ifelse(Player_short == "Higuain", "Higuai­n", ifelse(Player_short == "Lirola", "Pol Mikel", ifelse(Player_short == "Locatelli", "Manuel", ifelse(Player_short == "Savic", "Milinkovic-Savic", ifelse(Player_short == "Reina", "Jose Reina", ifelse(Player_short == "Andrade", "Nicolas", ifelse(Player_short == "Bello", "Felipe", ifelse(Player_short == "Santos", "Samir", ifelse(Player_short == "Nwankwo", "Simy", ifelse(Player_short == "Ekong", "Troots-Ekong", ifelse(Player_short == "Nzonzi", "N'Zonzi", ifelse(Player_short == "Marlon", "Marlon Santos", ifelse(Player_short == "Henrique", "Dalbert", Player_short)))))))))))))))))))))))))) %>%
+  select(-player_name, -player_extended_name, -overall, -revision, - Player1, -position)
+
+not_real_name21 <- not_missing_21 %>% 
+  filter(is.na(overall) == FALSE) %>% 
+  select(-Player1, -player_name, -player_extended_name)
+```
+
+
+```{r}
+weird_names21 <- last_names21 %>% 
+  inner_join(serie_a21_names, by = c("Player_short" = "player_name")) %>% 
+  select(-Player_short, -player_extended_name)
+```
+
+```{r}
+fifa21_serie_a_full <- serie_a21 %>%
+  bind_rows(not_real_name21, weird_names21) %>% 
+  distinct(Player, .keep_all = TRUE) %>% 
+  select(Player, revision, position, Int, TklW, OG, PKcon)
+```
+
+
+```{r}
+standardserie_a21 <- standardserie_a21 %>% 
+  mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
+  mutate(Player = str_replace_all(Player1, "-", " ")) %>% 
+  mutate(Age = gsub("-.*", "", Age))
+```
+
+```{r}
+fifa21_serie_a_standard_stats <- fifa21_serie_a_full %>% 
+  inner_join(standardserie_a21, by = "Player") %>% 
+  select(-Player1, -Pos) %>% 
+  distinct(Player, .keep_all = TRUE)
+```
+
+```{r}
+fifa21_standard_plus_table_serie_a <- fifa21_serie_a_standard_stats %>% 
+  inner_join(serie_atable21, by = "Squad")
+```
+
+
+
+
+```{r}
+fifa21_modeling_serie_a <- fifa21_standard_plus_table_serie_a %>% 
+   rename(minutes_played_divided_by90 = X90s, Non_PK_G = G.PK, G_plus_A_per90 = G.A, G_minus_Pk_per90 = G.PK.1, G_plus_A_minus_PK_per90 = G.A.PK, G_per90 = Gls.1, A_per90 = Ast.1) %>% 
+  mutate(Nation = sub('.* ', '', Nation)) 
+```
+
+
+```{r}
+dim(fifa21_modeling_serie_a)
 ```
 

@@ -340,6 +340,36 @@ serie_a_ranger_test %>%
 ```
 
 
+```{r}
+serie_a_modeling21 <- fifa21_modeling_serie_a %>% 
+  mutate(revision = as.factor(revision), Nation = as.factor(Nation), Age = as.integer(Age))
+```
+
+```{r}
+serie_a_modeling_outfield21 <- serie_a_modeling21 %>% 
+  filter(position != "GK") %>% 
+  #filter(position %in% c("ST", "LW", "RW", "CF", "CAM")) %>% 
+  filter(minutes_played_divided_by90 >= 14) %>% 
+  mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", ifelse(position == "RW", "RM", ifelse(position == "LW", "LM", position)))))
+```
+
+
+```{r}
+serie_a_ranger_test21 <- serie_a_modeling_outfield21 %>% 
+  bind_cols(predict(serie_a_ranger_fit, new_data = serie_a_modeling_outfield21, type = "prob")) %>% 
+  bind_cols(predict(serie_a_ranger_fit, new_data = serie_a_modeling_outfield21)) 
+```
+
+
+```{r}
+serie_a_lasso_test21 <- serie_a_modeling_outfield21 %>% 
+  bind_cols(predict(serie_a_lasso_final_mod, new_data = serie_a_modeling_outfield21, type = "prob")) %>% 
+  bind_cols(predict(serie_a_lasso_final_mod, new_data = serie_a_modeling_outfield21)) 
+```
+
+
+
+
 
 
 

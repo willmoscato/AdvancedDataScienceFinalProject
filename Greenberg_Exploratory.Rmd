@@ -159,22 +159,22 @@ prem_train_metrics <- prem_training %>%
   mutate(Type = "Training") %>% 
   rename(Revision = revision) %>% 
   group_by(Revision, Type) %>% 
-  summarize(Goals = mean(Gls, na.rm = T), Assists = mean(Ast, na.rm = T), `Non PK Goals` = mean(Non_PK_G, na.rm = T), PK = mean(PK, na.rm = T), `Team Rank` = mean(Rk, na.rm = T), `Minutes Per 90` = mean(Min, na.rm = T)/90 , `Goals SD` = sd(Gls, na.rm = T), `Assists SD` = sd(Ast, na.rm = T), `Non PK Goals SD` = sd(Non_PK_G, na.rm = T), `PK SD` = sd(PK, na.rm = T),`Team Rank SD` = sd(Rk, na.rm = T), `Minutes Per 90 SD` = sd(Min, na.rm = T)/90)
+  summarize(Goals = mean(Gls, na.rm = T), Assists = mean(Ast, na.rm = T), `Non PK Goals` = mean(Non_PK_G, na.rm = T), PK = mean(PK, na.rm = T), `Team Rank` = mean(Rk, na.rm = T), `Minutes Per 90` = mean(Min, na.rm = T)/90 , `Goals SD` = sd(Gls, na.rm = T), `Assists SD` = sd(Ast, na.rm = T), `Non PK Goals SD` = sd(Non_PK_G, na.rm = T),`Team Rank SD` = sd(Rk, na.rm = T), `Minutes Per 90 SD` = sd(Min, na.rm = T)/90)
 
 prem_test_metrics <- prem_testing %>% 
   mutate(Type = "Testing") %>% 
   rename(Revision = revision) %>% 
   group_by(Revision, Type) %>% 
-  summarize(Goals = mean(Gls, na.rm = T), Assists = mean(Ast, na.rm = T), `Non PK Goals` = mean(Non_PK_G, na.rm = T), PK = mean(PK, na.rm = T),`Team Rank` = mean(Rk, na.rm = T), `Minutes Per 90` = mean(Min, na.rm = T)/90, `Goals SD` = sd(Gls, na.rm = T), `Assists SD` = sd(Ast, na.rm = T), `Non PK Goals SD` = sd(Non_PK_G, na.rm = T), `PK SD` = sd(PK, na.rm = T),`Team Rank SD` = sd(Rk, na.rm = T), `Minutes Per 90 SD` = sd(Min, na.rm = T)/90)
+  summarize(Goals = mean(Gls, na.rm = T), Assists = mean(Ast, na.rm = T), `Non PK Goals` = mean(Non_PK_G, na.rm = T), PK = mean(PK, na.rm = T),`Team Rank` = mean(Rk, na.rm = T), `Minutes Per 90` = mean(Min, na.rm = T)/90, `Goals SD` = sd(Gls, na.rm = T), `Assists SD` = sd(Ast, na.rm = T), `Non PK Goals SD` = sd(Non_PK_G, na.rm = T),`Team Rank SD` = sd(Rk, na.rm = T), `Minutes Per 90 SD` = sd(Min, na.rm = T)/90)
 
 prem_rebound_split <- rbind(prem_train_metrics, prem_test_metrics) %>% arrange(Revision)
 
-prem_metrics_table <- formattable(prem_rebound_split[1:4,1:14])
+prem_metrics_table <- formattable(prem_rebound_split[1:4,1:13])
 
-kable(prem_metrics_table, align = c(rep('c', 14))) %>% 
+kable(prem_metrics_table, align = c(rep('c', 1))) %>% 
   row_spec(0) %>% 
   kable_styling(full_width = F) %>% 
-  add_header_above(c("Premier League Training and Testing Group Comparison for KPIs" = 14), background = "purple", color = "white")
+  add_header_above(c("Premier League Training and Testing Group Comparison for KPIs" = 13), background = "purple", color = "white")
 ```
 
 

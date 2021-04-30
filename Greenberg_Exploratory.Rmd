@@ -72,23 +72,32 @@ prem_prop_logo <- ggdraw() + draw_image("https://www.fifplay.com/img/public/prem
 prem_prop_logo
 ```
 
-
-
 ```{r}
-prem_modeling %>% 
-  ggplot(aes(x = Gls, fill = revision)) +
+prem_goals_density <- prem_modeling %>% 
+  rename(Revision = revision) %>% 
+  ggplot(aes(x = Gls, fill = Revision)) +
   geom_density(alpha = 0.5) +
   scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
-  xlab("Goals")
+  labs(x = "Goals", y = "Density", title = "Density Plot of Goals Scored in Premier League Season by Revision Status", subtitle = "TOTS players tend to score goals more prolifically than their non-selected counterparts") + 
+theme(plot.subtitle = element_text(hjust = -.35, size = 11), plot.title = element_text(hjust = .1, size = 13.5))
+
+prem_goals_logo <- ggdraw() + draw_image("https://www.fifplay.com/img/public/premier-league-2-logo.png", x = .42, y = .2, scale = .25) + 
+  draw_plot(prem_goals_density)
+
+prem_goals_logo
 ```
 
 ```{r}
 prem_modeling %>% 
-  ggplot(aes(x = Rk, fill = revision)) +
+  rename(Revision = revision) %>% 
+  ggplot(aes(x = Rk, fill = Revision)) +
   geom_density(alpha = 0.5) +
   scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
-  xlab("Table Position")
+  labs(x = "Table Position", y = "Density", title = "Density Plot of Premier League Table Position by Revision Status", subtitle = "Players on teams with higher table position make up a substantial proportion of the Premier League TOTS dataset") + 
+theme(plot.subtitle = element_text(hjust = .3, size = 10), plot.title = element_text(hjust = .1, size = 13.5))
+
 ```
+
 ```{r}
 prem_modeling %>% 
   ggplot(aes(x = minutes_played_divided_by90, fill = revision)) +

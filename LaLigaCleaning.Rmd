@@ -193,7 +193,7 @@ not_missing_la_liga_18 <- missing_la_liga18 %>%
 last_names_la_liga18 <- not_missing_la_liga_18 %>% 
  filter(is.na(overall) == TRUE) %>% 
   mutate(Player_short =  gsub(".* ", "", Player)) %>% 
-  mutate(Player_short = ifelse(Player_short == "Stegen", "Ter Stegen", ifelse(Player_short == "Sanjurjo", "Oier", ifelse(Player_short == "Berchiche", "Yuri", ifelse(Player_short == "Nzonzi", "N'Zonzi", ifelse(Player_short == "Soriano" , "Bruno", ifelse(Player_short == "Niguez", "Saul", ifelse(Player_short == "Etxebarria", "Benat", ifelse(Player_short == "Nacho", "Nacho Fernandez", ifelse(Player_short == "Ramirez", "Sandro", ifelse(Player == "Yeray Alvarez", "Yeray", ifelse(Player == "Jonny Castro", "Jonny", ifelse(Player_short == "Marcos", "De Marcos", ifelse(Player_short == "Michel", "Michel Maicedo", ifelse(Player_short == "Alexander", "Szymanowski", ifelse(Player == "Alvaro Gonzalez", "Alvaro", ifelse(Player_short == "Cuevas", "De Las Cuevas", ifelse(Player_short == "Carcela", "Carcela-Gonzalez", ifelse(Player_short == "Dehli", "Krohn-Dehli", ifelse(Player_short == "Tomas", "De Tomas", Player_short)))))))))))))))))))) %>% 
+  mutate(Player_short = ifelse(Player_short == "Stegen", "Ter Stegen", ifelse(Player_short == "Sanjurjo", "Oier", ifelse(Player_short == "Berchiche", "Yuri", ifelse(Player_short == "Nzonzi", "N'Zonzi", ifelse(Player_short == "Soriano" , "Bruno", ifelse(Player_short == "Niguez", "Saul", ifelse(Player_short == "Etxebarria", "Benat", ifelse(Player_short == "Nacho", "Nacho Fernandez", ifelse(Player_short == "Ramirez", "Sandro", ifelse(Player == "Yeray Alvarez", "Yeray", ifelse(Player == "Jonny Castro", "Jonny", ifelse(Player_short == "Marcos", "De Marcos", ifelse(Player_short == "Michel", "Michel Maicedo", ifelse(Player_short == "Alexander", "Szymanowski", ifelse(Player == "Alvaro Gonzalez", "Alvaro", ifelse(Player_short == "Cuevas", "De Las Cuevas", ifelse(Player_short == "Carcela", "Carcela-Gonzalez", ifelse(Player_short == "Dehli", "Krohn-Dehli", ifelse(Player_short == "Tomas", "De Tomas", ifelse(Player_short == "Torres", "Pau Torres", Player_short))))))))))))))))))))) %>% 
   select(-player_name, -player_extended_name, -overall, -revision, - Player1, -position)
 
 not_real_name_la_liga18 <- not_missing_la_liga_18 %>% 
@@ -418,7 +418,7 @@ not_missing_21 <- missing21 %>%
 last_names21 <- not_missing_21 %>% 
   filter(is.na(overall) == TRUE) %>% 
   mutate(Player_short =  gsub(".* ", "", Player)) %>% 
- mutate(Player_short = ifelse(Player_short == "Stegen", "Ter Stegen", ifelse(Player_short == "Sanjurjo", "Oier", ifelse(Player_short == "Berchiche", "Yuri", ifelse(Player_short == "Nzonzi", "N'Zonzi", ifelse(Player_short == "Soriano" , "Bruno", ifelse(Player_short == "Niguez", "Saul", ifelse(Player_short == "Etxebarria", "Benat", ifelse(Player_short == "Nacho", "Nacho Fernandez", ifelse(Player_short == "Ramirez", "Sandro", ifelse(Player == "Yeray Alvarez", "Yeray", ifelse(Player == "Jonny Castro", "Jonny", ifelse(Player_short == "Marcos", "De Marcos", ifelse(Player_short == "Michel", "Michel Maicedo", ifelse(Player_short == "Alexander", "Szymanowski", ifelse(Player == "Alvaro Gonzalez", "Alvaro", ifelse(Player_short == "Cuevas", "De Las Cuevas", ifelse(Player_short == "Carcela", "Carcela-Gonzalez", ifelse(Player_short == "Dehli", "Krohn-Dehli", ifelse(Player_short == "Tomas", "De Tomas", Player_short)))))))))))))))))))) %>%
+ mutate(Player_short = ifelse(Player_short == "Stegen", "Ter Stegen", ifelse(Player_short == "Sanjurjo", "Oier", ifelse(Player_short == "Berchiche", "Yuri", ifelse(Player_short == "Nzonzi", "N'Zonzi", ifelse(Player_short == "Soriano" , "Bruno", ifelse(Player_short == "Niguez", "Saul", ifelse(Player_short == "Etxebarria", "Benat", ifelse(Player_short == "Nacho", "Nacho Fernandez", ifelse(Player_short == "Ramirez", "Sandro", ifelse(Player == "Yeray Alvarez", "Yeray", ifelse(Player == "Jonny Castro", "Jonny", ifelse(Player_short == "Marcos", "De Marcos", ifelse(Player_short == "Michel", "Michel Maicedo", ifelse(Player_short == "Alexander", "Szymanowski", ifelse(Player == "Alvaro Gonzalez", "Alvaro", ifelse(Player_short == "Cuevas", "De Las Cuevas", ifelse(Player_short == "Carcela", "Carcela-Gonzalez", ifelse(Player_short == "Dehli", "Krohn-Dehli", ifelse(Player_short == "Tomas", "De Tomas", ifelse(Player_short == "Torres", "Pau Torres", Player_short))))))))))))))))))))) %>%
   select(-player_name, -player_extended_name, -overall, -revision, - Player1, -position)
 
 not_real_name21 <- not_missing_21 %>% 
@@ -471,5 +471,5 @@ fifa21_modeling_la_liga <- fifa21_standard_plus_table_la_liga %>%
 
 
 ```{r}
-dim(fifa21_modeling)
+dim(fifa21_modeling_la_liga)
 ```

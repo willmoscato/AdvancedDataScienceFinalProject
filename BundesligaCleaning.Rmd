@@ -468,7 +468,7 @@ fifa21_modeling_bundesliga <- fifa21_standard_plus_table_bundesliga %>%
 
 
 ```{r}
-dim(fifa21_modeling)
+dim(fifa21_modeling_bundesliga)
 ```
 
 

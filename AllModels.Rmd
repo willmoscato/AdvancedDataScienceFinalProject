@@ -1161,7 +1161,7 @@ ligue1_modeling_outfield21 <- ligue1_modeling21 %>%
   filter(position != "GK") %>% 
   #filter(position %in% c("ST", "LW", "RW", "CF", "CAM")) %>% 
   filter(minutes_played_divided_by90 >= 14) %>% 
-  mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", ifelse(position == "RW", "RM", ifelse(position == "LW", "LM", position)))))
+  mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", position)))
 ```
 
 

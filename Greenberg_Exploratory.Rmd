@@ -18,6 +18,7 @@ library(stacks)
 library(DALEX)
 library(DALEXtra)
 library(themis)
+library(cvms)
 
 # CHANGES
 
@@ -111,8 +112,8 @@ prem_mppn_density <- prem_modeling %>%
   ggplot(aes(x = minutes_played_divided_by90, fill = Revision)) +
   geom_density(alpha = 0.5) +
   scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
-  labs(x = "Total Minutes Played Dived by 90 (Full Games Played)", y = "Density", title = "Density Plot of Minutes Played (Per 90 Minutes) by Revision Status", subtitle = "Players who accrue more minutes per contest ") + 
-theme(plot.subtitle = element_text(hjust = .3, size = 10), plot.title = element_text(hjust = .1, size = 13.5))
+  labs(x = "Total Minutes Played Dived by 90 (Full Games Played)", y = "Density", title = "Density Plot of Minutes Played (Per 90 Minutes) by Revision Status", subtitle = "Players who accrue more minutes per contest") + 
+theme(plot.subtitle = element_text(hjust = .3, size = 10), plot.title = element_text(hjust = .8, size = 13))
 
 prem_mppn_logo <- ggdraw() + draw_image("https://www.fifplay.com/img/public/premier-league-2-logo.png", x = .42, y = .2, scale = .25) + 
   draw_plot(prem_mppn_density)
@@ -174,9 +175,8 @@ prem_metrics_table <- formattable(prem_rebound_split[1:4,1:13])
 kable(prem_metrics_table, align = c(rep('c', 1))) %>% 
   row_spec(0) %>% 
   kable_styling(full_width = F) %>% 
-  add_header_above(c("Premier League Training and Testing Group Comparison for KPIs" = 13), background = "purple", color = "white")
+  add_header_above(c("Premier League Training and Testing Group Comparison for Suspected KPIs" = 13), background = "purple", color = "white")
 ```
-
 
 
 ```{r}
@@ -192,7 +192,6 @@ prem_lasso_recipe %>%
   prep(prem_training) %>% 
   juice()
 ```
-
 
 
 ```{r}
@@ -236,7 +235,6 @@ prem_lasso_tune %>%
 ```
 
 ```{r}
-
 prem_best <- prem_lasso_tune %>% 
   select_best(metric = "accuracy")
 ```
@@ -257,9 +255,14 @@ prem_lasso_final_mod %>%
 ```
 
 ```{r}
-prem_lasso_final_mod %>% 
+prem_lasso_vip <- prem_lasso_final_mod %>% 
   pull_workflow_fit() %>% 
   vip()
+
+prem_lasso_vip_logo <- ggdraw() + draw_image("https://www.fifplay.com/img/public/premier-league-2-logo.png", x = .15, y = .07, scale = .9) + 
+  draw_plot(prem_lasso_vip) 
+
+prem_lasso_vip_logo
 ```
 
 
@@ -267,7 +270,7 @@ prem_lasso_final_mod %>%
 prem_lasso_test <- prem_lasso_final_wf %>% 
   last_fit(prem_split)
 
-prem_lasso_test %>% 
+prem_confusion_lasso <- prem_lasso_test %>% 
   collect_metrics()
 ```
 
@@ -276,10 +279,9 @@ prem_lasso_test %>%
 prem_preds <- prem_lasso_test %>% 
   collect_predictions()
 
-prem_preds %>% 
+prem_confusion <- prem_preds %>% 
   conf_mat(revision, .pred_class)
 ```
-
 
 ```{r}
 prem_lasso_test <- prem_testing %>% 
@@ -290,6 +292,17 @@ prem_lasso_test <- prem_testing %>%
 ```{r}
 prem_lasso_test %>% 
   conf_mat(revision, .pred_class)
+
+prem_confusion_table <- prem_lasso_test %>% 
+  conf_mat(revision, .pred_class)
+
+prem_lasso_ggconfusion <- autoplot(prem_confusion_table, type = "heatmap") + labs(title = "Confusion Matrix of Premier League LASSO Model") + scale_fill_gradient(low = "blue", high = "red") + theme(plot.title = element_text(hjust = .5, size = 15))
+
+
+prem_lasso_final_confusion <- ggdraw() + draw_image("https://www.fifplay.com/img/public/premier-league-2-logo.png", x = -.43, y = .4, scale = .18) + 
+  draw_plot(prem_lasso_ggconfusion)
+
+prem_lasso_final_confusion 
 ```
 
 ```{r}
@@ -371,10 +384,12 @@ prem_rf_var_imp <-
     prem_rf_explain
     )
 
-plot(prem_rf_var_imp)
+prem_rf_plot <- plot(prem_rf_var_imp) 
+
+ggdraw() + draw_image("https://www.fifplay.com/img/public/premier-league-2-logo.png", x = -.44, y = .41, scale = .18) + 
+  draw_plot(prem_rf_plot)
+
 ```
-
-
 
 
 
@@ -401,16 +416,24 @@ prem_ranger_test <- prem_testing %>%
 ```
 
 ```{r}
-prem_ranger_test %>% 
+prem_rf_preds <- prem_ranger_test %>% 
   conf_mat(revision, .pred_class)
+
+prem_rf_ggconfusion <- autoplot(prem_rf_preds, type = "heatmap") + labs(title = "Confusion Matrix of Premier League Random Forest Model") + scale_fill_gradient(low = "blue", high = "red") + theme(plot.title = element_text(hjust = .5, size = 15))
+
+
+prem_rf_final_confusion <- ggdraw() + draw_image("https://www.fifplay.com/img/public/premier-league-2-logo.png", x = -.43, y = .4, scale = .18) + 
+  draw_plot(prem_rf_ggconfusion)
+
+prem_rf_final_confusion 
+
+# grid.arrange(prem_rf_final_confusion, prem_lasso_final_confusion, ncol=1, nrow = 2) If we want the RF and LASSO Confusion Matrices stacked
 ```
 
 ```{r}
 prem_ranger_test %>% 
   filter(revision != .pred_class)
 ```
-
-
 
 
 ```{r}
@@ -438,5 +461,25 @@ prem_ranger_test21 <- prem_modeling_outfield21 %>%
 prem_lasso_test21 <- prem_modeling_outfield21 %>% 
   bind_cols(predict(prem_lasso_final_mod, new_data = prem_modeling_outfield21, type = "prob")) %>% 
   bind_cols(predict(prem_lasso_final_mod, new_data = prem_modeling_outfield21)) 
+
+prem_lasso_test21 %>% 
+  arrange(desc(.pred_TOTS))
+```
+
+
+```{r}
+new_obs_1 <- prem_ranger_test21 %>% filter(Player == "Raheem Sterling") %>% slice(1)
+
+# Pulls together the data needed for the break-down plot
+pp_lasso_1 <- predict_parts(explainer = prem_rf_explain,
+                          new_observation = new_obs_1,
+                          type = "break_down") #default
+
+# Break-down plot
+sterling_prem_pp <- plot(pp_lasso_1, title = "Raheem Sterling Premier League 2021 Prediction") + theme(plot.title = element_text(hjust = .5, size = 15, color = "black", face = "bold"))
+
+
+ggdraw() + draw_image("https://resources.premierleague.com/premierleague/photos/players/250x250/p103955.png", x = -.43, y = .4, scale = .18) + 
+  draw_plot(sterling_prem_pp)
 ```
 

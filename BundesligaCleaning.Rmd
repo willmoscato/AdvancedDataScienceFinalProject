@@ -406,7 +406,7 @@ missing21 <- bundesliganames21 %>%
 ```{r}
 not_missing_21 <- missing21 %>% 
   select(-overall, -revision, -position) %>% 
-  left_join(bundesliga19_names, by = c("Player" = "player_name")) 
+  left_join(bundesliga21_names, by = c("Player" = "player_name")) 
 ```
 
 

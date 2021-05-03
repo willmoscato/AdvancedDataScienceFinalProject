@@ -55,7 +55,7 @@ ligue1_modeling_outfield <- ligue1_modeling %>%
 
 ```{r}
 set.seed(494)
-ligue1_split <- initial_split(ligue1_modeling_outfield, prop = .5, strata = "revision")
+ligue1_split <- initial_split(ligue1_modeling_outfield, prop = .75, strata = "revision")
 ligue1_training <- training(ligue1_split)
 ligue1_testing <- testing(ligue1_split)
 ```
@@ -64,7 +64,7 @@ ligue1_testing <- testing(ligue1_split)
 
 ```{r}
 ligue1_lasso_recipe <- recipe(revision ~ . , data = ligue1_training) %>% 
-  step_rm(Player, Nation, Squad, Born, minutes_played_divided_by90, G_per90, A_per90) %>%
+  step_rm(Player, Nation, Squad, Born, minutes_played_divided_by90, G_per90, A_per90, Attendance) %>%
   step_upsample(revision, over_ratio = .38) %>% 
   step_normalize(all_predictors(),
                  -all_nominal()) %>% 
@@ -125,7 +125,7 @@ ligue1_best <- ligue1_lasso_tune %>%
 
 ```{r}
 ligue1_lasso_final_wf <- ligue1_lasso_wf %>% 
-  finalize_workflow(best)
+  finalize_workflow(ligue1_best)
 
 ligue1_lasso_final_wf
 ```
@@ -183,8 +183,8 @@ ligue1_lasso_test %>%
 
 ```{r}
 ligue1_ranger_recipe <- recipe(revision ~., data = ligue1_training) %>% 
-  step_rm(Player, Squad, Born, Gls, Ast) %>% 
-  step_upsample(revision, over_ratio = .33) %>% 
+  step_rm(Player, Nation, Squad, Born, minutes_played_divided_by90, G_per90, A_per90, Attendance) %>% 
+  step_upsample(revision, over_ratio = .3) %>% 
   step_mutate_at(all_numeric(), fn = ~as.numeric(.))
 
 ligue1_ranger_recipe %>% 
@@ -288,6 +288,39 @@ ligue1_ranger_test %>%
 ligue1_ranger_test %>% 
   filter(revision != .pred_class)
 ```
+
+
+```{r}
+ligue1_modeling21 <- fifa21_modeling_ligue1 %>% 
+  mutate(revision = as.factor(revision), Nation = as.factor(Nation), Age = as.integer(Age))
+```
+
+```{r}
+ligue1_modeling_outfield21 <- ligue1_modeling21 %>% 
+  filter(position != "GK") %>% 
+  #filter(position %in% c("ST", "LW", "RW", "CF", "CAM")) %>% 
+  filter(minutes_played_divided_by90 >= 14) %>% 
+  mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", ifelse(position == "RW", "RM", ifelse(position == "LW", "LM", position)))))
+```
+
+
+```{r}
+ligue1_ranger_test21 <- ligue1_modeling_outfield21 %>% 
+  bind_cols(predict(ligue1_ranger_fit, new_data = ligue1_modeling_outfield21, type = "prob")) %>% 
+  bind_cols(predict(ligue1_ranger_fit, new_data = ligue1_modeling_outfield21)) 
+```
+
+
+```{r}
+ligue1_lasso_test21 <- ligue1_modeling_outfield21 %>% 
+  bind_cols(predict(ligue1_lasso_final_mod, new_data = ligue1_modeling_outfield21, type = "prob")) %>% 
+  bind_cols(predict(ligue1_lasso_final_mod, new_data = ligue1_modeling_outfield21)) 
+```
+
+
+
+
+
 
 
 

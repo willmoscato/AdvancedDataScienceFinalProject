@@ -409,7 +409,7 @@ missing21 <- la_liganames21 %>%
 ```{r}
 not_missing_21 <- missing21 %>% 
   select(-overall, -revision, -position) %>% 
-  left_join(la_liga19_names, by = c("Player" = "player_name")) 
+  left_join(la_liga21_names, by = c("Player" = "player_name")) 
 ```
 
 

@@ -479,7 +479,7 @@ missing21 <- premnames21 %>%
 ```{r}
 not_missing_21 <- missing21 %>% 
   select(-overall, -revision, -position) %>% 
-  left_join(prem19_names, by = c("Player" = "player_name")) 
+  left_join(prem21_names, by = c("Player" = "player_name")) 
 ```
 
 

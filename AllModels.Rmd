@@ -354,7 +354,7 @@ prem_testing <- testing(prem_split)
 ```{r}
 prem_ranger_recipe <- recipe(revision ~., data = prem_training) %>% 
   step_rm(Player, Nation, Squad, G_per90, A_per90, minutes_played_divided_by90, Attendance, Born) %>% 
-  step_upsample(revision, over_ratio = .4) %>% 
+  step_upsample(revision, over_ratio = .33) %>% 
   step_mutate_at(all_numeric(), fn = ~as.numeric(.))
 
 prem_ranger_recipe %>% 

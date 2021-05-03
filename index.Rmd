@@ -84,7 +84,7 @@ The video game FIFA, which is developed by Electronic Arts (EA) Sports, has beco
 
 **Methods**: 
 \
-Using these data sets we went about predicting team of the season players using a Random Forest machine learning model. This makes many decision trees using the data to predict what players will be in the team of the season based upon the information that we feed into it. It then puts all of those trees together in order to make a decision on whether or not a player should be in the team of the season. We can then apply that model to data that it did not use in deciding how to decide whether or not a player is in the team of the season in order to check how good our model really is. 
+Using these data sets we went about predicting team of the season players using a Random Forest machine learning model. OTher models were tested, but we found that this method was the best. This makes many decision trees using the data to predict what players will be in the team of the season based upon the information that we feed into it. It then puts all of those trees together in order to make a decision on whether or not a player should be in the team of the season. We can then apply that model to data that it did not use in deciding how to decide whether or not a player is in the team of the season in order to check how good our model really is. 
 
 
 

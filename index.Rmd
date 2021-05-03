@@ -762,6 +762,15 @@ la_liga_ranger_test21 %>%
 
 
 ```{r ligue1mod, include=FALSE}
+ligue1_fifa19_modeling <- ligue1_fifa19_modeling %>%
+  mutate(Player = paste(Player, '19'))
+
+ligue1_fifa18_modeling <- ligue1_fifa18_modeling %>%
+  mutate(Player = paste(Player, '18'))
+
+ligue1_fifa17_modeling <- ligue1_fifa17_modeling %>%
+  mutate(Player = paste(Player, '17'))
+
 ligue1_modeling <- ligue1_fifa17_modeling %>% 
   bind_rows(ligue1_fifa18_modeling, ligue1_fifa19_modeling) %>% 
   mutate(revision = as.factor(revision), Nation = as.factor(Nation))

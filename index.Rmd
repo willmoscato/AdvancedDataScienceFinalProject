@@ -452,6 +452,14 @@ prem_ranger_test21 %>%
   head(5)
 ```
 
+![Premier League Team of the Season](PremTOTS.jpg)
+
+
+
+
+
+
+
 
 
 
@@ -704,9 +712,21 @@ la_liga_ranger_test21 %>%
 ```
 
 
+![La Liga Team of the Season](LaLigaTOTS.jpg)
+
+
+
+
+
+
 
 \
 \
+
+
+
+
+
 
 
 
@@ -930,6 +950,10 @@ ligue1_ranger_test21 %>%
 ```
 
 
+![Ligue 1 Team of the Season](Ligue1TOTS.jpg)
+
+
+
 
 
 
@@ -962,7 +986,7 @@ bundesliga_modeling <- fifa17_modeling_bundesliga2%>%
   mutate(revision = as.factor(revision), Nation = as.factor(Nation))
 ```
 
-```{r bundesligaplot1, echo=FALSE}
+```{r bundesligaplot1, include=FALSE}
 bundesliga_modeling %>% 
   select(where(is.numeric)) %>% 
   pivot_longer(cols = everything(),
@@ -1186,11 +1210,23 @@ bundesliga_ranger_test21 %>%
 
 
 
+![Bundesliga Team of the Season](BundesligaTOTS.jpg)
+
+
+
+
+
+
+
 
 
 
 \
 \
+
+
+
+
 
 
 
@@ -1443,6 +1479,9 @@ serie_a_ranger_test21 %>%
 ```
 
 
+![Serie A Team of the Season](SerieA_TOTS.jpg)
+
+
 
 
 
@@ -1450,6 +1489,8 @@ serie_a_ranger_test21 %>%
 
 \
 \
+
+
 
 
 
@@ -1459,6 +1500,8 @@ serie_a_ranger_test21 %>%
 
 
 ## All Leagues Combined (and why it does not work)
+
+
 
 
 

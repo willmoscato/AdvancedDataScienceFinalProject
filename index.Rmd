@@ -78,9 +78,14 @@ The video game FIFA, which is developed by Electronic Arts (EA) Sports, has beco
 
 ## Methods and Materials
 
-**Materials**: We retrieved complete player datasets for FIFA 17, FIFA 18, and FIFA 19 from [here](). We retrieved real life statistics from the 2016-2017, 2017-2018, and 2018-2019 seasons from [fbref.com](https://fbref.com/en/). We did not use data from the 2019-2020 season because COVID-19 caused each season to prematurely end in March of 2020.
+**Materials**: We retrieved complete player datasets for FIFA 17, FIFA 18, and FIFA 19 from [here](https://www.kaggle.com/stefanoleone992/fifa-21-ultimate-team-players-and-prices-dataset). We retrieved real life statistics from the 2016-2017, 2017-2018, and 2018-2019 seasons from [fbref.com](https://fbref.com/en/). We did not use data from the 2019-2020 season because COVID-19 caused each season to prematurely end in March of 2020.
+\
+
 
 **Methods**: 
+\
+Using these data sets we went about predicting team of the season players using a Random Forest machine learning model. This makes many decision trees using the data to predict what players will be in the team of the season based upon the information that we feed into it. It then puts all of those trees together in order to make a decision on whether or not a player should be in the team of the season. We can then apply that model to data that it did not use in deciding how to decide whether or not a player is in the team of the season in order to check how good our model really is. 
+
 
 
 

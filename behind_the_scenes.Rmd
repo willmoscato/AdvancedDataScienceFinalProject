@@ -23,7 +23,7 @@ library(lubridate)
 The majority of the cleaning for this project was getting the names of the players from the different data sets to match up. Some players had different names in the fifa (video game) data set than what their actual name is, or they had some nickname either in the fifa data set or in their stats, or for a few players the spelling didn't match up. Other than that most of the variables were already very good and we just had to rename them and join all the data sets together.
 
 \
-We will run you through the cleaning for the premier league and then include the code for all the other leagues, but it is essentially the same thing. 
+We will run you through the cleaning for the premier league for 2017 and then include the code for all the other years and leagues, but it is essentially the same thing. 
 
 ##Premier League
 

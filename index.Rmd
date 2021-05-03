@@ -610,20 +610,42 @@ ligue1_modeling <- ligue1_fifa17_modeling %>%
 
 ```{r ligue1plot1, echo=FALSE}
 ligue1_modeling %>% 
-  ggplot(aes(x = Gls, fill = revision)) +
-  geom_density(alpha = 0.5)
+  ggplot(aes(x = revision, fill = revision)) +
+  geom_bar() +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold"))
 ```
+
+
 
 ```{r ligue1plot2, echo=FALSE}
 ligue1_modeling %>% 
-  ggplot(aes(x = Rk, fill = revision)) +
-  geom_density(alpha = 0.5)
+  ggplot(aes(x = Gls, fill = revision)) +
+  geom_density(alpha = 0.5) +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
+  xlab("Goals Scored")
 ```
 
 ```{r ligue1plot3, echo=FALSE}
 ligue1_modeling %>% 
+  ggplot(aes(x = Rk, fill = revision)) +
+  geom_density(alpha = 0.5) +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
+  xlab("Table Position")
+```
+
+```{r ligue1plot4, echo=FALSE}
+ligue1_modeling %>% 
   ggplot(aes(x = minutes_played_divided_by90, fill = revision)) +
-  geom_density(alpha = 0.5)
+  geom_density(alpha = 0.5) +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
+  xlab("Total Minutes Played Dived by 90 (Full Games Played)")
+```
+
+```{r ligue1plot5, echo=FALSE}
+ligue1_modeling %>% 
+  ggplot(aes(x = position, fill = revision)) +
+  geom_bar(position = "dodge") +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold"))
 ```
 
 

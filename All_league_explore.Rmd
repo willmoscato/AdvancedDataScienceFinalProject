@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
+```{r library}
 library(tidyverse)
 library(tidymodels)
 library(lubridate)
@@ -19,7 +19,7 @@ library(DALEX)
 library(DALEXtra)
 ```
 
-```{r}
+```{r prem modeling creation}
 fifa19_modeling <- fifa19_modeling %>%
   mutate(Player = paste(Player, '19'))
 
@@ -36,7 +36,7 @@ prem_modeling <- fifa19_modeling %>%
          league = 'prem')
 ```
 
-```{r}
+```{r bundesliga modeling creation}
 fifa19_modeling_bundesliga2 <- fifa19_modeling_bundesliga %>%
   mutate(Player = paste(Player, '19'))
 
@@ -54,7 +54,7 @@ bundesliga_modeling <- fifa17_modeling_bundesliga2%>%
          league = 'bundesliga')
 ```
 
-```{r}
+```{r la liga modeling creation}
 fifa19_modeling_la_liga2 <- fifa19_modeling_la_liga %>%
   mutate(Player = paste(Player, '19'))
 
@@ -73,7 +73,7 @@ la_liga_modeling <- fifa17_modeling_la_liga2%>%
          league = 'la liga')
 ```
 
-```{r}
+```{r serie a modeling creation}
 fifa19_modeling_serie_a2 <- fifa19_modeling_serie_a %>%
   mutate(Player = paste(Player, '19'))
 
@@ -91,7 +91,7 @@ serie_a_modeling <- fifa17_modeling_serie_a2%>%
          league = 'serie a')
 ```
 
-```{r}
+```{r ligue 1 modeling creation}
 fifa19_modeling_ligue12 <- ligue1_fifa19_modeling %>%
   mutate(Player = paste(Player, '19'))
 
@@ -109,7 +109,7 @@ ligue1_modeling <- fifa17_modeling_ligue12%>%
          league = 'ligue 1')
 ```
 
-```{r}
+```{r dim check}
 dim(ligue1_modeling)
 dim(serie_a_modeling)
 dim(la_liga_modeling)
@@ -117,39 +117,38 @@ dim(prem_modeling)
 dim(bundesliga_modeling)
 ```
 
-```{r}
+```{r all leagues modeling creation}
 all_leagues_modeling <- prem_modeling %>%
   rbind(bundesliga_modeling, la_liga_modeling, serie_a_modeling, ligue1_modeling)
 ```
 
-```{r}
+```{r all modeling outfield creation/cleaning}
 '%ni%' <- Negate('%in%')
 
 all_modeling_outfield <- all_leagues_modeling %>% 
   filter(position != "GK") %>% 
   filter(MP > 19) %>%
-  mutate(points = Gls + Ast) %>%
   mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", position))) %>% 
   mutate(position = ifelse(position == 'CF', 'ST', position)) %>%
   mutate(position = as.factor(position)) %>%
-  select(-Goals_allowed, -GA90, -SoTA, -Saves, -Save_percent, -W, -L, -D, -CS, -CS_percent, -Pkatt_against, -PKA, -PKsv, -Pk_Save_percent, -PKm, -Born, -Rk, -G_plus_A_minus_PK_per90, -G_plus_A_per90, -G_per90, -A_per90, -G_minus_Pk_per90, -minutes_played_divided_by90)
+  select(-Goals_allowed, -GA90, -SoTA, -Saves, -Save_percent, -W, -L, -D, -CS, -CS_percent, -Pkatt_against, -PKA, -PKsv, -Pk_Save_percent, -PKm, -Born, -G_plus_A_minus_PK_per90, -G_plus_A_per90, -G_per90, -A_per90, -G_minus_Pk_per90, -minutes_played_divided_by90, -Pts)
 ```
 
-```{r}
+```{r all modeling outfield cleaning cont}
 all_modeling_outfield <- all_modeling_outfield %>%
   add_n_miss() %>%
   filter(n_miss_all == 0) %>%
   select(-n_miss_all)
 ```
 
-```{r}
+```{r splitting/training/testing}
 set.seed(494)
 all_split <- initial_split(all_modeling_outfield, prop = .75, strata = "revision")
 all_training <- training(all_split)
 all_testing <- testing(all_split)
 ```
 
-```{r}
+```{r lasso recipe}
 all_lasso_recipe <- recipe(revision ~ . , data = all_training) %>% 
   step_rm(Player, Squad, Nation, league, Attendance) %>%
   step_upsample(revision, over_ratio = .33) %>% 
@@ -163,7 +162,7 @@ all_lasso_recipe %>%
   juice()
 ```
 
-```{r}
+```{r laso WF creation}
 all_lasso <- logistic_reg(mixture = 1) %>% 
   set_engine("glmnet") %>% 
   set_args(penalty = tune()) %>% 
@@ -175,7 +174,7 @@ all_lasso_wf <-
   add_model(all_lasso)
 ```
 
-```{r}
+```{r cv and tune creation}
 set.seed(494) # for reproducibility
 all_cv <- vfold_cv(all_training, v = 5)
 
@@ -190,17 +189,17 @@ all_lasso_tune <-
     )
 ```
 
-```{r}
+```{r best model lasso}
 best <- all_lasso_tune %>% 
   select_best(metric = "accuracy")
 ```
 
-```{r}
+```{r final wf lasso}
 all_lasso_final_wf <- all_lasso_wf %>% 
   finalize_workflow(best)
 ```
 
-```{r}
+```{r lasso final mod}
 all_lasso_final_mod <- all_lasso_final_wf %>% 
   fit(data = all_training)
 
@@ -209,13 +208,13 @@ all_lasso_final_mod %>%
   tidy() 
 ```
 
-```{r}
+```{r lasso vip}
 all_lasso_final_mod %>% 
   pull_workflow_fit() %>% 
   vip()
 ```
 
-```{r}
+```{r lasso testing creation}
 all_lasso_test <- all_lasso_final_wf %>% 
   last_fit(all_split)
 
@@ -223,7 +222,7 @@ all_lasso_test %>%
   collect_metrics()
 ```
 
-```{r}
+```{r lasso prediction/confusion}
 preds <- all_lasso_test %>% 
   collect_predictions()
 
@@ -231,13 +230,13 @@ preds %>%
   conf_mat(revision, .pred_class)
 ```
 
-```{r}
+```{r lasso test col bind}
 lasso_test <- all_testing %>% 
   bind_cols(predict(all_lasso_final_mod, new_data = all_testing, type = "prob")) %>% 
   bind_cols(predict(all_lasso_final_mod, new_data = all_testing)) 
 ```
 
-```{r}
+```{r lasso error league check}
 lasso_test %>% 
   filter(.pred_class != revision) %>%
   select(Player, revision, .pred_class, position, .pred_TOTS, league) %>%
@@ -246,13 +245,14 @@ lasso_test %>%
   arrange(desc(total))
 ```
 
-```{r prem table}
-lasso_test %>%
-  filter(league == 'prem') %>%
-  arrange(desc(.pred_TOTS))
+```{r ranger split}
+set.seed(494)
+all_split <- initial_split(all_modeling_outfield, prop = .75, strata = "revision")
+all_training <- training(all_split)
+all_testing <- testing(all_split)
 ```
 
-```{r}
+```{r ranger recipe}
 all_ranger_recipe <- recipe(revision ~., data = all_training) %>% 
   step_rm(Player, Squad, Nation, league, Attendance) %>% 
   step_upsample(revision, over_ratio = .33) %>% 
@@ -263,8 +263,7 @@ all_ranger_recipe %>%
   juice()
 ```
 
-
-```{r}
+```{r ranger wf creation}
 all_ranger <- rand_forest(mtry = tune(), 
               min_n = tune(), 
               trees = 100) %>% 
@@ -279,14 +278,7 @@ all_ranger_wf <-
 all_ranger_wf
 ```
 
-```{r}
-set.seed(494)
-all_split <- initial_split(all_modeling_outfield, prop = .75, strata = "revision")
-all_training <- training(all_split)
-all_testing <- testing(all_split)
-```
-
-```{r}
+```{r ranger cv creation}
 set.seed(494)
 all_cv <- vfold_cv(all_training, v = 5)
 
@@ -303,7 +295,7 @@ collect_metrics(all_ranger_cv)
 ```
 
 
-```{r}
+```{r ranger best and final wf}
 all_best1 <- all_ranger_cv %>% 
   select_best(metric = "accuracy")
 
@@ -311,7 +303,7 @@ all_ranger_final_wf<- all_ranger_wf %>%
   finalize_workflow(all_best1)
 ```
 
-```{r}
+```{r ranger explainer creation}
 all_ranger_fit <- all_ranger_final_wf %>% 
   fit(all_training)
 
@@ -325,7 +317,7 @@ all_rf_explain <-
   )
 ```
 
-```{r}
+```{r ranger vip}
 all_rf_var_imp <- 
   model_parts(
     all_rf_explain
@@ -335,7 +327,7 @@ plot(all_rf_var_imp)
 ```
 
 
-```{r}
+```{r ranger metrics}
 all_ranger_test <- all_ranger_final_wf %>% 
   last_fit(all_split)
 
@@ -343,7 +335,7 @@ all_ranger_test %>%
   collect_metrics()
 ```
 
-```{r}
+```{r ranger confusion}
 all_preds1 <- all_ranger_test %>% 
   collect_predictions()
 
@@ -351,22 +343,224 @@ all_preds1 %>%
   conf_mat(revision, .pred_class)
 ```
 
-```{r}
+```{r ranger pred col bind}
 all_ranger_test <- all_testing %>% 
   bind_cols(predict(all_ranger_fit, new_data = all_testing, type = "prob")) %>% 
   bind_cols(predict(all_ranger_fit, new_data = all_testing)) 
 ```
 
-```{r}
-all_ranger_test %>% 
-  conf_mat(revision, .pred_class)
-```
-
-```{r}
+```{r ranger error league check}
 all_ranger_test %>% 
   filter(.pred_class != revision) %>%
   select(Player, revision, .pred_class, position, .pred_TOTS, league) %>%
   group_by(league) %>%
   summarise(total = n()) %>%
   arrange(desc(total))
+```
+
+```{r fifa 21 leagues mutate}
+fifa21_modeling <- fifa21_modeling %>%
+  select(-Starts) %>%
+  mutate(league = 'prem')
+
+fifa21_modeling_bundesliga <- fifa21_modeling_bundesliga %>%
+  mutate(league = 'bundesliga')
+
+fifa21_modeling_la_liga <- fifa21_modeling_la_liga %>%
+  mutate(league = 'la liga')
+
+fifa21_modeling_ligue1 <- fifa21_modeling_ligue1 %>%
+  mutate(league = 'ligue 1')
+
+fifa21_modeling_serie_a <- fifa21_modeling_serie_a %>%
+  mutate(league = 'serie a')
+```
+
+```{r all modeling 21 creation}
+all_modeling21 <- fifa21_modeling_bundesliga %>%
+  rbind(fifa21_modeling, fifa21_modeling_la_liga, fifa21_modeling_serie_a, fifa21_modeling_ligue1)
+```
+
+```{r all modeling 21 mutate}
+all_modeling21 <- all_modeling21 %>% 
+  mutate(revision = as.factor(revision), Nation = as.factor(Nation), Age = as.integer(Age))
+```
+
+```{r all modeling outfield 21 creation/clean}
+all_modeling_outfield21 <- all_modeling21 %>% 
+  filter(position != "GK") %>% 
+  filter(MP >= 14) %>% 
+  mutate(position = ifelse(position == 'CF', 'ST', position)) %>%
+  mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", position)))
+```
+
+```{r ranger 21 preds col bind}
+all_ranger_test21 <- all_modeling_outfield21 %>% 
+  bind_cols(predict(all_ranger_fit, new_data = all_modeling_outfield21, type = "prob")) %>% 
+  bind_cols(predict(all_ranger_fit, new_data = all_modeling_outfield21)) 
+```
+
+```{r prem attackers}
+all_ranger_test21 %>%
+  filter(league == 'prem') %>%
+  #filter(position %in% c('CB', 'RB', 'LB')) %>%
+  filter(position %in% c('LW', 'ST', 'RW')) %>%
+  #filter(position %in% c('LM', 'CM', 'CAM', 'CDM', 'RM')) %>%
+  arrange(desc(.pred_TOTS)) %>%
+  select(Player, .pred_TOTS) %>%
+  head(5)
+```
+
+```{r prem mid}
+all_ranger_test21 %>%
+  filter(league == 'prem') %>%
+  #filter(position %in% c('CB', 'RB', 'LB')) %>%
+  #filter(position %in% c('LW', 'ST', 'RW')) %>%
+  filter(position %in% c('LM', 'CM', 'CAM', 'CDM', 'RM')) %>%
+  arrange(desc(.pred_TOTS)) %>%
+  select(Player, .pred_TOTS) %>%
+  head(5)
+```
+
+```{r prem def}
+all_ranger_test21 %>%
+  filter(league == 'prem') %>%
+  filter(position %in% c('CB', 'RB', 'LB')) %>%
+  #filter(position %in% c('LW', 'ST', 'RW')) %>%
+  #filter(position %in% c('LM', 'CM', 'CAM', 'CDM', 'RM')) %>%
+  arrange(desc(.pred_TOTS)) %>%
+  select(Player, .pred_TOTS) %>%
+  head(5)
+```
+
+```{r la liga attackers}
+all_ranger_test21 %>%
+  filter(league == 'la liga') %>%
+  #filter(position %in% c('CB', 'RB', 'LB')) %>%
+  filter(position %in% c('LW', 'ST', 'RW')) %>%
+  #filter(position %in% c('LM', 'CM', 'CAM', 'CDM', 'RM')) %>%
+  arrange(desc(.pred_TOTS)) %>%
+  select(Player, .pred_TOTS) %>%
+  head(5)
+```
+
+```{r la liga mid}
+all_ranger_test21 %>%
+  filter(league == 'la liga') %>%
+  #filter(position %in% c('CB', 'RB', 'LB')) %>%
+  #filter(position %in% c('LW', 'ST', 'RW')) %>%
+  filter(position %in% c('LM', 'CM', 'CAM', 'CDM', 'RM')) %>%
+  arrange(desc(.pred_TOTS)) %>%
+  select(Player, .pred_TOTS) %>%
+  head(5)
+```
+
+```{r la liga def}
+all_ranger_test21 %>%
+  filter(league == 'la liga') %>%
+  filter(position %in% c('CB', 'RB', 'LB')) %>%
+  #filter(position %in% c('LW', 'ST', 'RW')) %>%
+  #filter(position %in% c('LM', 'CM', 'CAM', 'CDM', 'RM')) %>%
+  arrange(desc(.pred_TOTS)) %>%
+  select(Player, .pred_TOTS) %>%
+  head(5)
+```
+
+```{r ligue 1 attackers}
+all_ranger_test21 %>%
+  filter(league == 'ligue 1') %>%
+  #filter(position %in% c('CB', 'RB', 'LB')) %>%
+  filter(position %in% c('LW', 'ST', 'RW')) %>%
+  #filter(position %in% c('LM', 'CM', 'CAM', 'CDM', 'RM')) %>%
+  arrange(desc(.pred_TOTS)) %>%
+  select(Player, .pred_TOTS) %>%
+  head(5)
+```
+
+```{r ligue 1 mid}
+all_ranger_test21 %>%
+  filter(league == 'ligue 1') %>%
+  #filter(position %in% c('CB', 'RB', 'LB')) %>%
+  #filter(position %in% c('LW', 'ST', 'RW')) %>%
+  filter(position %in% c('LM', 'CM', 'CAM', 'CDM', 'RM')) %>%
+  arrange(desc(.pred_TOTS)) %>%
+  select(Player, .pred_TOTS) %>%
+  head(5)
+```
+
+```{r ligue 1 def}
+all_ranger_test21 %>%
+  filter(league == 'ligue 1') %>%
+  filter(position %in% c('CB', 'RB', 'LB')) %>%
+  #filter(position %in% c('LW', 'ST', 'RW')) %>%
+  #filter(position %in% c('LM', 'CM', 'CAM', 'CDM', 'RM')) %>%
+  arrange(desc(.pred_TOTS)) %>%
+  select(Player, .pred_TOTS) %>%
+  head(5)
+```
+
+```{r bundesliga attackers}
+all_ranger_test21 %>%
+  filter(league == 'bundesliga') %>%
+  #filter(position %in% c('CB', 'RB', 'LB')) %>%
+  filter(position %in% c('LW', 'ST', 'RW')) %>%
+  #filter(position %in% c('LM', 'CM', 'CAM', 'CDM', 'RM')) %>%
+  arrange(desc(.pred_TOTS)) %>%
+  select(Player, .pred_TOTS) %>%
+  head(5)
+```
+
+```{r bundesliga mid}
+all_ranger_test21 %>%
+  filter(league == 'bundesliga') %>%
+  #filter(position %in% c('CB', 'RB', 'LB')) %>%
+  #filter(position %in% c('LW', 'ST', 'RW')) %>%
+  filter(position %in% c('LM', 'CM', 'CAM', 'CDM', 'RM')) %>%
+  arrange(desc(.pred_TOTS)) %>%
+  select(Player, .pred_TOTS) %>%
+  head(5)
+```
+
+```{r bundesliga def}
+all_ranger_test21 %>%
+  filter(league == 'bundesliga') %>%
+  filter(position %in% c('CB', 'RB', 'LB')) %>%
+  #filter(position %in% c('LW', 'ST', 'RW')) %>%
+  #filter(position %in% c('LM', 'CM', 'CAM', 'CDM', 'RM')) %>%
+  arrange(desc(.pred_TOTS)) %>%
+  select(Player, .pred_TOTS) %>%
+  head(5)
+```
+
+```{r serie a attackers}
+all_ranger_test21 %>%
+  filter(league == 'serie a') %>%
+  #filter(position %in% c('CB', 'RB', 'LB')) %>%
+  filter(position %in% c('LW', 'ST', 'RW')) %>%
+  #filter(position %in% c('LM', 'CM', 'CAM', 'CDM', 'RM')) %>%
+  arrange(desc(.pred_TOTS)) %>%
+  select(Player, .pred_TOTS) %>%
+  head(5)
+```
+
+```{r serie a mid}
+all_ranger_test21 %>%
+  filter(league == 'serie a') %>%
+  #filter(position %in% c('CB', 'RB', 'LB')) %>%
+  #filter(position %in% c('LW', 'ST', 'RW')) %>%
+  filter(position %in% c('LM', 'CM', 'CAM', 'CDM', 'RM')) %>%
+  arrange(desc(.pred_TOTS)) %>%
+  select(Player, .pred_TOTS) %>%
+  head(5)
+```
+
+```{r serie a def}
+all_ranger_test21 %>%
+  filter(league == 'serie a') %>%
+  filter(position %in% c('CB', 'RB', 'LB')) %>%
+  #filter(position %in% c('LW', 'ST', 'RW')) %>%
+  #filter(position %in% c('LM', 'CM', 'CAM', 'CDM', 'RM')) %>%
+  arrange(desc(.pred_TOTS)) %>%
+  select(Player, .pred_TOTS) %>%
+  head(5)
 ```

@@ -262,7 +262,7 @@ serie_a_ranger_test21 %>%
   arrange(desc(.pred_TOTS)) %>% 
   head(5)
 ```
-
+![Serie A TOTS](SerieA_TOTS.jpg)
 
 #Prem
 
@@ -507,7 +507,7 @@ prem_ranger_test21 %>%
   arrange(desc(.pred_TOTS)) %>% 
   head(5)
 ```
-
+![Premier League TOTS](PremTOTS.jpg)
 
 #LaLiga
 ```{r}
@@ -752,7 +752,7 @@ la_liga_ranger_test21 %>%
   arrange(desc(.pred_TOTS)) %>% 
   head(5)
 ```
-
+![La Liga TOTS](LaLigaTOTS.jpg)
 
 #Bundesliga
 
@@ -996,6 +996,7 @@ bundesliga_ranger_test21 %>%
   arrange(desc(.pred_TOTS)) %>% 
   head(5)
 ```
+![Bundesliga TOTS](BundesligaTOTS.jpg)
 
 #Ligue1
 
@@ -1195,3 +1196,6 @@ ligue1_ranger_test21 %>%
   arrange(desc(.pred_TOTS)) %>% 
   head(5)
 ```
+
+
+![Ligue 1 TOTS](Ligue1TOTS.jpg)

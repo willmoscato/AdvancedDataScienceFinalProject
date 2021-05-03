@@ -370,3 +370,37 @@ all_ranger_test %>%
   summarise(total = n()) %>%
   arrange(desc(total))
 ```
+
+```{r}
+dim(fifa21_modeling)
+dim(fifa21_modeling_bundesliga)
+dim(fifa21_modeling_la_liga)
+dim(fifa21_modeling_ligue1)
+dim(fifa21_modeling_serie_a)
+```
+
+
+```{r}
+all_modeling21 <- fifa21_modeling_bundesliga %>%
+  rbind(fifa21_modeling, fifa21_modeling_la_liga, fifa21_modeling_serie_a, fifa21_modeling_ligue1)
+```
+
+```{r}
+all_modeling21 <- all_modeling21 %>% 
+  mutate(revision = as.factor(revision), Nation = as.factor(Nation), Age = as.integer(Age))
+```
+
+```{r}
+all_modeling_outfield21 <- all_modeling21 %>% 
+  filter(position != "GK") %>% 
+  filter(MP >= 14) %>% 
+  mutate(position = ifelse(position == 'CF', 'ST', position)) %>%
+  mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", position))) %>%
+  select(-Goals_allowed, -GA90, -SoTA, -Saves, -Save_percent, -W, -L, -D, -CS, -CS_percent, -Pkatt_against, -PKA, -PKsv, -Pk_Save_percent, -PKm, -Born, -Rk, -G_plus_A_minus_PK_per90, -G_plus_A_per90, -G_per90, -A_per90, -G_minus_Pk_per90, -minutes_played_divided_by90)
+```
+
+```{r}
+all_ranger_test21 <- all_modeling_outfield21 %>% 
+  bind_cols(predict(all_ranger_fit, new_data = all_modeling_outfield21, type = "prob")) %>% 
+  bind_cols(predict(all_ranger_fit, new_data = all_modeling_outfield21)) 
+```

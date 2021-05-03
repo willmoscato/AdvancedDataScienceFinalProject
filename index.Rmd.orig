@@ -125,12 +125,18 @@ prem_modeling %>%
              scales = "free")
 ```
 
-HEAD
+<<<<<<< HEAD
 ```{r}
 theme_set(theme_cowplot())
 prem_prop <- prem_modeling %>% 
+# CHANGES:
   rename(Revision = revision) %>% 
   ggplot(aes(x = Revision, fill = Revision)) +
+=======
+```{r premplot1, echo=FALSE}
+prem_modeling %>% 
+  ggplot(aes(x = revision, fill = revision)) +
+>>>>>>> 0d74337475d3941e9724bf78182fc68e45856c86
   geom_bar() +
   scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
   # CHANGES
@@ -145,10 +151,16 @@ prem_prop_logo
 
 
 
-
+<<<<<<< HEAD
+```{r}
+prem_goals_density <- prem_modeling %>% 
+  rename(Revision = revision) %>% 
+  ggplot(aes(x = Gls, fill = Revision)) +
+=======
 ```{r premplot2, echo=FALSE}
 prem_modeling %>% 
   ggplot(aes(x = Gls, fill = revision)) +
+>>>>>>> 0d74337475d3941e9724bf78182fc68e45856c86
   geom_density(alpha = 0.5) +
   scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
   labs(x = "Goals", y = "Density", title = "Density Plot of Goals Scored in Premier League Season by Revision Status", subtitle = "TOTS players tend to score goals more prolifically than their non-selected counterparts") + 
@@ -160,11 +172,16 @@ prem_goals_logo <- ggdraw() + draw_image("https://www.fifplay.com/img/public/pre
 prem_goals_logo
 ```
 
-
-```{r premplot3, echo=FALSE}
+<<<<<<< HEAD
+```{r}
 prem_tablepos_density <- prem_modeling %>% 
   rename(Revision = revision) %>% 
   ggplot(aes(x = Rk, fill = Revision)) +
+=======
+```{r premplot3, echo=FALSE}
+prem_modeling %>% 
+  ggplot(aes(x = Rk, fill = revision)) +
+>>>>>>> 0d74337475d3941e9724bf78182fc68e45856c86
   geom_density(alpha = 0.5) +
   scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
   labs(x = "Table Position", y = "Density", title = "Density Plot of Premier League Table Position by Revision Status", subtitle = "Players on winning teams (lower table position) make up a substantial proportion of the Premier League TOTS dataset") + 
@@ -176,14 +193,20 @@ prem_tablepos_logo <- ggdraw() + draw_image("https://www.fifplay.com/img/public/
 prem_tablepos_logo
 ```
 
-```{r premplot4, echo=FALSE}
+<<<<<<< HEAD
+```{r}
 prem_mppn_density <- prem_modeling %>% 
   rename(Revision = revision) %>% 
   ggplot(aes(x = minutes_played_divided_by90, fill = Revision)) +
+=======
+```{r premplot4, echo=FALSE}
+prem_modeling %>% 
+  ggplot(aes(x = minutes_played_divided_by90, fill = revision)) +
+>>>>>>> 0d74337475d3941e9724bf78182fc68e45856c86
   geom_density(alpha = 0.5) +
   scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
   labs(x = "Total Minutes Played Dived by 90 (Full Games Played)", y = "Density", title = "Density Plot of Minutes Played (Per 90 Minutes) by Revision Status", subtitle = "Players who accrue more minutes per contest") + 
-theme(plot.subtitle = element_text(hjust = .45, size = 11), plot.title = element_text(hjust = .8, size = 13))
+theme(plot.subtitle = element_text(hjust = .3, size = 10), plot.title = element_text(hjust = .8, size = 13))
 
 prem_mppn_logo <- ggdraw() + draw_image("https://www.fifplay.com/img/public/premier-league-2-logo.png", x = .42, y = .2, scale = .25) + 
   draw_plot(prem_mppn_density)
@@ -191,7 +214,8 @@ prem_mppn_logo <- ggdraw() + draw_image("https://www.fifplay.com/img/public/prem
 prem_mppn_logo
 ```
 
-```{r premplot5, echo=FALSE}
+<<<<<<< HEAD
+```{r}
 prem_positions <- prem_modeling %>% 
   rename(Revision = revision) %>% 
   ggplot(aes(x = position, fill = Revision)) +
@@ -203,6 +227,13 @@ prem_positions_logo <- ggdraw() + draw_image("https://www.fifplay.com/img/public
   draw_plot(prem_positions)
 
 prem_positions_logo
+=======
+```{r premplot5, echo=FALSE}
+prem_modeling %>% 
+  ggplot(aes(x = position, fill = revision)) +
+  geom_bar(position = "dodge") +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold"))
+>>>>>>> 0d74337475d3941e9724bf78182fc68e45856c86
 ```
 
 
@@ -420,14 +451,6 @@ prem_ranger_test21 %>%
   arrange(desc(.pred_TOTS)) %>% 
   head(5)
 ```
-
-![Premier League Team of the Season](PremTOTS.jpg)
-
-
-
-
-
-
 
 
 
@@ -681,21 +704,9 @@ la_liga_ranger_test21 %>%
 ```
 
 
-![La Liga Team of the Season](LaLigaTOTS.jpg)
-
-
-
-
-
-
 
 \
 \
-
-
-
-
-
 
 
 
@@ -919,10 +930,6 @@ ligue1_ranger_test21 %>%
 ```
 
 
-![Ligue 1 Team of the Season](Ligue1TOTS.jpg)
-
-
-
 
 
 
@@ -955,7 +962,7 @@ bundesliga_modeling <- fifa17_modeling_bundesliga2%>%
   mutate(revision = as.factor(revision), Nation = as.factor(Nation))
 ```
 
-```{r bundesligaplot1, include=FALSE}
+```{r bundesligaplot1, echo=FALSE}
 bundesliga_modeling %>% 
   select(where(is.numeric)) %>% 
   pivot_longer(cols = everything(),
@@ -1179,23 +1186,11 @@ bundesliga_ranger_test21 %>%
 
 
 
-![Bundesliga Team of the Season](BundesligaTOTS.jpg)
-
-
-
-
-
-
-
 
 
 
 \
 \
-
-
-
-
 
 
 
@@ -1448,9 +1443,6 @@ serie_a_ranger_test21 %>%
 ```
 
 
-![Serie A Team of the Season](SerieA_TOTS.jpg)
-
-
 
 
 
@@ -1458,8 +1450,6 @@ serie_a_ranger_test21 %>%
 
 \
 \
-
-
 
 
 
@@ -1469,8 +1459,6 @@ serie_a_ranger_test21 %>%
 
 
 ## All Leagues Combined (and why it does not work)
-
-
 
 
 

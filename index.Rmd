@@ -795,47 +795,87 @@ ligue1_modeling <- ligue1_fifa17_modeling %>%
 
 
 ```{r ligue1plot1, echo=FALSE}
-ligue1_modeling %>% 
-  ggplot(aes(x = revision, fill = revision)) +
+theme_set(theme_cowplot())
+
+ligue1_prop <- ligue1_modeling %>% 
+# CHANGES:
+  rename(Revision = revision) %>% 
+  ggplot(aes(x = Revision, fill = Revision)) +
   geom_bar() +
-  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold"))
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
+  # CHANGES
+  labs(x = "Revision", y = "Count", title = "Proportion of Revisions Within Ligue 1 Dataset Selected for TOTS") +
+  theme(plot.title = element_text(hjust = .2, size = 13.5)) +
+  geom_vline(xintercept = 0, linetype = "dotted") 
+ligue1_prop_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Ligue1.svg/1200px-Ligue1.svg.png", x = .42, y = .23, scale = .25) + 
+  draw_plot(ligue1_prop)
+
+ligue1_prop_logo
 ```
 
 
 
 ```{r ligue1plot2, echo=FALSE}
-ligue1_modeling %>% 
-  ggplot(aes(x = Gls, fill = revision)) +
+ligue1_goals_density <- ligue1_modeling %>% 
+  rename(Revision = revision) %>% 
+  ggplot(aes(x = Gls, fill = Revision)) +
   geom_density(alpha = 0.5) +
   scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
-  xlab("Goals Scored")
+  labs(x = "Goals", y = "Density", title = "Density Plot of Goals Scored in Ligue 1 Season by Revision Status", subtitle = "TOTS players tend to score goals more prolifically than their non-selected counterparts") + 
+theme(plot.subtitle = element_text(hjust = -.35, size = 11), plot.title = element_text(hjust = .1, size = 13.5))
+
+ligue1_goals_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Ligue1.svg/1200px-Ligue1.svg.png", x = .42, y = .2, scale = .25) + 
+  draw_plot(ligue1_goals_density)
+
+ligue1_goals_logo
 ```
 
 ```{r ligue1plot3, echo=FALSE}
-ligue1_modeling %>% 
-  ggplot(aes(x = Rk, fill = revision)) +
+ligue1_tablepos_density <- ligue1_modeling %>% 
+  rename(Revision = revision) %>% 
+  ggplot(aes(x = Rk, fill = Revision)) +
   geom_density(alpha = 0.5) +
   scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
-  xlab("Table Position")
+  labs(x = "Table Position", y = "Density", title = "Density Plot of Ligue 1 Table Position by Revision Status", subtitle = "Players on winning teams (lower table position) make up a substantial proportion of the Ligue 1 TOTS dataset") + 
+theme(plot.subtitle = element_text(hjust = .4, size = 10), plot.title = element_text(hjust = .1, size = 13.5))
+
+ligue1_tablepos_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Ligue1.svg/1200px-Ligue1.svg.png", x = .42, y = .2, scale = .25) + 
+  draw_plot(ligue1_tablepos_density)
+
+ligue1_tablepos_logo
 ```
 
 ```{r ligue1plot4, echo=FALSE}
-ligue1_modeling %>% 
-  ggplot(aes(x = minutes_played_divided_by90, fill = revision)) +
+ligue1_mppn_density <- ligue1_modeling %>% 
+  rename(Revision = revision) %>% 
+  ggplot(aes(x = minutes_played_divided_by90, fill = Revision)) +
   geom_density(alpha = 0.5) +
   scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
-  xlab("Total Minutes Played Dived by 90 (Full Games Played)")
+  labs(x = "Total Minutes Played Dived by 90 (Full Games Played)", y = "Density", title = "Density Plot of Minutes Played (Per 90 Minutes) by Revision Status", subtitle = "Players who accrue more minutes per contest are more likely to be selected for Ligue 1 TOTS") + 
+theme(plot.subtitle = element_text(hjust = .3, size = 10), plot.title = element_text(hjust = .8, size = 13))
+
+ligue1_mppn_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Ligue1.svg/1200px-Ligue1.svg.png", x = .42, y = .2, scale = .25) + 
+  draw_plot(ligue1_mppn_density)
+
+ligue1_mppn_logo
 ```
 
 ```{r ligue1plot5, echo=FALSE}
-ligue1_modeling %>% 
-  ggplot(aes(x = position, fill = revision)) +
-  geom_bar(position = "dodge") +
-  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold"))
+ligue1_positions <- ligue1_modeling %>% 
+  rename(Revision = revision) %>% 
+  ggplot(aes(x = position, fill = Revision)) +
+  geom_bar(position = "identity") +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
+  labs(x = "Position", y = "Count", title = "Positional Breakdown Within Ligue 1 Dataset") + theme(plot.title = element_text(hjust = .5))
+
+ligue1_positions_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Ligue1.svg/1200px-Ligue1.svg.png", x = .42, y = .22, scale = .25) + 
+  draw_plot(ligue1_positions)
+
+ligue1_positions_logo
 ```
 
 
-```{r ligue1mod2, include=FALSE}
+```{r ligue1mod2, echo = FALSE}
 ligue1_modeling_outfield <- ligue1_modeling %>% 
   filter(position != "GK") %>% 
   filter(minutes_played_divided_by90 >= 19) %>% 
@@ -844,14 +884,37 @@ ligue1_modeling_outfield <- ligue1_modeling %>%
 ```
 
 
-```{r ligue1mod3, include=FALSE}
+```{r ligue1mod3, echo =FALSE}
 set.seed(494)
 ligue1_split <- initial_split(ligue1_modeling_outfield, prop = .75, strata = "revision")
 ligue1_training <- training(ligue1_split)
 ligue1_testing <- testing(ligue1_split)
 ```
 
-```{r ligue1ranger1, include=FALSE}
+```{r}
+ligue1_train_metrics <- ligue1_training %>% 
+  mutate(Type = "Training") %>% 
+  rename(Revision = revision) %>% 
+  group_by(Revision, Type) %>% 
+  summarize(Goals = mean(Gls, na.rm = T), Assists = mean(Ast, na.rm = T), `Non PK Goals` = mean(Non_PK_G, na.rm = T), PK = mean(PK, na.rm = T), `Team Rank` = mean(Rk, na.rm = T), `Minutes Per 90` = mean(Min, na.rm = T)/90 , `Goals SD` = sd(Gls, na.rm = T), `Assists SD` = sd(Ast, na.rm = T), `Non PK Goals SD` = sd(Non_PK_G, na.rm = T),`Team Rank SD` = sd(Rk, na.rm = T), `Minutes Per 90 SD` = sd(Min, na.rm = T)/90)
+
+ligue1_test_metrics <- ligue1_testing %>% 
+  mutate(Type = "Testing") %>% 
+  rename(Revision = revision) %>% 
+  group_by(Revision, Type) %>% 
+  summarize(Goals = mean(Gls, na.rm = T), Assists = mean(Ast, na.rm = T), `Non PK Goals` = mean(Non_PK_G, na.rm = T), PK = mean(PK, na.rm = T),`Team Rank` = mean(Rk, na.rm = T), `Minutes Per 90` = mean(Min, na.rm = T)/90, `Goals SD` = sd(Gls, na.rm = T), `Assists SD` = sd(Ast, na.rm = T), `Non PK Goals SD` = sd(Non_PK_G, na.rm = T),`Team Rank SD` = sd(Rk, na.rm = T), `Minutes Per 90 SD` = sd(Min, na.rm = T)/90)
+
+ligue1_rebound_split <- rbind(ligue1_train_metrics, ligue1_test_metrics) %>% arrange(Revision)
+
+ligue1_metrics_table <- formattable(ligue1_rebound_split[1:4,1:13])
+
+kable(ligue1_metrics_table, align = c(rep('c', 1))) %>% 
+  row_spec(0) %>% 
+  kable_styling(full_width = F) %>% 
+  add_header_above(c("Ligue 1 Training and Testing Group Comparison for Suspected KPIs" = 13), background = "navy", color = "white")
+```
+
+```{r ligue1ranger1, echo = FALSE}
 ligue1_ranger_recipe <- recipe(revision ~., data = ligue1_training) %>% 
   step_rm(Player, Nation, Squad, Born, minutes_played_divided_by90, G_per90, A_per90, Attendance) %>% 
   step_upsample(revision, over_ratio = .4) %>% 
@@ -863,7 +926,7 @@ ligue1_ranger_recipe %>%
 ```
 
 
-```{r ligue1ranger2, include=FALSE}
+```{r ligue1ranger2, echo = FALSE}
 ligue1_ranger <- rand_forest(mtry = tune(), 
               min_n = tune(), 
               trees = 100) %>% 
@@ -879,7 +942,7 @@ ligue1_ranger_wf
 ```
 
 
-```{r ligue1ranger3, include=FALSE}
+```{r ligue1ranger3, echo = FALSE}
 set.seed(494)
 ligue1_cv <- vfold_cv(ligue1_training, v = 5)
 
@@ -896,7 +959,7 @@ collect_metrics(ligue1_ranger_cv)
 ```
 
 
-```{r ligue1ranger4, include=FALSE}
+```{r ligue1ranger4, echo = FALSE}
 ligue1_best1 <- ligue1_ranger_cv %>% 
   select_best(metric = "accuracy")
 
@@ -904,7 +967,7 @@ ligue1_ranger_final_wf<- ligue1_ranger_wf %>%
   finalize_workflow(ligue1_best1)
 ```
 
-```{r ligue1ranger5, include=FALSE}
+```{r ligue1ranger5, echo = FALSE}
 ligue1_ranger_fit <- ligue1_ranger_final_wf %>% 
   fit(ligue1_training)
 
@@ -918,7 +981,7 @@ ligue1_rf_explain <-
   )
 ```
 
-```{r ligue1vip, echo=FALSE}
+```{r ligue1vip, echo = FALSE}
 ligue1_rf_var_imp <- 
   model_parts(
     ligue1_rf_explain
@@ -928,7 +991,7 @@ plot(ligue1_rf_var_imp)
 ```
 
 
-```{r ligue1ranger6, include=FALSE}
+```{r ligue1ranger6, echo = FALSE}
 ligue1_ranger_test <- ligue1_ranger_final_wf %>% 
   last_fit(ligue1_split)
 
@@ -936,7 +999,7 @@ ligue1_ranger_test %>%
   collect_metrics()
 ```
 
-```{r ligue1confuse1, echo=FALSE}
+```{r ligue1confuse1, ech = FALSE}
 ligue1_preds1 <- ligue1_ranger_test %>% 
   collect_predictions()
 
@@ -944,29 +1007,42 @@ ligue1_preds1 %>%
   conf_mat(revision, .pred_class)
 ```
 
-```{r ligue1ranger7, include=FALSE}
+```{r ligue1ranger7, message = FALSE, echo = FALSE}
 ligue1_ranger_test <- ligue1_testing %>% 
   bind_cols(predict(ligue1_ranger_fit, new_data = ligue1_testing, type = "prob")) %>% 
   bind_cols(predict(ligue1_ranger_fit, new_data = ligue1_testing)) 
+
+ligue1_ranger_test %>% 
+  conf_mat(revision, .pred_class)
+
+ligue1_confusion_table <- ligue1_ranger_test %>% 
+  conf_mat(revision, .pred_class)
+
+ligue1_rf_ggconfusion <- autoplot(ligue1_confusion_table, type = "heatmap") + labs(title = "Confusion Matrix of Ligue 1 Random Forest Model") + scale_fill_gradient(low = "blue", high = "red") + theme(plot.title = element_text(hjust = .5, size = 15))
+
+
+ligue1_rf_final_confusion <- ggdraw() + draw_image("https://www.fifplay.com/img/public/premier-league-2-logo.png", x = -.43, y = .4, scale = .18) + 
+  draw_plot(ligue1_rf_ggconfusion)
+
+ligue1_rf_final_confusion 
 ```
 
-```{r ligue1confuse2, echo=FALSE}
+```{r ligue1confuse2, echo = FALSE}
 ligue1_ranger_test %>% 
   conf_mat(revision, .pred_class)
 ```
 
-```{r ligue1wrong, echo=FALSE}
+```{r ligue1wrong, echo = FALSE}
 ligue1_ranger_test %>% 
   filter(revision != .pred_class)
 ```
 
-
-```{r 21ligue1mod1, include=FALSE}
+```{r 21ligue1mod1, echo = FALSE}
 ligue1_modeling21 <- fifa21_modeling_ligue1 %>% 
   mutate(revision = as.factor(revision), Nation = as.factor(Nation), Age = as.integer(Age))
 ```
 
-```{r 21ligue1outfield, include=FALSE}
+```{r 21ligue1outfield, echo = FALSE}
 ligue1_modeling_outfield21 <- ligue1_modeling21 %>% 
   filter(position != "GK") %>% 
   filter(minutes_played_divided_by90 >= 14) %>% 
@@ -974,28 +1050,28 @@ ligue1_modeling_outfield21 <- ligue1_modeling21 %>%
 ```
 
 
-```{r 21ligue1ranger, include=FALSE}
+```{r 21ligue1ranger, echo = FALSE}
 ligue1_ranger_test21 <- ligue1_modeling_outfield21 %>% 
   bind_cols(predict(ligue1_ranger_fit, new_data = ligue1_modeling_outfield21, type = "prob")) %>% 
   bind_cols(predict(ligue1_ranger_fit, new_data = ligue1_modeling_outfield21)) 
 ```
 
 
-```{r 21ligue1predictATT, echo=FALSE}
+```{r 21ligue1predictATT, echo = FALSE}
 ligue1_ranger_test21 %>% 
   filter(position %in% c("ST", "RW", "CF", "LW")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
   head(5)
 ```
 
-```{r 21ligue1predictMID, echo=FALSE}
+```{r 21ligue1predictMID, echo = FALSE}
 ligue1_ranger_test21 %>% 
   filter(position %in% c("CAM", "CM", "CDM", "LM", "RM")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
   head(5)
 ```
 
-```{r 21ligue1predictDEF, echo=FALSE}
+```{r 21ligue1predictDEF, echo = FALSE}
 ligue1_ranger_test21 %>% 
   filter(position %in% c("LB", "CB", "RB")) %>% 
   arrange(desc(.pred_TOTS)) %>% 

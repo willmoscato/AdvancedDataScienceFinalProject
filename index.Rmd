@@ -181,7 +181,7 @@ prem_mppn_density <- prem_modeling %>%
   ggplot(aes(x = minutes_played_divided_by90, fill = Revision)) +
   geom_density(alpha = 0.5) +
   scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
-  labs(x = "Total Minutes Played Dived by 90 (Full Games Played)", y = "Density", title = "Density Plot of Minutes Played (Per 90 Minutes) by Revision Status", subtitle = "Players who accrue more minutes per contest") + 
+  labs(x = "Total Minutes Played Dived by 90 (Full Games Played)", y = "Density", title = "Density Plot of Premier League Minutes Played (Per 90 Minutes) by Revision Status", subtitle = "Players who accrue more minutes per contest") + 
 theme(plot.subtitle = element_text(hjust = .45, size = 11), plot.title = element_text(hjust = .8, size = 13))
 
 prem_mppn_logo <- ggdraw() + draw_image("https://www.fifplay.com/img/public/premier-league-2-logo.png", x = .42, y = .2, scale = .25) + 
@@ -468,36 +468,63 @@ la_liga_prop_logo
 ```
 
 
-
 ```{r laligaplot2, echo=FALSE}
-la_liga_modeling %>% 
-  ggplot(aes(x = Gls, fill = revision)) +
+la_liga_goals_density <- la_liga_modeling %>% 
+  rename(Revision = revision) %>% 
+  ggplot(aes(x = Gls, fill = Revision)) +
   geom_density(alpha = 0.5) +
   scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
-  xlab("Goals")
+  labs(x = "Goals", y = "Density", title = "Density Plot of Goals Scored in La Liga Season by Revision Status", subtitle = "TOTS players tend to score goals more prolifically than their non-selected counterparts") + 
+theme(plot.subtitle = element_text(hjust = -.35, size = 11), plot.title = element_text(hjust = .1, size = 13.5))
+
+la_liga_goals_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/LaLiga.svg/1200px-LaLiga.svg.png", x = .42, y = .2, scale = .25) + 
+  draw_plot(la_liga_goals_density)
+
+la_liga_goals_logo
 ```
 
 ```{r laligaplot3, echo=FALSE}
-la_liga_modeling %>% 
-  ggplot(aes(x = Rk, fill = revision)) +
+la_liga_tablepos_density <- la_liga_modeling %>% 
+  rename(Revision = revision) %>% 
+  ggplot(aes(x = Rk, fill = Revision)) +
   geom_density(alpha = 0.5) +
   scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
-  xlab("Table Position")
+  labs(x = "Table Position", y = "Density", title = "Density Plot of La Liga Table Position by Revision Status", subtitle = "Players on winning teams (lower table position) make up a substantial proportion of the La Liga TOTS dataset") + 
+theme(plot.subtitle = element_text(hjust = .4, size = 10), plot.title = element_text(hjust = .1, size = 13.5))
+
+la_liga_tablepos_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/LaLiga.svg/1200px-LaLiga.svg.png", x = .42, y = .2, scale = .25) + 
+  draw_plot(la_liga_tablepos_density)
+
+la_liga_tablepos_logo
 ```
 
 ```{r lalligaplot4, echo=FALSE}
-la_liga_modeling %>% 
-  ggplot(aes(x = minutes_played_divided_by90, fill = revision)) +
+la_liga_mppn_density <- la_liga_modeling %>% 
+  rename(Revision = revision) %>% 
+  ggplot(aes(x = minutes_played_divided_by90, fill = Revision)) +
   geom_density(alpha = 0.5) +
   scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
-  xlab("Total Minutes Played Dived by 90 (Full Games Played)")
+  labs(x = "Total Minutes Played Dived by 90 (Full Games Played)", y = "Density", title = "Density Plot of La Liga Minutes Played (Per 90 Minutes) by Revision Status", subtitle = "Players who accrue more minutes per contest") + 
+theme(plot.subtitle = element_text(hjust = .3, size = 10), plot.title = element_text(hjust = .8, size = 13))
+
+la_liga_mppn_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/LaLiga.svg/1200px-LaLiga.svg.png", x = .42, y = .22, scale = .25) + 
+  draw_plot(la_liga_mppn_density)
+
+la_liga_mppn_logo
 ```
 
 ```{r laligaplot5, echo=FALSE}
-la_liga_modeling %>% 
-  ggplot(aes(x = position, fill = revision)) +
-  geom_bar(position = "dodge") +
-  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold"))
+la_liga_positions <- la_liga_modeling %>% 
+  rename(Revision = revision) %>% 
+  ggplot(aes(x = position, fill = Revision)) +
+  geom_bar(position = "identity") +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
+  labs(x = "Position", y = "Count", title = "Positional Breakdown Within La Liga Dataset")
+
+la_liga_positions_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/LaLiga.svg/1200px-LaLiga.svg.png", x = .425, y = .23, scale = .25) + 
+  draw_plot(la_liga_positions)
+
+la_liga_positions_logo
 ```
 
 
@@ -516,6 +543,30 @@ la_liga_split <- initial_split(la_liga_modeling_outfield, prop = .75, strata = "
 la_liga_training <- training(la_liga_split)
 la_liga_testing <- testing(la_liga_split)
 ```
+
+```{r message = FALSE, warning = FALSE}
+la_liga_train_metrics <- la_liga_training %>% 
+  mutate(Type = "Training") %>% 
+  rename(Revision = revision) %>% 
+  group_by(Revision, Type) %>% 
+  summarize(Goals = mean(Gls, na.rm = T), Assists = mean(Ast, na.rm = T), `Non PK Goals` = mean(Non_PK_G, na.rm = T), PK = mean(PK, na.rm = T), `Team Rank` = mean(Rk, na.rm = T), `Minutes Per 90` = mean(Min, na.rm = T)/90 , `Goals SD` = sd(Gls, na.rm = T), `Assists SD` = sd(Ast, na.rm = T), `Non PK Goals SD` = sd(Non_PK_G, na.rm = T),`Team Rank SD` = sd(Rk, na.rm = T), `Minutes Per 90 SD` = sd(Min, na.rm = T)/90)
+
+la_liga_test_metrics <- la_liga_testing %>% 
+  mutate(Type = "Testing") %>% 
+  rename(Revision = revision) %>% 
+  group_by(Revision, Type) %>% 
+  summarize(Goals = mean(Gls, na.rm = T), Assists = mean(Ast, na.rm = T), `Non PK Goals` = mean(Non_PK_G, na.rm = T), PK = mean(PK, na.rm = T),`Team Rank` = mean(Rk, na.rm = T), `Minutes Per 90` = mean(Min, na.rm = T)/90, `Goals SD` = sd(Gls, na.rm = T), `Assists SD` = sd(Ast, na.rm = T), `Non PK Goals SD` = sd(Non_PK_G, na.rm = T),`Team Rank SD` = sd(Rk, na.rm = T), `Minutes Per 90 SD` = sd(Min, na.rm = T)/90)
+
+la_liga_rebound_split <- rbind(la_liga_train_metrics, la_liga_test_metrics) %>% arrange(Revision)
+
+la_liga_metrics_table <- formattable(la_liga_rebound_split[1:4,1:13])
+
+kable(la_liga_metrics_table, align = c(rep('c', 1))) %>% 
+  row_spec(0) %>% 
+  kable_styling(full_width = F) %>% 
+  add_header_above(c("La Liga Training and Testing Group Comparison for Suspected KPIs" = 13), background = "navy", color = "red")
+```
+
 
 ```{r laligaranger1, include=FALSE}
 la_liga_ranger_recipe <- recipe(revision ~., data = la_liga_training) %>% 
@@ -619,6 +670,18 @@ la_liga_ranger_test <- la_liga_testing %>%
 ```{r laligaconfuse2, echo=FALSE}
 la_liga_ranger_test %>% 
   conf_mat(revision, .pred_class)
+```
+```{r}
+la_liga_ranger_test <- la_liga_testing %>% 
+  bind_cols(predict(la_liga_ranger_fit, new_data = prem_testing, type = "prob")) %>% 
+  bind_cols(predict(la_liga_ranger_fit, new_data = prem_testing)) 
+
+la_liga_rf_preds <- la_liga_ranger_test %>% 
+  conf_mat(revision, .pred_class)
+
+la_liga_rf_ggconfusion <- autoplot(la_liga_rf_preds, type = "heatmap") + labs(title = "Confusion Matrix of Premier League Random Forest Model") + scale_fill_gradient(low = "blue", high = "red") + theme(plot.title = element_text(hjust = .5, size = 15))
+
+_rf_ggconfusion
 ```
 
 ```{r laligawrong1, echo=FALSE}

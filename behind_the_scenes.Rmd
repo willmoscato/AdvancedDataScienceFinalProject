@@ -16,8 +16,9 @@ library(tidyverse)
 library(tidymodels)
 library(lubridate)
 ```
+#Data Cleaning
 
-#Prem
+##Premier League
 
 ```{r}
 fifa17 <- read_csv("fut_bin17_players.csv")
@@ -105,7 +106,7 @@ fifa21_names <- fifa21_clean %>%
 
 
 
-##17
+###2017
 
 ```{r}
 premnames17 <-premnames17 %>% 
@@ -212,7 +213,7 @@ fifa17_modeling <- fifa17_standard_plus_table %>%
 
 
 
-##18
+###2018
 
 
 ```{r}
@@ -319,7 +320,7 @@ fifa18_modeling <- fifa18_standard_plus_table %>%
 ```
 
 
-##19
+###2019
 ```{r}
 premnames19 <-premnames19 %>% 
   mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
@@ -435,17 +436,12 @@ dim(fifa19_modeling)
 
 
 
-```{r}
-fifa17_modeling %>% 
-  filter(revision == "TOTS")
-```
 
 
 
 
 
-
-## 21 testing 
+###2021  
 
 ```{r}
 premnames21 <-premnames21 %>% 
@@ -548,7 +544,7 @@ dim(fifa21_modeling)
 ```
 
 
-#LaLiga
+##LaLiga
 
 ```{r}
 la_liganames17 <- read.csv("16_17_la_liganames.csv")
@@ -572,7 +568,7 @@ la_ligatable21 <- read.csv("la_ligatable21.csv")
 
 
 
-##17
+###2017
 
 ```{r}
 la_liganames17 <-la_liganames17 %>% 
@@ -680,7 +676,7 @@ fifa17_modeling_la_liga <- fifa17_standard_plus_table_la_liga %>%
 
 
 
-##18
+###2018
 
 
 ```{r}
@@ -788,7 +784,7 @@ fifa18_modeling_la_liga <- fifa18_standard_plus_table_la_liga %>%
 ```
 
 
-##19
+###2019
 ```{r}
 la_liganames19 <-la_liganames19 %>% 
   mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
@@ -900,13 +896,9 @@ dim(fifa18_modeling_la_liga)
 dim(fifa19_modeling_la_liga)
 ```
 
-```{r}
-fifa19_modeling_la_liga %>% 
-  filter(revision == "TOTS")
-```
 
 
-## 21 testing 
+###2021 
 
 ```{r}
 la_liganames21 <-la_liganames21 %>% 
@@ -1008,7 +1000,7 @@ fifa21_modeling_la_liga <- fifa21_standard_plus_table_la_liga %>%
 dim(fifa21_modeling_la_liga)
 ```
 
-#Ligue1
+##Ligue1
 
 ```{r}
 ligue1_names17 <- read.csv("16_17_ligue1names.csv")
@@ -1030,7 +1022,7 @@ ligue1table21 <- read.csv("ligue1table21.csv")
 ```
 
 
-##17
+###2017
 
 ```{r}
 ligue1_names17 <-ligue1_names17 %>% 
@@ -1141,7 +1133,7 @@ ligue1_fifa17_modeling <- ligue1_fifa17_standard_plus_table %>%
 ```
 
 
-##18
+###2018
 
 
 ```{r}
@@ -1253,7 +1245,7 @@ ligue1_fifa18_modeling <- ligue1_fifa18_standard_plus_table %>%
 ```
 
 
-##19
+###2019
 ```{r}
 ligue1_names19 <- ligue1_names19 %>% 
   mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
@@ -1364,10 +1356,6 @@ dim(ligue1_fifa17_modeling)
 dim(ligue1_fifa18_modeling)
 dim(ligue1_fifa19_modeling)
 ```
-```{r}
-ligue1_fifa19_modeling %>% 
-  filter(revision == "TOTS")
-```
 
 
 
@@ -1376,7 +1364,7 @@ ligue1_fifa19_modeling %>%
 
 
 
-## 21 testing 
+###2021 
 
 ```{r}
 ligue1names21 <-ligue1names21 %>% 
@@ -1479,7 +1467,7 @@ dim(fifa21_modeling_ligue1)
 ```
 
 
-#SerieA
+##Serie A
 
 ```{r}
 serie_anames17 <- read.csv("16_17_serie_anames.csv")
@@ -1503,7 +1491,7 @@ serie_atable21 <- read.csv("serie_atable21.csv")
 
 
 
-##17
+###2017
 
 ```{r}
 serie_anames17 <-serie_anames17 %>% 
@@ -1612,7 +1600,7 @@ fifa17_modeling_serie_a <- fifa17_standard_plus_table_serie_a %>%
 
 
 
-##18
+###2018
 
 
 ```{r}
@@ -1720,7 +1708,7 @@ fifa18_modeling_serie_a <- fifa18_standard_plus_table_serie_a %>%
 ```
 
 
-##19
+###2019
 ```{r}
 serie_anames19 <-serie_anames19 %>% 
   mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
@@ -1831,13 +1819,10 @@ dim(fifa18_modeling_serie_a)
 dim(fifa19_modeling_serie_a)
 ```
 
-```{r}
-fifa17_modeling_serie_a %>% 
-  filter(revision == "TOTS")
-```
 
 
-## 21 testing 
+
+###2021 
 
 ```{r}
 serie_anames21 <-serie_anames21 %>% 
@@ -1941,7 +1926,7 @@ dim(fifa21_modeling_serie_a)
 
 
 
-#Bundesliga
+##Bundesliga
 
 ```{r}
 bundesliganames17 <- read.csv("16_17_bundesliganames.csv")
@@ -1965,7 +1950,7 @@ bundesligatable21 <- read.csv("bundesligatable21.csv")
 
 
 
-##17
+###2017
 
 ```{r}
 bundesliganames17 <-bundesliganames17 %>% 
@@ -2073,7 +2058,7 @@ fifa17_modeling_bundesliga <- fifa17_standard_plus_table_bundesliga %>%
 
 
 
-##18
+###2018
 
 
 ```{r}
@@ -2180,7 +2165,7 @@ fifa18_modeling_bundesliga <- fifa18_standard_plus_table_bundesliga %>%
 ```
 
 
-##19
+###2019
 ```{r}
 bundesliganames19 <-bundesliganames19 %>% 
   mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
@@ -2290,13 +2275,10 @@ dim(fifa18_modeling_bundesliga)
 dim(fifa19_modeling_bundesliga)
 ```
 
-```{r}
-fifa17_modeling_bundesliga %>% 
-  filter(revision == "TOTS")
-```
 
 
-## 21 testing 
+
+###2021 
 
 ```{r}
 bundesliganames21 <-bundesliganames21 %>% 

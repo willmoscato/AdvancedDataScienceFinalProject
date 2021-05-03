@@ -245,12 +245,6 @@ lasso_test %>%
   arrange(desc(total))
 ```
 
-```{r prem table}
-lasso_test %>%
-  filter(league == 'prem') %>%
-  arrange(desc(.pred_TOTS))
-```
-
 ```{r}
 all_ranger_recipe <- recipe(revision ~., data = all_training) %>% 
   step_rm(Player, Squad, Nation, league, Attendance) %>% 
@@ -416,10 +410,163 @@ all_ranger_test21 <- all_modeling_outfield21 %>%
 all_ranger_test21 %>%
   filter(league == 'prem') %>%
   #filter(position %in% c('CB', 'RB', 'LB')) %>%
+  filter(position %in% c('LW', 'ST', 'RW')) %>%
+  #filter(position %in% c('LM', 'CM', 'CAM', 'CDM', 'RM')) %>%
+  arrange(desc(.pred_TOTS)) %>%
+  select(Player, .pred_TOTS) %>%
+  head(5)
+```
+
+```{r}
+all_ranger_test21 %>%
+  filter(league == 'prem') %>%
+  #filter(position %in% c('CB', 'RB', 'LB')) %>%
   #filter(position %in% c('LW', 'ST', 'RW')) %>%
   filter(position %in% c('LM', 'CM', 'CAM', 'CDM', 'RM')) %>%
   arrange(desc(.pred_TOTS)) %>%
-  select(Player, revision, .pred_class, .pred_TOTS)
+  select(Player, .pred_TOTS) %>%
+  head(5)
 ```
 
+```{r}
+all_ranger_test21 %>%
+  filter(league == 'prem') %>%
+  filter(position %in% c('CB', 'RB', 'LB')) %>%
+  #filter(position %in% c('LW', 'ST', 'RW')) %>%
+  #filter(position %in% c('LM', 'CM', 'CAM', 'CDM', 'RM')) %>%
+  arrange(desc(.pred_TOTS)) %>%
+  select(Player, .pred_TOTS) %>%
+  head(5)
+```
 
+```{r}
+all_ranger_test21 %>%
+  filter(league == 'la liga') %>%
+  #filter(position %in% c('CB', 'RB', 'LB')) %>%
+  filter(position %in% c('LW', 'ST', 'RW')) %>%
+  #filter(position %in% c('LM', 'CM', 'CAM', 'CDM', 'RM')) %>%
+  arrange(desc(.pred_TOTS)) %>%
+  select(Player, .pred_TOTS) %>%
+  head(5)
+```
+
+```{r}
+all_ranger_test21 %>%
+  filter(league == 'la liga') %>%
+  #filter(position %in% c('CB', 'RB', 'LB')) %>%
+  #filter(position %in% c('LW', 'ST', 'RW')) %>%
+  filter(position %in% c('LM', 'CM', 'CAM', 'CDM', 'RM')) %>%
+  arrange(desc(.pred_TOTS)) %>%
+  select(Player, .pred_TOTS) %>%
+  head(5)
+```
+
+```{r}
+all_ranger_test21 %>%
+  filter(league == 'la liga') %>%
+  filter(position %in% c('CB', 'RB', 'LB')) %>%
+  #filter(position %in% c('LW', 'ST', 'RW')) %>%
+  #filter(position %in% c('LM', 'CM', 'CAM', 'CDM', 'RM')) %>%
+  arrange(desc(.pred_TOTS)) %>%
+  select(Player, .pred_TOTS) %>%
+  head(5)
+```
+
+```{r}
+all_ranger_test21 %>%
+  filter(league == 'ligue 1') %>%
+  #filter(position %in% c('CB', 'RB', 'LB')) %>%
+  filter(position %in% c('LW', 'ST', 'RW')) %>%
+  #filter(position %in% c('LM', 'CM', 'CAM', 'CDM', 'RM')) %>%
+  arrange(desc(.pred_TOTS)) %>%
+  select(Player, .pred_TOTS) %>%
+  head(5)
+```
+
+```{r}
+all_ranger_test21 %>%
+  filter(league == 'ligue 1') %>%
+  #filter(position %in% c('CB', 'RB', 'LB')) %>%
+  #filter(position %in% c('LW', 'ST', 'RW')) %>%
+  filter(position %in% c('LM', 'CM', 'CAM', 'CDM', 'RM')) %>%
+  arrange(desc(.pred_TOTS)) %>%
+  select(Player, .pred_TOTS) %>%
+  head(5)
+```
+
+```{r}
+all_ranger_test21 %>%
+  filter(league == 'ligue 1') %>%
+  filter(position %in% c('CB', 'RB', 'LB')) %>%
+  #filter(position %in% c('LW', 'ST', 'RW')) %>%
+  #filter(position %in% c('LM', 'CM', 'CAM', 'CDM', 'RM')) %>%
+  arrange(desc(.pred_TOTS)) %>%
+  select(Player, .pred_TOTS) %>%
+  head(5)
+```
+
+```{r}
+all_ranger_test21 %>%
+  filter(league == 'bundesliga') %>%
+  #filter(position %in% c('CB', 'RB', 'LB')) %>%
+  filter(position %in% c('LW', 'ST', 'RW')) %>%
+  #filter(position %in% c('LM', 'CM', 'CAM', 'CDM', 'RM')) %>%
+  arrange(desc(.pred_TOTS)) %>%
+  select(Player, .pred_TOTS) %>%
+  head(5)
+```
+
+```{r}
+all_ranger_test21 %>%
+  filter(league == 'bundesliga') %>%
+  #filter(position %in% c('CB', 'RB', 'LB')) %>%
+  #filter(position %in% c('LW', 'ST', 'RW')) %>%
+  filter(position %in% c('LM', 'CM', 'CAM', 'CDM', 'RM')) %>%
+  arrange(desc(.pred_TOTS)) %>%
+  select(Player, .pred_TOTS) %>%
+  head(5)
+```
+
+```{r}
+all_ranger_test21 %>%
+  filter(league == 'bundesliga') %>%
+  filter(position %in% c('CB', 'RB', 'LB')) %>%
+  #filter(position %in% c('LW', 'ST', 'RW')) %>%
+  #filter(position %in% c('LM', 'CM', 'CAM', 'CDM', 'RM')) %>%
+  arrange(desc(.pred_TOTS)) %>%
+  select(Player, .pred_TOTS) %>%
+  head(5)
+```
+
+```{r}
+all_ranger_test21 %>%
+  filter(league == 'serie a') %>%
+  #filter(position %in% c('CB', 'RB', 'LB')) %>%
+  filter(position %in% c('LW', 'ST', 'RW')) %>%
+  #filter(position %in% c('LM', 'CM', 'CAM', 'CDM', 'RM')) %>%
+  arrange(desc(.pred_TOTS)) %>%
+  select(Player, .pred_TOTS) %>%
+  head(5)
+```
+
+```{r}
+all_ranger_test21 %>%
+  filter(league == 'serie a') %>%
+  #filter(position %in% c('CB', 'RB', 'LB')) %>%
+  #filter(position %in% c('LW', 'ST', 'RW')) %>%
+  filter(position %in% c('LM', 'CM', 'CAM', 'CDM', 'RM')) %>%
+  arrange(desc(.pred_TOTS)) %>%
+  select(Player, .pred_TOTS) %>%
+  head(5)
+```
+
+```{r}
+all_ranger_test21 %>%
+  filter(league == 'serie a') %>%
+  filter(position %in% c('CB', 'RB', 'LB')) %>%
+  #filter(position %in% c('LW', 'ST', 'RW')) %>%
+  #filter(position %in% c('LM', 'CM', 'CAM', 'CDM', 'RM')) %>%
+  arrange(desc(.pred_TOTS)) %>%
+  select(Player, .pred_TOTS) %>%
+  head(5)
+```

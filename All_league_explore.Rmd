@@ -245,6 +245,13 @@ lasso_test %>%
   arrange(desc(total))
 ```
 
+```{r ranger split}
+set.seed(494)
+all_split <- initial_split(all_modeling_outfield, prop = .75, strata = "revision")
+all_training <- training(all_split)
+all_testing <- testing(all_split)
+```
+
 ```{r ranger recipe}
 all_ranger_recipe <- recipe(revision ~., data = all_training) %>% 
   step_rm(Player, Squad, Nation, league, Attendance) %>% 
@@ -255,7 +262,6 @@ all_ranger_recipe %>%
   prep(all_training) %>% 
   juice()
 ```
-
 
 ```{r ranger wf creation}
 all_ranger <- rand_forest(mtry = tune(), 
@@ -270,13 +276,6 @@ all_ranger_wf <-
   add_model(all_ranger) 
 
 all_ranger_wf
-```
-
-```{r ranger split}
-set.seed(494)
-all_split <- initial_split(all_modeling_outfield, prop = .75, strata = "revision")
-all_training <- training(all_split)
-all_testing <- testing(all_split)
 ```
 
 ```{r ranger cv creation}

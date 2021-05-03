@@ -254,7 +254,7 @@ all_testing <- testing(all_split)
 
 ```{r ranger recipe}
 all_ranger_recipe <- recipe(revision ~., data = all_training) %>% 
-  step_rm(Player, Squad, Nation, league, Attendance) %>% 
+  step_rm(Player, Squad, Nation, Attendance) %>% 
   step_upsample(revision, over_ratio = .33) %>% 
   step_mutate_at(all_numeric(), fn = ~as.numeric(.))
 
@@ -564,3 +564,34 @@ all_ranger_test21 %>%
   select(Player, .pred_TOTS) %>%
   head(5)
 ```
+
+```{r TOTY attack}
+all_ranger_test21 %>%
+  #filter(position %in% c('CB', 'RB', 'LB')) %>%
+  filter(position %in% c('LW', 'ST', 'RW')) %>%
+  #filter(position %in% c('LM', 'CM', 'CAM', 'CDM', 'RM')) %>%
+  arrange(desc(.pred_TOTS)) %>%
+  select(Player, .pred_TOTS) %>%
+  head(5)
+```
+
+```{r TOTY mid}
+all_ranger_test21 %>%
+  #filter(position %in% c('CB', 'RB', 'LB')) %>%
+  #filter(position %in% c('LW', 'ST', 'RW')) %>%
+  filter(position %in% c('LM', 'CM', 'CAM', 'CDM', 'RM')) %>%
+  arrange(desc(.pred_TOTS)) %>%
+  select(Player, .pred_TOTS) %>%
+  head(5)
+```
+
+```{r TOTY def}
+all_ranger_test21 %>%
+  filter(position %in% c('CB', 'RB', 'LB')) %>%
+  #filter(position %in% c('LW', 'ST', 'RW')) %>%
+  #filter(position %in% c('LM', 'CM', 'CAM', 'CDM', 'RM')) %>%
+  arrange(desc(.pred_TOTS)) %>%
+  select(Player, .pred_TOTS) %>%
+  head(5)
+```
+

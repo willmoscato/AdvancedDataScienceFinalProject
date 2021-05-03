@@ -2,6 +2,8 @@
 title: "Behind The Scenes"
 author: "Will Moscato"
 date: "5/3/2021"
+toc_float : TRUE
+code_download : TRUE
 output: html_document
 ---
 
@@ -17,6 +19,11 @@ library(tidymodels)
 library(lubridate)
 ```
 #Data Cleaning
+\
+The majority of the cleaning for this project was getting the names of the players from the different data sets to match up. Some players had different names in the fifa (video game) data set than what their actual name is, or they had some nickname either in the fifa data set or in their stats, or for a few players the spelling didn't match up. Other than that most of the variables were already very good and we just had to rename them and join all the data sets together.
+
+\
+We will run you through the cleaning for the premier league and then include the code for all the other leagues, but it is essentially the same thing. 
 
 ##Premier League
 
@@ -65,7 +72,8 @@ fifa19_clean <- fifa19 %>%
   distinct(player_extended_name, .keep_all = TRUE)
 ```
 
-
+\
+First we took out all the card types in the fifa data sets that were not just the normal base card or the team of the season card. Then we took out any players that had multiple cards in the data set. This way we didn't have any duplicate players when trying to join with player stats and team stats. Also we wanted to make sure that what we were modeling off of only had the team of the season players as team of the seasons.
 ```{r}
 fifa21_clean <- fifa21 %>% 
   mutate(revision = ifelse(revision == "Rare", "Normal", ifelse(revision == "Non-Rare", "Normal", revision))) %>% 
@@ -75,7 +83,8 @@ fifa21_clean <- fifa21 %>%
   arrange(desc(overall)) %>% 
   distinct(player_extended_name, .keep_all = TRUE)
 ```
-
+\
+For the 2021 data set we had to add in a few players to the premier league because the data set was not updated.
 
 
 ```{r}
@@ -104,7 +113,8 @@ fifa21_names <- fifa21_clean %>%
    mutate(player_name = stringi::stri_trans_general(player_name, "Latin-ASCII"))
 ```
 
-
+\
+We then took out all of the accents from the player names because there were no accents in the data set with all the stats.
 
 ###2017
 
@@ -113,14 +123,16 @@ premnames17 <-premnames17 %>%
   mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
   mutate(Player = str_replace_all(Player1, "-", " "))
 ```
-
+\
+From the data set of miscellaneous stats we simplified the names of the players in order to get rid of the slashes (the names were there twice, once with some accents once without) and to get rid of any hyphens.
 
 ```{r}
 prem17_names <- fifa17_names %>% 
   filter(league == "Premier League") %>% 
   select(player_name, player_extended_name, overall, revision, position)
 ```
-
+\
+Then from the fifa data set we filtered for the desired league and selected the variables that we want. 
 
 
 ```{r}
@@ -128,7 +140,8 @@ prem17 <- premnames17 %>%
   inner_join(prem17_names, by = c("Player" = "player_extended_name")) %>% 
   select(-Player1, -player_name)
 ```
-
+\
+Then we attempted our first join by if the full name of the player in fifa matched the full name of the player from the stats page. This got a decent number of players, but especially for Spanish and Brazilian players it tended not match perfectly.
 
 ```{r}
 missing17 <- premnames17 %>%
@@ -137,7 +150,8 @@ missing17 <- premnames17 %>%
 ```
 
 
-
+\
+We then did a left join of the same data sets in order to get the ones that don't match in the data set. 
 
 
 ```{r}
@@ -145,7 +159,8 @@ not_missing_17 <- missing17 %>%
   select(-overall, -revision, -position) %>% 
   left_join(prem17_names, by = c("Player" = "player_name")) 
 ```
-
+\
+Then we joined by the shortened player names in the fifa data sets and this got us a number of the rest of the players. 
 
 ```{r}
 
@@ -159,22 +174,25 @@ not_real_name17 <- not_missing_17 %>%
   filter(is.na(overall) == FALSE) %>% 
   select(-Player1, -player_name, -player_extended_name)
 ```
-
+\
+Then for all the players that could not be joined in from the last two methods we had to manually go through and change their names in order for them to match. This was the most tedious part of the cleaning due to the fact that we had to go through all of the players one by one.
 
 ```{r}
 weird_names17 <- last_names17 %>% 
   inner_join(prem17_names, by = c("Player_short" = "player_name")) %>% 
   select(-Player_short, -player_extended_name)
 ```
-
+\
+Lastly, to get all the names that we changed manually we inner joined by the shortened changed name that we created.
 ```{r}
 fifa17_prem_full <- prem17 %>%
   bind_rows(not_real_name17, weird_names17) %>% 
   distinct(Player, .keep_all = TRUE) %>% 
   select(Player, revision, position, Int, TklW, OG, PKcon)
 ```
-
-
+\
+Once we had all the player names joined together properly we bound the rows to have a full data set of all the players with some miscellaneous stats and the fifa stats. 
+We then selected the stats that we needed from this data set.
 ```{r}
 standardprem17 <- standardprem17 %>% 
   mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
@@ -187,12 +205,14 @@ fifa17_prem_standard_stats <- fifa17_prem_full %>%
   select(-Player1, -Pos) %>% 
   distinct(Player, .keep_all = TRUE)
 ```
-
+\
+We then added in standard stats for all the players.
 ```{r}
 fifa17_standard_plus_table <- fifa17_prem_standard_stats %>% 
   inner_join(premtable17, by = "Squad")
 ```
-
+\
+And we added in some team stats for each player.
 
 ```{r}
 premgoalkeeper17 <- premgoalkeeper17 %>% 
@@ -201,7 +221,8 @@ premgoalkeeper17 <- premgoalkeeper17 %>%
   rename(Pkatt_against = PKatt) %>% 
   rename(Goals_allowed = GA)
 ```
-
+\
+And we added some goalkeeping stats (we ended up not being able to model for goalkeepers because of a lack of data for them and the huge difference in the type of stats for them).
 ```{r}
 fifa17_modeling <- fifa17_standard_plus_table %>% 
   left_join(premgoalkeeper17, by = "Player") %>% 
@@ -209,7 +230,11 @@ fifa17_modeling <- fifa17_standard_plus_table %>%
   select(-Matches.x, -Matches.y, -Player1, -Starts) %>% 
   mutate(Nation = sub('.* ', '', Nation))
 ```
-
+\
+Lastly, we renamed a bunch of the variables to make them more intuitive.
+\
+\
+From here on out it is essentially the same process iterated over year and league. Each year and each league obviously had some different name issues and different names that had to be manually changed in order to get it to match, but the process for each year and each league was the same. 
 
 
 

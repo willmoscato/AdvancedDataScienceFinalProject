@@ -671,17 +671,17 @@ la_liga_ranger_test <- la_liga_testing %>%
 la_liga_ranger_test %>% 
   conf_mat(revision, .pred_class)
 ```
-```{r}
+```{r message = FALSE}
 la_liga_ranger_test <- la_liga_testing %>% 
-  bind_cols(predict(la_liga_ranger_fit, new_data = prem_testing, type = "prob")) %>% 
-  bind_cols(predict(la_liga_ranger_fit, new_data = prem_testing)) 
+  bind_cols(predict(la_liga_ranger_fit, new_data = la_liga_testing, type = "prob")) %>% 
+  bind_cols(predict(la_liga_ranger_fit, new_data = la_liga_testing)) 
 
 la_liga_rf_preds <- la_liga_ranger_test %>% 
   conf_mat(revision, .pred_class)
 
-la_liga_rf_ggconfusion <- autoplot(la_liga_rf_preds, type = "heatmap") + labs(title = "Confusion Matrix of Premier League Random Forest Model") + scale_fill_gradient(low = "blue", high = "red") + theme(plot.title = element_text(hjust = .5, size = 15))
+la_liga_rf_ggconfusion <- autoplot(la_liga_rf_preds, type = "heatmap") + labs(title = "Confusion Matrix of La Liga Random Forest Model") + scale_fill_gradient(low = "blue", high = "red") + theme(plot.title = element_text(hjust = .5, size = 15))
 
-_rf_ggconfusion
+la_liga_rf_ggconfusion
 ```
 
 ```{r laligawrong1, echo=FALSE}

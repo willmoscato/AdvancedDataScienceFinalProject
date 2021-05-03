@@ -823,7 +823,7 @@ ligue1_testing <- testing(ligue1_split)
 ```{r ligue1ranger1, include=FALSE}
 ligue1_ranger_recipe <- recipe(revision ~., data = ligue1_training) %>% 
   step_rm(Player, Nation, Squad, Born, minutes_played_divided_by90, G_per90, A_per90, Attendance) %>% 
-  step_upsample(revision, over_ratio = .3) %>% 
+  step_upsample(revision, over_ratio = .4) %>% 
   step_mutate_at(all_numeric(), fn = ~as.numeric(.))
 
 ligue1_ranger_recipe %>% 

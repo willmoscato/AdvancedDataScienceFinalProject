@@ -125,7 +125,6 @@ prem_modeling %>%
              scales = "free")
 ```
 
-HEAD
 ```{r}
 theme_set(theme_cowplot())
 prem_prop <- prem_modeling %>% 
@@ -222,7 +221,6 @@ prem_training <- training(prem_split)
 prem_testing <- testing(prem_split)
 ```
 
-<<<<<<< HEAD
 ```{r message = FALSE, warning = FALSE}
 prem_train_metrics <- prem_training %>% 
   mutate(Type = "Training") %>% 
@@ -230,11 +228,6 @@ prem_train_metrics <- prem_training %>%
   group_by(Revision, Type) %>% 
   summarize(Goals = mean(Gls, na.rm = T), Assists = mean(Ast, na.rm = T), `Non PK Goals` = mean(Non_PK_G, na.rm = T), PK = mean(PK, na.rm = T), `Team Rank` = mean(Rk, na.rm = T), `Minutes Per 90` = mean(Min, na.rm = T)/90 , `Goals SD` = sd(Gls, na.rm = T), `Assists SD` = sd(Ast, na.rm = T), `Non PK Goals SD` = sd(Non_PK_G, na.rm = T),`Team Rank SD` = sd(Rk, na.rm = T), `Minutes Per 90 SD` = sd(Min, na.rm = T)/90)
 
-prem_test_metrics <- prem_testing %>% 
-  mutate(Type = "Testing") %>% 
-  rename(Revision = revision) %>% 
-  group_by(Revision, Type) %>% 
-  summarize(Goals = mean(Gls, na.rm = T), Assists = mean(Ast, na.rm = T), `Non PK Goals` = mean(Non_PK_G, na.rm = T), PK = mean(PK, na.rm = T),`Team Rank` = mean(Rk, na.rm = T), `Minutes Per 90` = mean(Min, na.rm = T)/90, `Goals SD` = sd(Gls, na.rm = T), `Assists SD` = sd(Ast, na.rm = T), `Non PK Goals SD` = sd(Non_PK_G, na.rm = T),`Team Rank SD` = sd(Rk, na.rm = T), `Minutes Per 90 SD` = sd(Min, na.rm = T)/90)
 
 prem_rebound_split <- rbind(prem_train_metrics, prem_test_metrics) %>% arrange(Revision)
 
@@ -246,10 +239,7 @@ kable(prem_metrics_table, align = c(rep('c', 1))) %>%
   add_header_above(c("Premier League Training and Testing Group Comparison for Suspected KPIs" = 13), background = "purple", color = "white")
 ```
 
-```{r}
-=======
 ```{r premranger1, include=FALSE}
->>>>>>> 0d74337475d3941e9724bf78182fc68e45856c86
 prem_ranger_recipe <- recipe(revision ~., data = prem_training) %>% 
   step_rm(Player, Nation, Squad, G_per90, A_per90, minutes_played_divided_by90, Attendance, Born) %>% 
   step_upsample(revision, over_ratio = .33) %>% 
@@ -328,13 +318,7 @@ plot(prem_rf_var_imp)
 
 
 
-<<<<<<< HEAD
-```{r}
-=======
-
-
 ```{r premranger6, include=FALSE}
->>>>>>> 0d74337475d3941e9724bf78182fc68e45856c86
 prem_ranger_test <- prem_ranger_final_wf %>% 
   last_fit(prem_split)
 
@@ -350,11 +334,8 @@ prem_preds1 %>%
   conf_mat(`revision`, .pred_class)
 ```
 
-<<<<<<< HEAD
-```{r message = FALSE}
-=======
-```{r premranger7, include=FALSE}
->>>>>>> 0d74337475d3941e9724bf78182fc68e45856c86
+
+```{r premranger7, message= FALSE}
 prem_ranger_test <- prem_testing %>% 
   bind_cols(predict(prem_ranger_fit, new_data = prem_testing, type = "prob")) %>% 
   bind_cols(predict(prem_ranger_fit, new_data = prem_testing)) 
@@ -376,8 +357,6 @@ prem_ranger_test %>%
 prem_ranger_test %>% 
   filter(revision != .pred_class)
 ```
-
-
 
 
 ```{r 21prem, include=FALSE}
@@ -471,10 +450,21 @@ la_liga_modeling %>%
 ```
 
 ```{r laligaplot1, echo=FALSE}
-la_liga_modeling %>% 
-  ggplot(aes(x = revision, fill = revision)) +
+theme_set(theme_cowplot())
+la_liga_prop <- la_liga_modeling %>% 
+# CHANGES:
+  rename(Revision = revision) %>% 
+  ggplot(aes(x = Revision, fill = Revision)) +
   geom_bar() +
-  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold"))
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
+  # CHANGES
+  labs(x = "Revision", y = "Count", title = "Proportion of Revisions Within La Liga Dataset Selected for TOTS") +
+  theme(plot.title = element_text(hjust = .2, size = 13.5)) +
+  geom_vline(xintercept = 0, linetype = "dotted") 
+la_liga_prop_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/LaLiga.svg/1200px-LaLiga.svg.png", x = .42, y = .25, scale = .25) + 
+  draw_plot(la_liga_prop)
+
+la_liga_prop_logo
 ```
 
 

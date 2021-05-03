@@ -126,41 +126,82 @@ prem_modeling %>%
 ```
 
 ```{r}
-prem_modeling %>% 
-  ggplot(aes(x = revision, fill = revision)) +
+theme_set(theme_cowplot())
+prem_prop <- prem_modeling %>% 
+# CHANGES:
+  rename(Revision = revision) %>% 
+  ggplot(aes(x = Revision, fill = Revision)) +
   geom_bar() +
-  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold"))
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
+  # CHANGES
+  labs(x = "Revision", y = "Count", title = "Proportion of Revisions Within Premier League Dataset Selected for TOTS") +
+  theme(plot.title = element_text(hjust = .2, size = 13.5)) +
+  geom_vline(xintercept = 0, linetype = "dotted") 
+prem_prop_logo <- ggdraw() + draw_image("https://www.fifplay.com/img/public/premier-league-2-logo.png", x = .42, y = .23, scale = .25) + 
+  draw_plot(prem_prop)
+
+prem_prop_logo
 ```
 
 
 
 ```{r}
-prem_modeling %>% 
-  ggplot(aes(x = Gls, fill = revision)) +
+prem_goals_density <- prem_modeling %>% 
+  rename(Revision = revision) %>% 
+  ggplot(aes(x = Gls, fill = Revision)) +
   geom_density(alpha = 0.5) +
   scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
-  xlab("Goals")
+  labs(x = "Goals", y = "Density", title = "Density Plot of Goals Scored in Premier League Season by Revision Status", subtitle = "TOTS players tend to score goals more prolifically than their non-selected counterparts") + 
+theme(plot.subtitle = element_text(hjust = -.35, size = 11), plot.title = element_text(hjust = .1, size = 13.5))
+
+prem_goals_logo <- ggdraw() + draw_image("https://www.fifplay.com/img/public/premier-league-2-logo.png", x = .42, y = .2, scale = .25) + 
+  draw_plot(prem_goals_density)
+
+prem_goals_logo
 ```
 
 ```{r}
-prem_modeling %>% 
-  ggplot(aes(x = Rk, fill = revision)) +
+prem_tablepos_density <- prem_modeling %>% 
+  rename(Revision = revision) %>% 
+  ggplot(aes(x = Rk, fill = Revision)) +
   geom_density(alpha = 0.5) +
   scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
-  xlab("Table Position")
+  labs(x = "Table Position", y = "Density", title = "Density Plot of Premier League Table Position by Revision Status", subtitle = "Players on winning teams (lower table position) make up a substantial proportion of the Premier League TOTS dataset") + 
+theme(plot.subtitle = element_text(hjust = .4, size = 10), plot.title = element_text(hjust = .1, size = 13.5))
+
+prem_tablepos_logo <- ggdraw() + draw_image("https://www.fifplay.com/img/public/premier-league-2-logo.png", x = .42, y = .2, scale = .25) + 
+  draw_plot(prem_tablepos_density)
+
+prem_tablepos_logo
 ```
+
 ```{r}
-prem_modeling %>% 
-  ggplot(aes(x = minutes_played_divided_by90, fill = revision)) +
+prem_mppn_density <- prem_modeling %>% 
+  rename(Revision = revision) %>% 
+  ggplot(aes(x = minutes_played_divided_by90, fill = Revision)) +
   geom_density(alpha = 0.5) +
   scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
-  xlab("Total Minutes Played Dived by 90 (Full Games Played)")
+  labs(x = "Total Minutes Played Dived by 90 (Full Games Played)", y = "Density", title = "Density Plot of Minutes Played (Per 90 Minutes) by Revision Status", subtitle = "Players who accrue more minutes per contest") + 
+theme(plot.subtitle = element_text(hjust = .3, size = 10), plot.title = element_text(hjust = .8, size = 13))
+
+prem_mppn_logo <- ggdraw() + draw_image("https://www.fifplay.com/img/public/premier-league-2-logo.png", x = .42, y = .2, scale = .25) + 
+  draw_plot(prem_mppn_density)
+
+prem_mppn_logo
 ```
+
 ```{r}
-prem_modeling %>% 
-  ggplot(aes(x = position, fill = revision)) +
-  geom_bar(position = "dodge") +
-  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold"))
+prem_positions <- prem_modeling %>% 
+  rename(Revision = revision) %>% 
+  ggplot(aes(x = position, fill = Revision)) +
+  geom_bar(position = "identity") +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
+  labs(x = "Position", y = "Count", title = "Positional Breakdown Within Premier League Dataset")
+
+prem_positions_logo <- ggdraw() + draw_image("https://www.fifplay.com/img/public/premier-league-2-logo.png", x = .42, y = .22, scale = .25) + 
+  draw_plot(prem_positions)
+
+prem_positions_logo
 ```
 
 
@@ -179,6 +220,29 @@ set.seed(494)
 prem_split <- initial_split(prem_modeling_outfield, prop = .75, strata = "revision")
 prem_training <- training(prem_split)
 prem_testing <- testing(prem_split)
+```
+
+```{r message = FALSE, warning = FALSE}
+prem_train_metrics <- prem_training %>% 
+  mutate(Type = "Training") %>% 
+  rename(Revision = revision) %>% 
+  group_by(Revision, Type) %>% 
+  summarize(Goals = mean(Gls, na.rm = T), Assists = mean(Ast, na.rm = T), `Non PK Goals` = mean(Non_PK_G, na.rm = T), PK = mean(PK, na.rm = T), `Team Rank` = mean(Rk, na.rm = T), `Minutes Per 90` = mean(Min, na.rm = T)/90 , `Goals SD` = sd(Gls, na.rm = T), `Assists SD` = sd(Ast, na.rm = T), `Non PK Goals SD` = sd(Non_PK_G, na.rm = T),`Team Rank SD` = sd(Rk, na.rm = T), `Minutes Per 90 SD` = sd(Min, na.rm = T)/90)
+
+prem_test_metrics <- prem_testing %>% 
+  mutate(Type = "Testing") %>% 
+  rename(Revision = revision) %>% 
+  group_by(Revision, Type) %>% 
+  summarize(Goals = mean(Gls, na.rm = T), Assists = mean(Ast, na.rm = T), `Non PK Goals` = mean(Non_PK_G, na.rm = T), PK = mean(PK, na.rm = T),`Team Rank` = mean(Rk, na.rm = T), `Minutes Per 90` = mean(Min, na.rm = T)/90, `Goals SD` = sd(Gls, na.rm = T), `Assists SD` = sd(Ast, na.rm = T), `Non PK Goals SD` = sd(Non_PK_G, na.rm = T),`Team Rank SD` = sd(Rk, na.rm = T), `Minutes Per 90 SD` = sd(Min, na.rm = T)/90)
+
+prem_rebound_split <- rbind(prem_train_metrics, prem_test_metrics) %>% arrange(Revision)
+
+prem_metrics_table <- formattable(prem_rebound_split[1:4,1:13])
+
+kable(prem_metrics_table, align = c(rep('c', 1))) %>% 
+  row_spec(0) %>% 
+  kable_styling(full_width = F) %>% 
+  add_header_above(c("Premier League Training and Testing Group Comparison for Suspected KPIs" = 13), background = "purple", color = "white")
 ```
 
 ```{r}
@@ -260,8 +324,6 @@ plot(prem_rf_var_imp)
 
 
 
-
-
 ```{r}
 prem_ranger_test <- prem_ranger_final_wf %>% 
   last_fit(prem_split)
@@ -275,13 +337,20 @@ prem_preds1 <- prem_ranger_test %>%
   collect_predictions()
 
 prem_preds1 %>% 
-  conf_mat(revision, .pred_class)
+  conf_mat(`revision`, .pred_class)
 ```
 
-```{r}
+```{r message = FALSE}
 prem_ranger_test <- prem_testing %>% 
   bind_cols(predict(prem_ranger_fit, new_data = prem_testing, type = "prob")) %>% 
   bind_cols(predict(prem_ranger_fit, new_data = prem_testing)) 
+
+prem_rf_preds <- prem_ranger_test %>% 
+  conf_mat(revision, .pred_class)
+
+prem_rf_ggconfusion <- autoplot(prem_rf_preds, type = "heatmap") + labs(title = "Confusion Matrix of Premier League Random Forest Model") + scale_fill_gradient(low = "blue", high = "red") + theme(plot.title = element_text(hjust = .5, size = 15))
+
+prem_rf_ggconfusion
 ```
 
 ```{r}

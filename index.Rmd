@@ -102,6 +102,41 @@ Using these data sets we went about predicting team of the season players using 
 \
 
 
+```{r echo = FALSE}
+prem_summarized <- prem_modeling %>% 
+  summarize(Goals = round(mean(Gls, na.rm = T),2), Assists = round(mean(Ast, na.rm = T),2), `Non PK Goals` = round(mean(Non_PK_G, na.rm = T),2), PK = round(mean(PK, na.rm = T),2), `Team Rank` = round(mean(Rk, na.rm = T),2), `Minutes Per 90` = round(mean(Min, na.rm = T)/90,2) , `Goals SD` = round(sd(Gls, na.rm = T),2), `Assists SD` = round(sd(Ast, na.rm = T),2), `Non PK Goals SD` = round(sd(Non_PK_G, na.rm = T),2),`Team Rank SD` = round(sd(Rk, na.rm = T),2), `Minutes Per 90 SD` = round(sd(Min, na.rm = T)/90,2)) %>% 
+  mutate(League = "Premier League") %>% 
+  select(League, everything())
+
+la_liga_summarized <- la_liga_modeling %>% 
+    summarize(Goals = round(mean(Gls, na.rm = T),2), Assists = round(mean(Ast, na.rm = T),2), `Non PK Goals` = round(mean(Non_PK_G, na.rm = T),2), PK = round(mean(PK, na.rm = T),2), `Team Rank` = round(mean(Rk, na.rm = T),2), `Minutes Per 90` = round(mean(Min, na.rm = T)/90,2) , `Goals SD` = round(sd(Gls, na.rm = T),2), `Assists SD` = round(sd(Ast, na.rm = T),2), `Non PK Goals SD` = round(sd(Non_PK_G, na.rm = T),2),`Team Rank SD` = round(sd(Rk, na.rm = T),2), `Minutes Per 90 SD` = round(sd(Min, na.rm = T)/90,2)) %>% 
+  mutate(League = "La Liga") %>% 
+  select(League, everything())
+
+ligue1_summarized <- ligue1_modeling %>% 
+  summarize(Goals = round(mean(Gls, na.rm = T),2), Assists = round(mean(Ast, na.rm = T),2), `Non PK Goals` = round(mean(Non_PK_G, na.rm = T),2), PK = round(mean(PK, na.rm = T),2), `Team Rank` = round(mean(Rk, na.rm = T),2), `Minutes Per 90` = round(mean(Min, na.rm = T)/90,2) , `Goals SD` = round(sd(Gls, na.rm = T),2), `Assists SD` = round(sd(Ast, na.rm = T),2), `Non PK Goals SD` = round(sd(Non_PK_G, na.rm = T),2),`Team Rank SD` = round(sd(Rk, na.rm = T),2), `Minutes Per 90 SD` = round(sd(Min, na.rm = T)/90,2)) %>% 
+  mutate(League = "Ligue 1") %>% 
+  select(League, everything())
+
+bundesliga_summarized <- bundesliga_modeling %>% 
+  summarize(Goals = round(mean(Gls, na.rm = T),2), Assists = round(mean(Ast, na.rm = T),2), `Non PK Goals` = round(mean(Non_PK_G, na.rm = T),2), PK = round(mean(PK, na.rm = T),2), `Team Rank` = round(mean(Rk, na.rm = T),2), `Minutes Per 90` = round(mean(Min, na.rm = T)/90,2) , `Goals SD` = round(sd(Gls, na.rm = T),2), `Assists SD` = round(sd(Ast, na.rm = T),2), `Non PK Goals SD` = round(sd(Non_PK_G, na.rm = T),2),`Team Rank SD` = round(sd(Rk, na.rm = T),2), `Minutes Per 90 SD` = round(sd(Min, na.rm = T)/90,2)) %>% 
+  mutate(League = "Bundesliga") %>%  
+  select(League, everything())
+
+serie_a_summarized <- serie_a_modeling %>% 
+    summarize(Goals = round(mean(Gls, na.rm = T),2), Assists = round(mean(Ast, na.rm = T),2), `Non PK Goals` = round(mean(Non_PK_G, na.rm = T),2), PK = round(mean(PK, na.rm = T),2), `Team Rank` = round(mean(Rk, na.rm = T),2), `Minutes Per 90` = round(mean(Min, na.rm = T)/90,2) , `Goals SD` = round(sd(Gls, na.rm = T),2), `Assists SD` = round(sd(Ast, na.rm = T),2), `Non PK Goals SD` = round(sd(Non_PK_G, na.rm = T),2),`Team Rank SD` = round(sd(Rk, na.rm = T),2), `Minutes Per 90 SD` = round(sd(Min, na.rm = T)/90,2)) %>% 
+  mutate(League = "Serie A") %>%  
+  select(League, everything())
+
+league_comparison <- rbind(prem_summarized, la_liga_summarized, ligue1_summarized, bundesliga_summarized, serie_a_summarized)
+
+leagues_formatted <- formattable(league_comparison[1:5,1:12])
+
+kable(leagues_formatted, align = c(rep("c", 12))) %>% 
+  row_spec(0) %>% 
+  kable_styling(full_width = F) %>% 
+  add_header_above(c("Comparison of 5 Largest Global Soccer Leagues for Suspected KPIs (2017-2019)" = 12), background = "black", color = "white")
+```
 
 
 
@@ -1700,7 +1735,6 @@ serie_a_final_confusion <- ggdraw() + draw_image("https://static.wikia.nocookie.
 
 serie_a_final_confusion 
 ```
-```
 
 ```{r serieaconfuse2, echo = FALSE}
 serie_a_ranger_test %>% 
@@ -1743,6 +1777,7 @@ serie_a_ranger_test21 %>%
 serie_a_ranger_test21 %>% 
   filter(position %in% c("CAM", "CM", "CDM", "LM", "RM")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
+
   head(5)
 ```
 
@@ -1753,6 +1788,59 @@ serie_a_ranger_test21 %>%
   head(5)
 ```
 
+
+```{r echo = FALSE}
+new_obs_1 <- prem_ranger_test21 %>% filter(Player == "Kevin De Bruyne") %>% slice(1)
+
+#Pulls together the data needed for the break-down plot
+pp_sterling_rf_prem <- predict_parts(explainer = prem_rf_explain,
+                          new_observation = new_obs_1,
+                          type = "break_down") #default
+
+pp_sterling_rf_la_liga <- predict_parts(explainer = la_liga_rf_explain,
+                          new_observation = new_obs_1,
+                          type = "break_down") #default
+
+pp_sterling_rf_ligue1 <- predict_parts(explainer = ligue1_rf_explain,
+                          new_observation = new_obs_1,
+                          type = "break_down") #default
+
+pp_sterling_rf_bundesliga <- predict_parts(explainer = bundesliga_rf_explain,
+                          new_observation = new_obs_1,
+                          type = "break_down") #default
+
+pp_sterling_rf_serie_a <- predict_parts(explainer = serie_a_rf_explain,
+                          new_observation = new_obs_1,
+                          type = "break_down") #default
+
+# Break-down plot
+sterling_prem_pp <- plot(pp_sterling_rf_prem, title = "Kevin De Bruyne Premier League 2021 Prediction") + theme(plot.title = element_text(hjust = .5, size = 15, color = "black", face = "bold"))
+
+sterling_la_liga_pp <- plot(pp_sterling_rf_la_liga, title = "Kevin De Bruyne La Liga 2021 Prediction") + theme(plot.title = element_text(hjust = .5, size = 15, color = "black", face = "bold"))
+
+sterling_ligue1_pp <- plot(pp_sterling_rf_ligue1, title = "Kevin De Bruyne Ligue 1 2021 Prediction") + theme(plot.title = element_text(hjust = .5, size = 15, color = "black", face = "bold"))
+
+sterling_bundesliga_pp <- plot(pp_sterling_rf_bundesliga, title = "Kevin De Bruyne Bundesliga 2021 Prediction") + theme(plot.title = element_text(hjust = .5, size = 15, color = "black", face = "bold"))
+
+sterling_serie_a_pp <- plot(pp_sterling_rf_serie_a, title = "Kevin De Bruyne Serie A 2021 Prediction") + theme(plot.title = element_text(hjust = .5, size = 15, color = "black", face = "bold"))
+
+
+ggdraw() + draw_image("https://resources.premierleague.com/premierleague/photos/players/250x250/p61366.png", x = -.43, y = .4, scale = .18) + 
+  draw_plot(sterling_prem_pp)
+
+ggdraw() + draw_image("https://resources.premierleague.com/premierleague/photos/players/250x250/p61366.png", x = .45, y = .4, scale = .18) + 
+  draw_plot(sterling_la_liga_pp)
+
+ggdraw() + draw_image("https://resources.premierleague.com/premierleague/photos/players/250x250/p61366.png", x = -.43, y = .4, scale = .18) + 
+  draw_plot(sterling_ligue1_pp)
+
+ggdraw() + draw_image("https://resources.premierleague.com/premierleague/photos/players/250x250/p61366.png", x = -.43, y = .4, scale = .18) + 
+  draw_plot(sterling_bundesliga_pp)
+
+ggdraw() + draw_image("https://resources.premierleague.com/premierleague/photos/players/250x250/p61366.png", x = -.43, y = .4, scale = .18) + 
+  draw_plot(sterling_serie_a_pp)
+  
+```
 
 ![Serie A Team of the Season](SerieA_TOTS.jpg)
 

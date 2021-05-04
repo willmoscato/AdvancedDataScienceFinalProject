@@ -96,7 +96,7 @@ serie_a_modeling_outfield <- serie_a_modeling %>%
   filter(position != "GK") %>% 
   #filter(position %in% c("ST", "LW", "RW", "CF", "CAM")) %>% 
   filter(minutes_played_divided_by90 >= 19) %>% 
-  mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", ifelse(position == "RW", "RM", ifelse(position == "LW", "LM", position))))) %>% 
+  mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", position))) %>%  
   select(-Goals_allowed, -GA90, -SoTA, -Saves, -Save_percent, -W, -L, -D, -CS, -CS_percent, -Pkatt_against, -PKA, -PKsv, -Pk_Save_percent, -PKm)
 ```
 
@@ -232,7 +232,7 @@ serie_a_modeling_outfield21 <- serie_a_modeling21 %>%
   filter(position != "GK") %>% 
   #filter(position %in% c("ST", "LW", "RW", "CF", "CAM")) %>% 
   filter(minutes_played_divided_by90 >= 14) %>% 
-  mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", ifelse(position == "RW", "RM", ifelse(position == "LW", "LM", position)))))
+  mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", position)))
 ```
 
 

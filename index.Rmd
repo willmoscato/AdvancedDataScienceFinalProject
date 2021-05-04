@@ -2084,7 +2084,7 @@ kable(serie_a_tots_formatted, align = c(rep('c',11)))  %>%
 
 ![Serie A Team of the Season](SerieA_TOTS.jpg)
 
-##Kevin De Bruyne Across Leagues
+## Kevin De Bruyne Across Leagues
 \
 Here we show how Kevin De Bruyne would be modeled in all the different leagues had he played in them in order to demonstrate the similarities and differences between the models.
 \
@@ -2184,7 +2184,7 @@ In all of the leagues he preforms fairly well, but we can see that some of the m
 
 
 
-##Conclusion
+## Conclusion
 \
 In conclusion, we found that this is something that is very hard to predict. Our models in no way predicting the binary of TOTS or not properly, but they did seem to order the predicted probabilities fairly well. The best stats that our models seemed to use was how well the player's team is doing and how much the player is playing. Obviously they used other stats fairly effectively as well, but they struggled to predict players that played well on worse teams. Thus these models likely couldn't be used for much other than proving that much of what EA Sports does is subjective in terms of picking who gets these cards. Making these models confirmed our suspicion that they have no method to their madness. One interesting implication of this could be how getting or not getting one of these cards affects the public's perception of the player. Are there players that should be more highly rated by soccer fans, but they didn't get a team of the season so they aren't (and vice versa).
 

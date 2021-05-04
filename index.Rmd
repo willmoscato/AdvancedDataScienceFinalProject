@@ -2541,7 +2541,7 @@ la_liga_modeling <- fifa17_modeling_la_liga2%>%
   mutate(revision = as.factor(revision), Nation = as.factor(Nation))
 ```
 
-```{r laligamod2, echo = FALSE}
+```{r laligamod2, echo = FALSE, include=FALSE}
 la_liga_modeling %>% 
   select(where(is.numeric)) %>% 
   pivot_longer(cols = everything(),
@@ -2552,6 +2552,9 @@ la_liga_modeling %>%
   facet_wrap(vars(variable), 
              scales = "free")
 ```
+\
+The first exploratory plot we looked at was the number of TOTS vs Normal cards, and as you can see there are not many team of the season players in the data set.
+\
 
 ```{r laligaplot1, echo = FALSE}
 theme_set(theme_cowplot())
@@ -2568,7 +2571,9 @@ la_liga_prop_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wikiped
 
 la_liga_prop_logo
 ```
-
+\
+Then we looked at goals scored by TOTS and normal players, and while both the densities are low, TOTS players tend to score more goals.
+\
 
 ```{r laligaplot2, echo = FALSE}
 la_liga_goals_density <- la_liga_modeling %>% 
@@ -2584,7 +2589,9 @@ la_liga_goals_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wikipe
 
 la_liga_goals_logo
 ```
-
+\
+Next, we have a density plot of table position for team of the season players and normal player, TOTS player tend to finsish higher in the table.
+\
 ```{r laligaplot3, echo = FALSE}
 la_liga_tablepos_density <- la_liga_modeling %>% 
   rename(Revision = revision) %>% 
@@ -2599,6 +2606,9 @@ la_liga_tablepos_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wik
 
 la_liga_tablepos_logo
 ```
+\
+Next, we have a density plot of minutes played for the team of the season players vs the normal players. Clearly the TOTS players play more.
+\
 
 ```{r lalligaplot4, echo = FALSE}
 la_liga_mppn_density <- la_liga_modeling %>% 
@@ -2614,7 +2624,9 @@ la_liga_mppn_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wikiped
 
 la_liga_mppn_logo
 ```
-
+\
+This last exploratory plot shows us the distribution of the positions. As you can see there are not many center forwards, so those have been converted to strikers.
+\
 ```{r laligaplot5, echo = FALSE}
 la_liga_positions <- la_liga_modeling %>% 
   rename(Revision = revision) %>% 
@@ -2645,7 +2657,9 @@ la_liga_split <- initial_split(la_liga_modeling_outfield, prop = .75, strata = "
 la_liga_training <- training(la_liga_split)
 la_liga_testing <- testing(la_liga_split)
 ```
-
+\
+This table below shows us a comparison of important stats in the training and testing data. As you can see the difference between the two is minimal.
+\
 ```{r message = FALSE, warning = FALSE, echo = FALSE}
 la_liga_train_metrics <- la_liga_training %>% 
   mutate(Type = "Training") %>% 
@@ -2670,7 +2684,7 @@ kable(la_liga_metrics_table, align = c(rep('c', 1))) %>%
 ```
 
 
-```{r laligaranger1, echo = FALSE}
+```{r laligaranger1, echo = FALSE, include=FALSE}
 la_liga_ranger_recipe <- recipe(revision ~., data = la_liga_training) %>% 
   step_rm(Player, Nation, Squad, Born, G_per90, A_per90, minutes_played_divided_by90, OG, Attendance) %>% 
   step_upsample(revision, over_ratio = .5) %>% 
@@ -2682,7 +2696,7 @@ la_liga_ranger_recipe %>%
 ```
 
 
-```{r laligaranger2, echo = FALSE}
+```{r laligaranger2, echo = FALSE, include=FALSE}
 la_liga_ranger <- rand_forest(mtry = tune(), 
               min_n = tune(), 
               trees = 100) %>% 
@@ -2698,7 +2712,7 @@ la_liga_ranger_wf
 ```
 
 
-```{r laligaranger3, echo = FALSE}
+```{r laligaranger3, echo = FALSE, include=FALSE}
 set.seed(494)
 la_liga_cv <- vfold_cv(la_liga_training, v = 5)
 
@@ -2723,7 +2737,7 @@ la_liga_ranger_final_wf<- la_liga_ranger_wf %>%
   finalize_workflow(la_liga_best1)
 ```
 
-```{r laligaranger5, echo = FALSE}
+```{r laligaranger5, echo = FALSE, include=FALSE}
 set.seed(494)
 la_liga_ranger_fit <- la_liga_ranger_final_wf %>% 
   fit(la_liga_training)
@@ -2737,6 +2751,9 @@ la_liga_rf_explain <-
     label = "rf"
   )
 ```
+\
+The plot below show the importance of the variables in the La Liga model, the most important stats are "Minutes Played", "Tackles Won", and "Penalty Kicks Scored".
+\
 
 ```{r laligavip1, echo = FALSE}
 la_liga_rf_var_imp <- 
@@ -2747,7 +2764,7 @@ la_liga_rf_var_imp <-
 plot(la_liga_rf_var_imp)
 ```
 
-```{r laligaranger6, echo = FALSE}
+```{r laligaranger6, echo = FALSE, include=FALSE}
 la_liga_ranger_test <- la_liga_ranger_final_wf %>% 
   last_fit(la_liga_split)
 
@@ -2755,7 +2772,7 @@ la_liga_ranger_test %>%
   collect_metrics()
 ```
 
-```{r laligaconfuse1, echo = FALSE}
+```{r laligaconfuse1, echo = FALSE, include=FALSE}
 preds1 <- la_liga_ranger_test %>% 
   collect_predictions()
 
@@ -2769,10 +2786,13 @@ la_liga_ranger_test <- la_liga_testing %>%
   bind_cols(predict(la_liga_ranger_fit, new_data = la_liga_testing)) 
 ```
 
-```{r laligaconfuse2, echo = FALSE}
+```{r laligaconfuse2, echo = FALSE, include=FALSE}
 la_liga_ranger_test %>% 
   conf_mat(revision, .pred_class)
 ```
+\
+The confusion matrix below shows us that we guessed 9 TOTS rights, 112 normal cards right, and 12 total wrong in the testing data for La Liga.
+\
 
 ```{r message = FALSE, echo = FALSE}
 la_liga_ranger_test <- la_liga_testing %>% 
@@ -2790,7 +2810,7 @@ la_liga_rf_final_confusion <- ggdraw() + draw_image("https://upload.wikimedia.or
 la_liga_rf_final_confusion 
 ```
 
-```{r laligawrong1, echo = FALSE}
+```{r laligawrong1, echo = FALSE, include=FALSE}
 la_liga_ranger_test %>% 
   filter(revision != .pred_class)
 ```
@@ -2841,7 +2861,9 @@ la_liga_ranger_test_def <- la_liga_ranger_test21 %>%
   head(5) %>% 
   mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 2, "Starter", "Bench"), Position = 3)
 ```
-
+\
+Here is our predicted team of the season for La Liga 20/21:
+\
 ```{r 21laligapredictALL}
 la_liga_tots_21 <- rbind(la_liga_ranger_test_att, la_liga_ranger_test_mid, la_liga_ranger_test_def) %>% 
   arrange(desc(Role), Position) %>% 
@@ -3181,7 +3203,7 @@ ligue1_ranger_test21 <- ligue1_modeling_outfield21 %>%
   bind_cols(predict(ligue1_ranger_fit, new_data = ligue1_modeling_outfield21)) 
 ```
 
-Finally, using statistics from the 2020-2021 season, we are able to see that Gaetan Laborde, Kylian Mbappe, Memphis Depay, Kevin Volland, and Wissam Ben Yedder were the top 5 attackers in Ligue 1.
+
 
 ```{r 21ligue1predictATT, echo = FALSE}
 ligue1_ranger_test_att <- ligue1_ranger_test21 %>% 
@@ -3191,7 +3213,7 @@ ligue1_ranger_test_att <- ligue1_ranger_test21 %>%
   mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 3, "Starter", "Bench"), Position = 1)
 ```
 
-The model also shows that Jonathan Bamba, Idrissa Gana Gueye, Aurelien Tchouameni, Maxence Cqueret, and Ander Herrera are the top 5 midfielders in Ligue 1. 
+
 
 ```{r 21ligue1predictMID, echo = FALSE}
 ligue1_ranger_test_mid <- ligue1_ranger_test21 %>% 
@@ -3201,7 +3223,7 @@ ligue1_ranger_test_mid <- ligue1_ranger_test21 %>%
   mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 3, "Starter", "Bench"), Position = 2)
 ```
 
-Lastly, the top 5 defenders are shown to be Thomas Delaine, Leo Dubois, Presnel Kimpembe, Damien Da Silva, and Thilo Kehrer.
+
 
 ```{r 21ligue1predictDEF, echo = FALSE}
 ligue1_ranger_test_def <- ligue1_ranger_test21 %>% 
@@ -3211,7 +3233,9 @@ ligue1_ranger_test_def <- ligue1_ranger_test21 %>%
   mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 2, "Starter", "Bench"), Position = 3)
 ```
 
-
+\
+Here is our predicted team of the season for Ligue 1 20/21:
+\
 ```{r 21ligue1predictALL}
 ligue1_tots_21 <- rbind(ligue1_ranger_test_att, ligue1_ranger_test_mid, ligue1_ranger_test_def) %>% 
   arrange(desc(Role), Position) %>% 
@@ -3267,7 +3291,7 @@ bundesliga_modeling <- fifa17_modeling_bundesliga2%>%
   mutate(revision = as.factor(revision), Nation = as.factor(Nation))
 ```
 
-```{r bundesligaplot1, echo = FALSE}
+```{r bundesligaplot1, echo = FALSE, include=FALSE}
 bundesliga_modeling %>% 
   select(where(is.numeric)) %>% 
   pivot_longer(cols = everything(),
@@ -3278,7 +3302,9 @@ bundesliga_modeling %>%
   facet_wrap(vars(variable), 
              scales = "free")
 ```
-
+\
+First, we looked at how many TOTS players there are vs normal players in our bundesliga data set. As you can see TOTS is a prestigious award not given to many players.
+\
 ```{r bundesligaplot2, echo = FALSE}
 theme_set(theme_cowplot())
 
@@ -3295,7 +3321,9 @@ bundesliga_prop_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wiki
 
 bundesliga_prop_logo
 ```
-
+\
+Then we looked at a density of goals scored. As we can see the top for both TOTS and not is fairly low, but the TOTS tend to score more.
+\
 
 ```{r bundesligaplot3, echo = FALSE}
 bundesliga_goals_density <- bundesliga_modeling %>% 
@@ -3311,7 +3339,9 @@ bundesliga_goals_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wik
 
 bundesliga_goals_logo
 ```
-
+\
+Next, we have a density plot of the table position of TOTS vs normal players, and as with the other leagues the TOTS players tend to do better.
+\
 ```{r bundesligaplot4, echo = FALSE}
 bundesliga_tablepos_density <- bundesliga_modeling %>% 
   rename(Revision = revision) %>% 
@@ -3326,7 +3356,9 @@ bundesliga_tablepos_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/
 
 bundesliga_tablepos_logo
 ```
-
+\
+Next, we have a density plot of the minutes played of the normal cards vs TOTS cards and it is clear that the team of the season players play much more.
+\
 ```{r bundesligaplot5, echo = FALSE}
 bundesliga_mppn_density <- bundesliga_modeling %>% 
   rename(Revision = revision) %>% 
@@ -3341,7 +3373,9 @@ bundesliga_mppn_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wiki
 
 bundesliga_mppn_logo
 ```
-
+\
+Lastly, we have a distribution of the positions and what positions got team of the seasons. As you can see there are not many wingers in the bundesliga, so they have been converted to left and right mids.
+\
 ```{r bundesligaplot6, echo = FALSE}
 bundesliga_positions <- bundesliga_modeling %>% 
   rename(Revision = revision) %>% 
@@ -3372,7 +3406,9 @@ bundesliga_split <- initial_split(bundesliga_modeling_outfield, prop = .75, stra
 bundesliga_training <- training(bundesliga_split)
 bundesliga_testing <- testing(bundesliga_split)
 ```
-
+\
+In the table below we have some comparisons of the important stats for the training and testing data sets. As you can see the difference between the two is minimal.
+\
 ```{r bundesligatable1, echo = FALSE}
 bundesliga_train_metrics <- bundesliga_training %>% 
   mutate(Type = "Training") %>% 
@@ -3396,7 +3432,7 @@ kable(bundesliga_metrics_table, align = c(rep('c', 1))) %>%
   add_header_above(c("Bundesliga Training and Testing Group Comparison for Suspected KPIs" = 13), background = "red", color = "white")
 ```
 
-```{r bundesliaranger1, echo = FALSE}
+```{r bundesliaranger1, echo = FALSE, include=FALSE}
 bundesliga_ranger_recipe <- recipe(revision ~., data = bundesliga_training) %>% 
   step_rm(Player, Nation, Squad, G_per90, A_per90, minutes_played_divided_by90, Attendance, Born) %>% 
   step_upsample(revision, over_ratio = .55) %>% 
@@ -3408,7 +3444,7 @@ bundesliga_ranger_recipe %>%
 ```
 
 
-```{r bundesligaranger2, echo = FALSE}
+```{r bundesligaranger2, echo = FALSE, include=FALSE}
 bundesliga_ranger <- rand_forest(mtry = tune(), 
               min_n = tune(), 
               trees = 100) %>% 
@@ -3424,7 +3460,7 @@ bundesliga_ranger_wf
 ```
 
 
-```{r bundesligaranger3, echo = FALSE}
+```{r bundesligaranger3, echo = FALSE, include=FALSE}
 set.seed(494)
 bundesliga_cv <- vfold_cv(bundesliga_training, v = 5)
 
@@ -3463,6 +3499,9 @@ bundesliga_rf_explain <-
     label = "rf"
   )
 ```
+\
+Below is the variable importance plot for the bundesliga model. The most important variables are "Minutes Played", "Non Penalty Goals", and "Assists".
+\
 
 ```{r bundesligavip, echo = FALSE}
 bundesliga_rf_var_imp <- 
@@ -3477,7 +3516,7 @@ plot(bundesliga_rf_var_imp)
 
 
 
-```{r bundesligaranger6, echo = FALSE}
+```{r bundesligaranger6, echo = FALSE, include=FALSE}
 bundesliga_ranger_test <- bundesliga_ranger_final_wf %>% 
   last_fit(bundesliga_split)
 
@@ -3485,7 +3524,7 @@ bundesliga_ranger_test %>%
   collect_metrics()
 ```
 
-```{r bundesligaconfuse1, echo = FALSE}
+```{r bundesligaconfuse1, echo = FALSE, include= FALSE}
 preds1 <- bundesliga_ranger_test %>% 
   collect_predictions()
 
@@ -3493,7 +3532,7 @@ preds1 %>%
   conf_mat(revision, .pred_class)
 ```
 
-```{r bundesligaranger7,message = FALSE, echo = FALSE}
+```{r bundesligaranger7,message = FALSE, echo = FALSE, include= FALSE}
 bundesliga_ranger_test <- bundesliga_testing %>% 
   bind_cols(predict(bundesliga_ranger_fit, new_data = bundesliga_testing, type = "prob")) %>% 
   bind_cols(predict(bundesliga_ranger_fit, new_data = bundesliga_testing)) 
@@ -3504,7 +3543,9 @@ bundesliga_ranger_test %>%
 bundesliga_confusion_table <- bundesliga_ranger_test %>% 
   conf_mat(revision, .pred_class)
 ```
-
+\
+This shows us how well we did in predicting on the testing data. We predicted 7 TOTS correctly, 85 normal correctly, and 17 total incorrectly.
+\
 ```{r message = FALSE, echo = FALSE}
 bundesliga_rf_ggconfusion <- autoplot(bundesliga_confusion_table, type = "heatmap") + labs(title = "Confusion Matrix of Bundesliga Random Forest Model") + scale_fill_gradient(low = "blue", high = "red") + theme(plot.title = element_text(hjust = .5, size = 15))
 
@@ -3515,12 +3556,12 @@ bundesliga_rf_final_confusion <- ggdraw() + draw_image("https://upload.wikimedia
 bundesliga_rf_final_confusion 
 ```
 
-```{r bundesligaconfuse2, echo = FALSE}
+```{r bundesligaconfuse2, echo = FALSE, include= FALSE}
 bundesliga_ranger_test %>% 
   conf_mat(revision, .pred_class)
 ```
 
-```{r bundesligawrong, echo = FALSE}
+```{r bundesligawrong, echo = FALSE, include= FALSE}
 bundesliga_ranger_test %>% 
   filter(revision != .pred_class)
 ```
@@ -3567,7 +3608,9 @@ bundesliga_ranger_test_def <- bundesliga_ranger_test21 %>%
   head(5) %>% 
   mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 2, "Starter", "Bench"), Position = 3)
 ```
-
+\
+Here are our predicted team of the season players in the Bundesliga:
+\
 ```{r 21lbundesligapredictALL}
 bundesliga_tots_21 <- rbind(bundesliga_ranger_test_att, bundesliga_ranger_test_mid, bundesliga_ranger_test_def) %>% 
   arrange(desc(Role), Position) %>% 

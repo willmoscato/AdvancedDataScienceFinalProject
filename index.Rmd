@@ -781,6 +781,7 @@ la_liga_ranger_test21 %>%
 
 ## French Ligue 1
 
+We began our modeling for Ligue 1 by joining the Ligue 1 datasets from 2017, 2018, and 2019.
 
 ```{r ligue1mod, echo = FALSE}
 ligue1_fifa19_modeling <- ligue1_fifa19_modeling %>%
@@ -797,6 +798,7 @@ ligue1_modeling <- ligue1_fifa17_modeling %>%
   mutate(revision = as.factor(revision), Nation = as.factor(Nation))
 ```
 
+We then began with exploratory plots. The first plot showed us how many players were given TOTS cards in the three combined datasets. We are able to see that once again only a small proportion of players are given TOTS cards.
 
 ```{r ligue1plot1, echo = FALSE}
 theme_set(theme_cowplot())
@@ -815,6 +817,7 @@ ligue1_prop_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wikipedi
 ligue1_prop_logo
 ```
 
+Next, we looked at the density of goals scored between regular players and TOTS players. We were able to see that in general, a larger proportion of TOTS players score a higher number of goals.
 
 
 ```{r ligue1plot2, echo = FALSE}
@@ -832,6 +835,8 @@ ligue1_goals_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wikiped
 ligue1_goals_logo
 ```
 
+Next, we looked at the density of table position by card type. We see that there is an even density of table position for normal cards, while the majority of TOTS players play for better teams.
+
 ```{r ligue1plot3, echo = FALSE}
 ligue1_tablepos_density <- ligue1_modeling %>% 
   rename(Revision = revision) %>% 
@@ -847,6 +852,8 @@ ligue1_tablepos_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wiki
 ligue1_tablepos_logo
 ```
 
+We then looked at the density of minutes played per match and, unsurprisingly, players who are given TOTS cards tend to play more minutes per contest.
+
 ```{r ligue1plot4, echo = FALSE}
 ligue1_mppn_density <- ligue1_modeling %>% 
   rename(Revision = revision) %>% 
@@ -861,6 +868,8 @@ ligue1_mppn_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wikipedi
 
 ligue1_mppn_logo
 ```
+
+Finally, we looked at the distribution of TOTS cards by position. We are able to see that there is an overwhelming number of strikers and center backs in Ligue 1, and that players who play in the center of the field.
 
 ```{r ligue1plot5, echo = FALSE}
 ligue1_positions <- ligue1_modeling %>% 
@@ -892,6 +901,8 @@ ligue1_split <- initial_split(ligue1_modeling_outfield, prop = .75, strata = "re
 ligue1_training <- training(ligue1_split)
 ligue1_testing <- testing(ligue1_split)
 ```
+
+We also evaluated the metrics between the training and testing data to see if there was a significant difference between the two. For Ligue 1, there was not a significant difference in any of the important columns.
 
 ```{r}
 ligue1_train_metrics <- ligue1_training %>% 
@@ -943,6 +954,7 @@ ligue1_ranger_wf <-
 ligue1_ranger_wf
 ```
 
+We then examined the accuracy rates of the different models in the different folds. The second model in the first fold is the most accurate at 94.3% accuracy.
 
 ```{r ligue1ranger3, echo = FALSE}
 set.seed(494)
@@ -983,7 +995,10 @@ ligue1_rf_explain <-
   )
 ```
 
+In this model, the most important variables are minutes played, goal differential, and goals plus assists per 90 minutes. These three variables contribute to the card classification significantly more than the other variables.
+
 ```{r ligue1vip, echo = FALSE}
+set.seed(494)
 ligue1_rf_var_imp <- 
   model_parts(
     ligue1_rf_explain
@@ -993,7 +1008,10 @@ plot(ligue1_rf_var_imp)
 ```
 
 
+After running the random forest model, our model accuracy comes out to about 86.56%. This is likely due to many players outperforming their card rank, as well as many teams outperforming their projections.
+
 ```{r ligue1ranger6, echo = FALSE}
+set.seed(494)
 ligue1_ranger_test <- ligue1_ranger_final_wf %>% 
   last_fit(ligue1_split)
 
@@ -1006,6 +1024,7 @@ ligue1_preds1 <- ligue1_ranger_test %>%
   collect_predictions()
 ```
 
+Overall, this model predicted that 18 players met our criteria to be selected for team of the season, while also misclassifying 15 players.
 
 ```{r ligue1ranger7, message = FALSE, echo = FALSE} 
 ligue1_ranger_test <- ligue1_testing %>% 
@@ -1028,6 +1047,8 @@ ligue1_rf_final_confusion
 ligue1_ranger_test %>% 
   conf_mat(revision, .pred_class)
 ```
+
+The misclassified players are shown below:
 
 ```{r ligue1wrong, echo = FALSE}
 ligue1_ranger_test %>% 
@@ -1053,6 +1074,7 @@ ligue1_ranger_test21 <- ligue1_modeling_outfield21 %>%
   bind_cols(predict(ligue1_ranger_fit, new_data = ligue1_modeling_outfield21)) 
 ```
 
+Finally, using statistics from the 2020-2021 season, we are able to see that Gaetan Laborde, Kylian Mbappe, Memphis Depay, Kevin Volland, and Wissam Ben Yedder were the top 5 attackers in Ligue 1.
 
 ```{r 21ligue1predictATT, echo = FALSE}
 ligue1_ranger_test21 %>% 
@@ -1061,12 +1083,16 @@ ligue1_ranger_test21 %>%
   head(5)
 ```
 
+The model also shows that Jonathan Bamba, Idrissa Gana Gueye, Aurelien Tchouameni, Maxence Cqueret, and Ander Herrera are the top 5 midfielders in Ligue 1. 
+
 ```{r 21ligue1predictMID, echo = FALSE}
 ligue1_ranger_test21 %>% 
   filter(position %in% c("CAM", "CM", "CDM", "LM", "RM")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
   head(5)
 ```
+
+Lastly, the top 5 defenders are shown to be Thomas Delaine, Leo Dubois, Presnel Kimpembe, Damien Da Silva, and Thilo Kehrer.
 
 ```{r 21ligue1predictDEF, echo = FALSE}
 ligue1_ranger_test21 %>% 
@@ -1700,7 +1726,7 @@ serie_a_final_confusion <- ggdraw() + draw_image("https://static.wikia.nocookie.
 
 serie_a_final_confusion 
 ```
-```
+
 
 ```{r serieaconfuse2, echo = FALSE}
 serie_a_ranger_test %>% 

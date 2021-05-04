@@ -8,7 +8,7 @@ output:
 ---
 
 ```{r setup, include = FALSE}
-##knitr::opts_chunk$set(include = TRUE)
+knitr::opts_chunk$set(include = TRUE, echo = FALSE)
 ```
 
 ```{r libraries, include = FALSE}

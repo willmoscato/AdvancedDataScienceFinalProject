@@ -1199,3 +1199,55 @@ ligue1_ranger_test21 %>%
 
 
 ![Ligue 1 TOTS](Ligue1TOTS.jpg)
+
+
+
+
+
+#Variable Legend
+
+Revision: Whether the card is "Normal" or "Team of the Season (TOTS)"
+\
+Int : Interceptions
+\
+TklW : Tackles Won
+\
+OG : Own Goals
+\
+Pkcon : Penalties Conceded
+\
+MP: Matches Played
+\
+Min : Minutes
+\
+Gls : Goals
+\
+Ast: Assists
+\
+Non_Pk_G : Non Penalty Goals (Goals from Open Play or Free Kicks)
+\
+Pk: Penalty Kicks
+\
+Pkatt: Penalty Attempts
+\
+CrdY : Yellow Cards
+\
+CrdR : Red Cards
+\
+G_per90 : Goals per 90 minutes 
+\
+A_per90 : Assists per 90 minutes
+\
+G_plus_A_per90 : Goals plus Assists per 90 minutes
+\
+G_minus_pk_per90 : Non Penalty Goals per 90 minutes
+\
+Rk : Table Position
+\
+GF : Goals For (Goals your team has scored)
+\
+GA : Goals Against (Goals your team has conceded)
+\
+GD : Goal Difference (GF-GA)
+\
+Pts : Team Points for the Season (3 for a win, 1 for a draw, 0 for a loss)

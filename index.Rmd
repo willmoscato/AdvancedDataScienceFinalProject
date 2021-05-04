@@ -2331,7 +2331,7 @@ prem_ranger_fit <- prem_ranger_final_wf %>%
   fit(prem_training)
 ```
 
-```{r premranger5, echo = FALSE}
+```{r premranger5.1, echo = FALSE}
 set.seed(494)
 
 prem_rf_explain <- 
@@ -2355,10 +2355,11 @@ prem_rf_var_imp <-
 
 prem_plot_vip <- plot(prem_rf_var_imp)
 
-ggsave('RF_premier_league.PNG', prem_plot_vip)
+ggsave('RF_premier_league.JPG', prem_plot_vip)
 ```
 
-![VIP](RF_premier_league.PNG)
+![VIP](RF_premier_league.JPG)
+
 
 ```{r premranger6, include = FALSE}
 prem_ranger_test <- prem_ranger_final_wf %>% 

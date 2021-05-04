@@ -269,6 +269,8 @@ kable(leagues_formatted, align = c(rep("c", 12))) %>%
 
 
 ## English Premier League
+\
+The Premier League is widely considered the best league in the world. A league full of tradition and history that has seen many dominant teams and outstanding players. In recent history the league has been generally dominated by Manchester City and Liverpool, both of which won league titles by large margins. With the influx of foreign money in the league the talent gap between the top and the bottom of the league has seen steady growth, but those at the bottom continue to make it competitive. 
 
 ```{r premmod1, echo = FALSE}
 fifa19_modeling2 <- fifa19_modeling %>%
@@ -624,6 +626,10 @@ kable(prem_tots_formatted, align = c(rep('c',12)))  %>%
 
 
 ## La Liga (Spain)
+\
+La Liga has been dominated for many years by Barcelona and Real Madrid, two of the most storied clubs in the world. For the past decade it has been the story of Messi vs Ronaldo, best vs best. These two clubs have won the most Champions League trophies in the last decade and it is rare that one of them does not win the league. Outside of those two clubs the league somewhat struggles for talent, especially defensively, but the gap has seen some closing in the last few years.
+\
+
 
 ```{r laligamod1, echo = FALSE}
 fifa19_modeling_la_liga2 <- fifa19_modeling_la_liga %>%
@@ -990,6 +996,9 @@ prem_ranger_test21 <- prem_modeling_outfield21 %>%
 
 
 ## French Ligue 1
+\
+Generally considered the worst of the top 5 European leagues, Ligue 1 has been completely dominated by PSG for many years. Often called a "farmer's league" and sometimes not even considered among the best leagues in the world. However, there is no doubt that PSG is one of the best teams in the world. With the likes of Mbappe and Neymar they managed to make it to the Champions League final last season and are in the semi-finals currently.
+\
 
 We began our modeling for Ligue 1 by joining the Ligue 1 datasets from 2017, 2018, and 2019.
 

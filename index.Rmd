@@ -1754,7 +1754,9 @@ serie_a_modeling %>%
   facet_wrap(vars(variable), 
              scales = "free")
 ```
-
+\
+First we made a bar chart to see the number of team of the season players in the Serie A.
+\
 ```{r serieaplot2, echo = FALSE}
 theme_set(theme_cowplot())
 serie_a_prop <- serie_a_modeling %>% 
@@ -1771,7 +1773,9 @@ serie_a_prop_logo <- ggdraw() + draw_image("https://static.wikia.nocookie.net/lo
 serie_a_prop_logo
 ```
 
-
+\
+Next we made a density plot of goals. Team of the season players tend to score slightly more goals than normal players.
+\
 
 ```{r serieaplot3, echo = FALSE}
 serie_a_goals_density <- serie_a_modeling %>% 
@@ -1787,7 +1791,9 @@ serie_a_goals_logo <- ggdraw() + draw_image("https://static.wikia.nocookie.net/l
 
 serie_a_goals_logo
 ```
-
+\
+Then we made a density plot of team rank of the team of the season players vs normal players. We can see that the team of the season players finish much higher in the table.
+\
 ```{r serieaplot4, echo = FALSE}
 serie_a_tablepos_density <- serie_a_modeling %>% 
   rename(Revision = revision) %>% 
@@ -1802,7 +1808,9 @@ serie_a_tablepos_logo <- ggdraw() + draw_image("https://static.wikia.nocookie.ne
 
 serie_a_tablepos_logo
 ```
-
+\
+Next we made a distribution plot of how much the team of the season players play vs normal players. As you can see the team of the seaon players tend to play a lot more.
+\
 ```{r serieaaplot5, echo = FALSE}
 serie_a_mppn_density <- serie_a_modeling %>% 
   rename(Revision = revision) %>% 
@@ -1817,7 +1825,9 @@ serie_a_mppn_logo <- ggdraw() + draw_image("https://static.wikia.nocookie.net/lo
 
 serie_a_mppn_logo
 ```
-
+\
+We then made a plot of the positional breakdown of all the players. It seems that the distribution of the players is heavily in center backs, center mids, and strikers.
+\
 ```{r serieaplot6, echo = FALSE}
 serie_a_positions <- serie_a_modeling %>% 
   rename(Revision = revision) %>% 
@@ -1849,7 +1859,9 @@ serie_a_training <- training(serie_a_split)
 serie_a_testing <- testing(serie_a_split)
 ```
 
-
+\
+Next we made a table to compare important stats for the training and testing data.
+\
 ```{r serieatable1, echo - FALSE}
 serie_a_train_metrics <- serie_a_training %>% 
   mutate(Type = "Training") %>% 
@@ -1940,7 +1952,9 @@ serie_a_rf_explain <-
     label = "rf"
   )
 ```
-
+\
+Here is a plot of the most important variables in our Serie A model. It seems that "Minutes Played", "Tackles Won", and "Assists" seem to be the most important.
+\
 ```{r serieavip, echo = FALSE}
 serie_a_rf_var_imp <- 
   model_parts(
@@ -1970,6 +1984,9 @@ preds1 %>%
   conf_mat(revision, .pred_class)
 ```
 
+\
+Here is a confusion matrix of the predictions and true values for the testing data. As you can see we predicted 9 team of the season players correctly and 10 incorrectly. While this is not great, it seems to be mostly ok because the predicted probabilities are seem to be ordered fairly well.
+\
 ```{r seriearanger7, echo = FALSE}
 serie_a_ranger_test <- serie_a_testing %>% 
   bind_cols(predict(serie_a_ranger_fit, new_data = serie_a_testing, type = "prob")) %>% 
@@ -1992,6 +2009,9 @@ serie_a_final_confusion
 serie_a_ranger_test %>% 
   conf_mat(revision, .pred_class)
 ```
+\
+Here are the players in the testing data that our model predicted wrong. As you can see it is a wide variety of players, some being predicted wrong likely due to position, others due to team performance and others due to personal performance.
+\
 
 ```{r serieawrong, echo = FALSE}
 serie_a_ranger_test %>% 
@@ -2041,7 +2061,9 @@ serie_a_ranger_test_def <- serie_a_ranger_test21 %>%
   head(5) %>% 
   mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 2, "Starter", "Bench"), Position = 3)
 ```
-
+\
+Here are the predicted team of the season players for the Serie A this year:
+\
 
 ```{r 21serieapredictALL}
 serie_a_tots_21 <- rbind(serie_a_ranger_test_att, serie_a_ranger_test_mid, serie_a_ranger_test_def) %>% 
@@ -2060,7 +2082,12 @@ kable(serie_a_tots_formatted, align = c(rep('c',11)))  %>%
 ```
 
 
+![Serie A Team of the Season](SerieA_TOTS.jpg)
 
+##Kevin De Bruyne Across Leagues
+\
+Here we show how Kevin De Bruyne would be modeled in all the different leagues had he played in them in order to demonstrate the similarities and differences between the models.
+\
 
 
 ```{r echo = FALSE}
@@ -2116,9 +2143,10 @@ ggdraw() + draw_image("https://resources.premierleague.com/premierleague/photos/
   
 ```
 
-![Serie A Team of the Season](SerieA_TOTS.jpg)
 
 
+\
+In all of the leagues he preforms fairly well, but we can see that some of the models have assists as a more important stat thus making him do better. And some of the leagues place more negative weight on the fact that he has played slightly less this season, etc.
 
 
 

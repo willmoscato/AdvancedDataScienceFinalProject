@@ -19,6 +19,28 @@ library(DALEX)
 library(DALEXtra)
 library(themis)
 ```
+```{r base models, echo = FALSE}
+fifa17_modeling <- readRDS("prem17mod")
+fifa18_modeling <- readRDS("prem18mod")
+fifa19_modeling <- readRDS("prem19mod")
+fifa21_modeling <- readRDS("prem21mod")
+fifa17_modeling_la_liga <- readRDS("laliga17mod")
+fifa18_modeling_la_liga <- readRDS("laliga18mod")
+fifa19_modeling_la_liga <- readRDS("laliga19mod")
+fifa21_modeling_la_liga <- readRDS("laliga21mod")
+ligue1_fifa17_modeling <- readRDS("ligue1_17mod")
+ligue1_fifa18_modeling <- readRDS("ligue1_18mod")
+ligue1_fifa19_modeling <- readRDS("ligue1_19mod")
+fifa21_modeling_ligue1 <- readRDS("ligue1_21mod")
+fifa17_modeling_serie_a <- readRDS("seriea17mod")
+fifa18_modeling_serie_a <- readRDS("seriea18mod")
+fifa19_modeling_serie_a <- readRDS("seriea19mod")
+fifa21_modeling_serie_a <- readRDS("seriea21mod")
+fifa17_modeling_bundesliga <- readRDS("bundesliga17mod")
+fifa18_modeling_bundesliga <- readRDS("bundesliga18mod")
+fifa19_modeling_bundesliga <- readRDS("bundesliga19mod")
+fifa21_modeling_bundesliga <- readRDS("bundesliga21mod")
+```
 
 
 #Serie A

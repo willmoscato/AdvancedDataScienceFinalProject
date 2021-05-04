@@ -101,7 +101,7 @@ Using these data sets we went about predicting team of the season players using 
 \
 \
 
-##Variable Legend
+## Variable Legend
 
 Revision: Whether the card is "Normal" or "Team of the Season (TOTS)"
 \

@@ -438,25 +438,44 @@ prem_ranger_test21 <- prem_modeling_outfield21 %>%
 ```
 
 ```{r, 21prempredictATT, echo = FALSE}
-prem_ranger_test21 %>% 
+prem_ranger_test_att <- prem_ranger_test21 %>% 
   filter(position %in% c("ST", "RW", "CF", "LW")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
-  head(5)
+  head(5) %>% 
+  mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 3, "Starter", "Bench"), Position = 1)
 ```
 
 ```{r 21prempredictMID, echo = FALSE}
-prem_ranger_test21 %>% 
+prem_ranger_test_mid <- prem_ranger_test21 %>% 
   filter(position %in% c("CAM", "CM", "CDM", "LM", "RM")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
-  head(5)
+  head(5) %>% 
+  mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 3, "Starter", "Bench"), Position = 2)
 ```
 
 
 ```{r 21prempredictDEF, echo = FALSE}
-prem_ranger_test21 %>% 
+prem_ranger_test_def <- prem_ranger_test21 %>% 
   filter(position %in% c("LB", "CB", "RB")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
-  head(5)
+  head(5)  %>% 
+    mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 4, "Starter", "Bench"), Position = 3)
+```
+
+```{r 21prempredictALL}
+prem_tots_21 <- rbind(prem_ranger_test_att, prem_ranger_test_mid, prem_ranger_test_def) %>% 
+  arrange(desc(Role), Position) %>% 
+  distinct(Player, Role, position, Squad, Gls, Ast, Pts, Rk, MP, Starts, Min, .pred_TOTS) %>% 
+  rename(Position = position, Goals = Gls, Assists = Ast, Points = Pts, `Team Rank` = Rk, `Minutes Played` = MP, `Predicted TOTS Probability` = .pred_TOTS, `Projected Role` = Role)
+
+prem_tots_formatted <- formattable(prem_tots_21[1:15,1:12])
+
+kable(prem_tots_formatted, align = c(rep('c',12)))  %>% 
+  row_spec(0) %>% 
+  kable_styling(full_width = F) %>% 
+  add_header_above(c("Premier League 2021 Predicted TOTS" = 12), background = "purple", color = "white") %>% 
+  row_spec(1:8, background = "green", color = "white") %>% 
+  row_spec(9:15, background = "red", color = "white") 
 ```
 
 ![Premier League Team of the Season](PremTOTS.jpg)
@@ -773,26 +792,54 @@ la_liga_ranger_test21 <- la_liga_modeling_outfield21 %>%
 
 
 ```{r 21laligapredictATT, echo = FALSE}
-la_liga_ranger_test21 %>% 
+la_liga_ranger_test_att <- la_liga_ranger_test21 %>% 
   filter(position %in% c("ST", "RW", "CF", "LW")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
-  head(5)
+  head(5) %>% 
+  mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 3, "Starter", "Bench"), Position = 1)
 ```
 
 ```{r 21laligapredictMID, echo = FALSE}
-la_liga_ranger_test21 %>% 
+la_liga_ranger_test_mid <- la_liga_ranger_test21 %>% 
   filter(position %in% c("CAM", "CM", "CDM", "LM", "RM")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
-  head(5)
+  head(5) %>% 
+  mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 3, "Starter", "Bench"), Position = 2)
 ```
 
 
 ```{r 21laligapredictDEF, echo = FALSE}
-la_liga_ranger_test21 %>% 
+la_liga_ranger_test_def <- la_liga_ranger_test21 %>% 
   filter(position %in% c("LB", "CB", "RB")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
-  head(5)
+  head(5) %>% 
+  mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 4, "Starter", "Bench"), Position = 3)
 ```
+
+```{r 21laligapredictALL}
+la_liga_tots_21 <- rbind(la_liga_ranger_test_att, la_liga_ranger_test_mid, la_liga_ranger_test_def) %>% 
+  arrange(desc(Role), Position) %>% 
+  distinct(Player, Role, position, Squad, Gls, Ast, Pts, Rk, MP, Min, .pred_TOTS) %>% 
+  rename(Position = position, Goals = Gls, Assists = Ast, Points = Pts, `Team Rank` = Rk, `Minutes Played` = MP, `Predicted TOTS Probability` = .pred_TOTS, `Projected Role` = Role)
+
+la_liga_tots_formatted <- formattable(la_liga_tots_21[1:15,1:11])
+
+kable(la_liga_tots_formatted, align = c(rep('c',11)))  %>% 
+  row_spec(0) %>% 
+  kable_styling(full_width = F) %>% 
+  add_header_above(c("La Liga 2021 Predicted TOTS" = 11), background = "navy", color = "red") %>% 
+  row_spec(1:8, background = "green", color = "white") %>% 
+  row_spec(9:15, background = "red", color = "white") 
+```
+
+
+```{r 21premranger1, echo = FALSE}
+prem_ranger_test21 <- prem_modeling_outfield21 %>% 
+  bind_cols(predict(prem_ranger_fit, new_data = prem_modeling_outfield21, type = "prob")) %>% 
+  bind_cols(predict(prem_ranger_fit, new_data = prem_modeling_outfield21)) 
+```
+
+
 
 
 ![La Liga Team of the Season](LaLigaTOTS.jpg)
@@ -1090,26 +1137,45 @@ ligue1_ranger_test21 <- ligue1_modeling_outfield21 %>%
 
 
 ```{r 21ligue1predictATT, echo = FALSE}
-ligue1_ranger_test21 %>% 
+ligue1_ranger_test_att <- ligue1_ranger_test21 %>% 
   filter(position %in% c("ST", "RW", "CF", "LW")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
-  head(5)
+  head(5) %>% 
+  mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 3, "Starter", "Bench"), Position = 1)
 ```
 
 ```{r 21ligue1predictMID, echo = FALSE}
-ligue1_ranger_test21 %>% 
+ligue1_ranger_test_mid <- ligue1_ranger_test21 %>% 
   filter(position %in% c("CAM", "CM", "CDM", "LM", "RM")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
-  head(5)
+  head(5) %>% 
+  mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 3, "Starter", "Bench"), Position = 2)
 ```
 
 ```{r 21ligue1predictDEF, echo = FALSE}
-ligue1_ranger_test21 %>% 
+ligue1_ranger_test_def <- ligue1_ranger_test21 %>% 
   filter(position %in% c("LB", "CB", "RB")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
-  head(5)
+  head(5) %>% 
+  mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 4, "Starter", "Bench"), Position = 3)
 ```
 
+
+```{r 21ligue1predictALL}
+ligue1_tots_21 <- rbind(ligue1_ranger_test_att, ligue1_ranger_test_mid, ligue1_ranger_test_def) %>% 
+  arrange(desc(Role), Position) %>% 
+  distinct(Player, Role, position, Squad, Gls, Ast, Pts, Rk, MP, Min, .pred_TOTS) %>% 
+  rename(Position = position, Goals = Gls, Assists = Ast, Points = Pts, `Team Rank` = Rk, `Minutes Played` = MP, `Predicted TOTS Probability` = .pred_TOTS, `Projected Role` = Role)
+
+ligue1_tots_formatted <- formattable(ligue1_tots_21[1:15,1:11])
+
+kable(ligue1_tots_formatted, align = c(rep('c',11)))  %>% 
+  row_spec(0) %>% 
+  kable_styling(full_width = F) %>% 
+  add_header_above(c("Ligue 1 2021 Predicted TOTS" = 11), background = "navy", color = "white") %>% 
+  row_spec(1:8, background = "green", color = "white") %>% 
+  row_spec(9:15, background = "red", color = "white") 
+```
 
 ![Ligue 1 Team of the Season](Ligue1TOTS.jpg)
 
@@ -1425,28 +1491,44 @@ bundesliga_ranger_test21 <- bundesliga_modeling_outfield21 %>%
 ```
 
 ```{r bundesligapredictATT, echo = FALSE}
-bundesliga_ranger_test21 %>% 
+bundesliga_ranger_test_att <- bundesliga_ranger_test21 %>% 
   filter(position %in% c("ST", "RW", "CF", "LW")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
-  head(5)
+  head(5) %>% 
+  mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 3, "Starter", "Bench"), Position = 1)
 ```
 
 ```{r bundesligapredictMID, echo = FALSE}
-bundesliga_ranger_test21 %>% 
+bundesliga_ranger_test_mid <- bundesliga_ranger_test21 %>% 
   filter(position %in% c("CAM", "CM", "CDM", "LM", "RM")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
-  head(5)
+  head(5) %>% 
+  mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 3, "Starter", "Bench"), Position = 2)
 ```
 
 ```{r bundesligapredictDEF, echo = FALSE}
-bundesliga_ranger_test21 %>% 
+bundesliga_ranger_test_def <- bundesliga_ranger_test21 %>% 
   filter(position %in% c("LB", "CB", "RB")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
-  head(5)
+  head(5) %>% 
+  mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 4, "Starter", "Bench"), Position = 3)
 ```
 
+```{r 21lbundesligapredictALL}
+bundesliga_tots_21 <- rbind(bundesliga_ranger_test_att, bundesliga_ranger_test_mid, bundesliga_ranger_test_def) %>% 
+  arrange(desc(Role), Position) %>% 
+  distinct(Player, Role, position, Squad, Gls, Ast, Pts, Rk, MP, Min, .pred_TOTS) %>% 
+  rename(Position = position, Goals = Gls, Assists = Ast, Points = Pts, `Team Rank` = Rk, `Minutes Played` = MP, `Predicted TOTS Probability` = .pred_TOTS, `Projected Role` = Role)
 
+bundesliga_tots_formatted <- formattable(bundesliga_tots_21[1:15,1:11])
 
+kable(bundesliga_tots_formatted, align = c(rep('c',11)))  %>% 
+  row_spec(0) %>% 
+  kable_styling(full_width = F) %>% 
+  add_header_above(c("Bundesliga 2021 Predicted TOTS" = 11), background = "red", color = "white") %>% 
+  row_spec(1:8, background = "green", color = "white") %>% 
+  row_spec(9:15, background = "red", color = "white") 
+```
 
 ![Bundesliga Team of the Season](BundesligaTOTS.jpg)
 
@@ -1767,26 +1849,48 @@ serie_a_ranger_test21 <- serie_a_modeling_outfield21 %>%
 ```
 
 ```{r serieapredictATT, echo = FALSE}
-serie_a_ranger_test21 %>% 
+serie_a_ranger_test_att <- serie_a_ranger_test21 %>% 
   filter(position %in% c("ST", "RW", "CF", "LW")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
-  head(5)
+  head(5) %>% 
+    mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 3, "Starter", "Bench"), Position = 1)
 ```
 
 ```{r serieapredictMID, echo = FALSE}
-serie_a_ranger_test21 %>% 
+serie_a_ranger_test_mid <- serie_a_ranger_test21 %>% 
   filter(position %in% c("CAM", "CM", "CDM", "LM", "RM")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
-
-  head(5)
+  head(5) %>% 
+  mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 3, "Starter", "Bench"), Position = 2)
 ```
 
 ```{r serieapredictDEF, echo = FALSE}
-serie_a_ranger_test21 %>% 
+serie_a_ranger_test_def <- serie_a_ranger_test21 %>% 
   filter(position %in% c("LB", "CB", "RB")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
-  head(5)
+  head(5) %>% 
+  mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 4, "Starter", "Bench"), Position = 3)
 ```
+
+
+```{r 21lbundesligapredictALL}
+serie_a_tots_21 <- rbind(serie_a_ranger_test_att, serie_a_ranger_test_mid, serie_a_ranger_test_def) %>% 
+  arrange(desc(Role), Position) %>% 
+  distinct(Player, Role, position, Squad, Gls, Ast, Pts, Rk, MP, Min, .pred_TOTS) %>% 
+  rename(Position = position, Goals = Gls, Assists = Ast, Points = Pts, `Team Rank` = Rk, `Minutes Played` = MP, `Predicted TOTS Probability` = .pred_TOTS, `Projected Role` = Role)
+
+serie_a_tots_formatted <- formattable(serie_a_tots_21[1:15,1:11])
+
+kable(serie_a_tots_formatted, align = c(rep('c',11)))  %>% 
+  row_spec(0) %>% 
+  kable_styling(full_width = F) %>% 
+  add_header_above(c("Serie A 2021 Predicted TOTS" = 11), background = "red", color = "#00FF00") %>% 
+  row_spec(1:8, background = "green", color = "white") %>% 
+  row_spec(9:15, background = "red", color = "white") 
+```
+
+
+
 
 
 ```{r echo = FALSE}

@@ -2345,7 +2345,7 @@ prem_rf_explain <-
 
 Using our random forest model, we were able to observe which variables were most important to our model. It appears that goals against each player's team, minutes played, and matches played. 
 
-```{r premvip1, echo = FALSE}
+```{r premvip1, echo = FALSE, eval=FALSE}
 set.seed(494)
 
 prem_rf_var_imp <- 

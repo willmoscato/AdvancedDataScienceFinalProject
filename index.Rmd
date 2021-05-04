@@ -2126,7 +2126,7 @@ prem_modeling <- fifa17_modeling2 %>%
   mutate(revision = as.factor(revision), Nation = as.factor(Nation))
 ```
 
-```{r premmod2, echo = FALSE}
+```{r premmod2, include = FALSE}
 prem_modeling %>% 
   select(where(is.numeric)) %>% 
   pivot_longer(cols = everything(),
@@ -2137,6 +2137,8 @@ prem_modeling %>%
   facet_wrap(vars(variable), 
              scales = "free")
 ```
+
+Before diving into modeling, we first must explore the data to observe basic trends. First, we looked at the proportion of Premier League cards that are given the TOTS designation. Below, we see that a select few cards are given the TOTS designation.
 
 ```{r echo = FALSE}
 theme_set(theme_cowplot())
@@ -2156,6 +2158,11 @@ prem_prop_logo <- ggdraw() + draw_image("https://www.fifplay.com/img/public/prem
 prem_prop_logo
 ```
 
+<<<<<<< HEAD
+=======
+We also wanted to look at goals scored by TOTS players versus normal players. In this density plot, we are able to see that TOTS players score significantly more goals than regular players.
+
+>>>>>>> 5edf923d17d2e75336f8afe7695328d150b13b1d
 ```{r premplot2, echo = FALSE}
 prem_goals_density <- prem_modeling %>% 
   rename(Revision = revision) %>% 
@@ -2171,6 +2178,11 @@ prem_goals_logo <- ggdraw() + draw_image("https://www.fifplay.com/img/public/pre
 prem_goals_logo
 ```
 
+<<<<<<< HEAD
+=======
+We also found that final table position and player card status were highly correlated, specifically that players with TOTS cards generally played for teams that finished highly in the table. In the past three years, each team of the season has generally been filled with many of the top teams' players, and the density plot below reflects this.
+
+>>>>>>> 5edf923d17d2e75336f8afe7695328d150b13b1d
 ```{r premplot3, echo = FALSE}
 prem_tablepos_density <- prem_modeling %>% 
   rename(Revision = revision) %>% 
@@ -2186,6 +2198,8 @@ prem_tablepos_logo <- ggdraw() + draw_image("https://www.fifplay.com/img/public/
 prem_tablepos_logo
 ```
 
+Players who receive TOTS cards are usually the most important players to their teams, and because of this, play more minutes per contest. The density plot below is evidence of this fact.
+
 ```{r premplot4, echo = FALSE}
 prem_mppn_density <- prem_modeling %>% 
   rename(Revision = revision) %>% 
@@ -2200,6 +2214,8 @@ prem_mppn_logo <- ggdraw() + draw_image("https://www.fifplay.com/img/public/prem
 
 prem_mppn_logo
 ```
+
+Finally, TOTS distribution is expected to be vary from league to league, so it is important to look at the distribution specific to the Premier League. In the Premier League, the position with the highest number of TOTS cards is striker.
 
 ```{r premplot5, echo = FALSE}
 prem_positions <- prem_modeling %>% 
@@ -2230,6 +2246,8 @@ prem_training <- training(prem_split)
 prem_testing <- testing(prem_split)
 ```
 
+Before modeling the data, we must split the data into training and testing sets. The training data is the data that we give to the model to learn from, while the testing data is what we use to test our model. It is important that the Key Performance Indicators (KPIs) are similar in each dataset, as this indicates that the model that has learned from the training data is correctly being applied to the testing data.
+
 ```{r message = FALSE, warning = FALSE, echo = FALSE}
 prem_train_metrics <- prem_training %>% 
   mutate(Type = "Training") %>% 
@@ -2255,7 +2273,7 @@ kable(prem_metrics_table, align = c(rep('c', 1))) %>%
   add_header_above(c("Premier League Training and Testing Group Comparison for Suspected KPIs" = 13), background = "purple", color = "white")
 ```
 
-```{r premranger1, echo = FALSE}
+```{r premranger1, include = FALSE}
 prem_ranger_recipe <- recipe(revision ~., data = prem_training) %>% 
   step_rm(Player, Nation, Squad, G_per90, A_per90, minutes_played_divided_by90, Attendance, Born) %>% 
   step_upsample(revision, over_ratio = .33) %>% 
@@ -2266,7 +2284,12 @@ prem_ranger_recipe %>%
   juice()
 ```
 
+<<<<<<< HEAD
 ```{r premranger2, echo = FALSE}
+=======
+
+```{r premranger2, include = FALSE}
+>>>>>>> 5edf923d17d2e75336f8afe7695328d150b13b1d
 prem_ranger <- rand_forest(mtry = tune(), 
               min_n = tune(), 
               trees = 100) %>% 
@@ -2281,7 +2304,14 @@ prem_ranger_wf <-
 prem_ranger_wf
 ```
 
+<<<<<<< HEAD
 ```{r premranger3, echo = FALSE}
+=======
+After seeing that our training and testing sets performed similarly, we created a random forest model to predict whether a player would be classified as TOTS or not. Our random forest model was made up of 100 decision trees. Each of these trees are uncorrelated, which helps provide stability and accuracy to the model. We also created a LASSO model, which filters out explanatory variables based on their importance to the outcome, for the training and testing data, however we found that the random forest was more accurate.
+
+
+```{r premranger3, include = FALSE}
+>>>>>>> 5edf923d17d2e75336f8afe7695328d150b13b1d
 set.seed(494)
 prem_cv <- vfold_cv(prem_training, v = 5)
 
@@ -2304,6 +2334,11 @@ prem_best1 <- prem_ranger_cv %>%
 prem_ranger_final_wf<- prem_ranger_wf %>% 
   finalize_workflow(prem_best1)
 
+<<<<<<< HEAD
+=======
+```{r premranger5, include = FALSE}
+set.seed(494)
+>>>>>>> 5edf923d17d2e75336f8afe7695328d150b13b1d
 prem_ranger_fit <- prem_ranger_final_wf %>% 
   fit(prem_training)
 ```
@@ -2320,6 +2355,8 @@ prem_rf_explain <-
   )
 ```
 
+Using our random forest model, we were able to observe which variables were most important to our model. It appears that goals against each player's team, minutes played, and matches played. 
+
 ```{r premvip1, echo = FALSE}
 set.seed(494)
 
@@ -2335,7 +2372,7 @@ ggsave('RF_premier_league.PNG', prem_plot_vip)
 
 ![VIP](RF_premier_league.PNG)
 
-```{r premranger6, echo = FALSE}
+```{r premranger6, include = FALSE}
 prem_ranger_test <- prem_ranger_final_wf %>% 
   last_fit(prem_split)
 
@@ -2343,7 +2380,7 @@ prem_ranger_test %>%
   collect_metrics()
 ```
 
-```{r premconfuse1, echo = FALSE}
+```{r premconfuse1, include = FALSE}
 prem_preds1 <- prem_ranger_test %>% 
   collect_predictions()
 
@@ -2351,6 +2388,7 @@ prem_preds1 %>%
   conf_mat(`revision`, .pred_class)
 ```
 
+<<<<<<< HEAD
 ```{r}
 saveRDS(prem_ranger_test, file = 'somethingdifferent.Rds')
 ```
@@ -2358,6 +2396,9 @@ saveRDS(prem_ranger_test, file = 'somethingdifferent.Rds')
 ```{r}
 zzz <- readRDS('somethingdifferent.Rds')
 ```
+=======
+The confusion matrix below shows that 17 players were classified as TOTS. 10 of these players were correctly classified, while the model felt that 7 players who were not given TOTS cards should have been given one. It also felt that 7 players who were given TOTS cards should not have been given one.
+>>>>>>> 5edf923d17d2e75336f8afe7695328d150b13b1d
 
 ```{r premranger7, message = FALSE, echo = FALSE}
 prem_ranger_test <- prem_testing %>% 
@@ -2380,6 +2421,8 @@ prem_rf_final_confusion
 prem_ranger_test %>% 
   conf_mat(revision, .pred_class)
 ```
+
+Below are the players that our testing model incorrectly classified. Many of these players were either undervalued or overvalued based on the performance of their team. It is clear that the choices for TOTS are someone subjective.
 
 ```{r premwrong1, echo = FALSE}
 prem_ranger_test %>% 
@@ -2427,6 +2470,9 @@ prem_ranger_test_def <- prem_ranger_test21 %>%
   head(5)  %>% 
     mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 2, "Starter", "Bench"), Position = 3)
 ```
+
+
+Finally, we applied our model to the Premier League stats from the 2020-2021 season. The players who were chosen for TOTS are shown below.
 
 ```{r 21prempredictALL}
 prem_tots_21 <- rbind(prem_ranger_test_att, prem_ranger_test_mid, prem_ranger_test_def) %>% 

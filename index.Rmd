@@ -7,11 +7,11 @@ output:
     highlight: tango
 ---
 
-```{r setup, echo = FALSE}
-##knitr::opts_chunk$set(echo = TRUE)
+```{r setup, include = FALSE}
+##knitr::opts_chunk$set(include = TRUE)
 ```
 
-```{r libraries, echo = FALSE}
+```{r libraries, include = FALSE}
 library(tidyverse)
 library(tidymodels)
 library(lubridate)
@@ -101,6 +101,81 @@ Using these data sets we went about predicting team of the season players using 
 \
 \
 
+```{r earlyjoiningfortablebelow, echo = FALSE}
+fifa19_modeling2 <- fifa19_modeling %>%
+  mutate(Player = paste(Player, '19'))
+
+fifa18_modeling2 <- fifa18_modeling %>%
+  mutate(Player = paste(Player, '18'))
+
+fifa17_modeling2 <- fifa17_modeling %>%
+  mutate(Player = paste(Player, '17'))
+
+
+
+prem_modeling <- fifa17_modeling2 %>% 
+  bind_rows(fifa18_modeling2, fifa19_modeling2) %>% 
+  mutate(revision = as.factor(revision), Nation = as.factor(Nation))
+
+fifa19_modeling_la_liga2 <- fifa19_modeling_la_liga %>%
+  mutate(Player = paste(Player, '19'))
+
+fifa18_modeling_la_liga2 <- fifa18_modeling_la_liga %>%
+  mutate(Player = paste(Player, '18'))
+
+fifa17_modeling_la_liga2 <- fifa17_modeling_la_liga %>%
+  mutate(Player = paste(Player, '17'))
+
+
+
+la_liga_modeling <- fifa17_modeling_la_liga2%>% 
+  bind_rows(fifa18_modeling_la_liga2, fifa19_modeling_la_liga2) %>% 
+  select(-Starts) %>% 
+  mutate(revision = as.factor(revision), Nation = as.factor(Nation))
+
+ligue1_fifa19_modeling <- ligue1_fifa19_modeling %>%
+  mutate(Player = paste(Player, '19'))
+
+ligue1_fifa18_modeling <- ligue1_fifa18_modeling %>%
+  mutate(Player = paste(Player, '18'))
+
+ligue1_fifa17_modeling <- ligue1_fifa17_modeling %>%
+  mutate(Player = paste(Player, '17'))
+
+ligue1_modeling <- ligue1_fifa17_modeling %>% 
+  bind_rows(ligue1_fifa18_modeling, ligue1_fifa19_modeling) %>% 
+  mutate(revision = as.factor(revision), Nation = as.factor(Nation))
+
+fifa19_modeling_bundesliga2 <- fifa19_modeling_bundesliga %>%
+  mutate(Player = paste(Player, '19'))
+
+fifa18_modeling_bundesliga2 <- fifa18_modeling_bundesliga %>%
+  mutate(Player = paste(Player, '18'))
+
+fifa17_modeling_bundesliga2 <- fifa17_modeling_bundesliga %>%
+  mutate(Player = paste(Player, '17'))
+
+
+bundesliga_modeling <- fifa17_modeling_bundesliga2%>% 
+  bind_rows(fifa18_modeling_bundesliga2, fifa19_modeling_bundesliga2) %>% 
+  mutate(revision = as.factor(revision), Nation = as.factor(Nation))
+
+fifa19_modeling_serie_a2 <- fifa19_modeling_serie_a %>%
+  mutate(Player = paste(Player, '19'))
+
+fifa18_modeling_serie_a2 <- fifa18_modeling_serie_a %>%
+  mutate(Player = paste(Player, '18'))
+
+fifa17_modeling_serie_a2 <- fifa17_modeling_serie_a %>%
+  mutate(Player = paste(Player, '17'))
+
+
+
+serie_a_modeling <- fifa17_modeling_serie_a2%>% 
+  bind_rows(fifa18_modeling_serie_a2, fifa19_modeling_serie_a2) %>% 
+  mutate(revision = as.factor(revision), Nation = as.factor(Nation))
+```
+
 
 ```{r echo = FALSE}
 prem_summarized <- prem_modeling %>% 
@@ -171,7 +246,7 @@ prem_modeling %>%
              scales = "free")
 ```
 
-```{r echo = FALSE}}
+```{r echo = FALSE}
 theme_set(theme_cowplot())
 
 prem_prop <- prem_modeling %>% 
@@ -431,7 +506,7 @@ prem_modeling_outfield21 <- prem_modeling21 %>%
 ```
 
 
-```{r 21premranger1, echo = FALSE}
+```{r 21premranger1_1, echo = FALSE}
 prem_ranger_test21 <- prem_modeling_outfield21 %>% 
   bind_cols(predict(prem_ranger_fit, new_data = prem_modeling_outfield21, type = "prob")) %>% 
   bind_cols(predict(prem_ranger_fit, new_data = prem_modeling_outfield21)) 
@@ -459,7 +534,7 @@ prem_ranger_test_def <- prem_ranger_test21 %>%
   filter(position %in% c("LB", "CB", "RB")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
   head(5)  %>% 
-    mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 4, "Starter", "Bench"), Position = 3)
+    mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 2, "Starter", "Bench"), Position = 3)
 ```
 
 ```{r 21prempredictALL}
@@ -474,8 +549,8 @@ kable(prem_tots_formatted, align = c(rep('c',12)))  %>%
   row_spec(0) %>% 
   kable_styling(full_width = F) %>% 
   add_header_above(c("Premier League 2021 Predicted TOTS" = 12), background = "purple", color = "white") %>% 
-  row_spec(1:8, background = "green", color = "white") %>% 
-  row_spec(9:15, background = "red", color = "white") 
+  row_spec(1:10, background = "green", color = "white") %>% 
+  row_spec(11:15, background = "red", color = "white") 
 ```
 
 ![Premier League Team of the Season](PremTOTS.jpg)
@@ -813,7 +888,7 @@ la_liga_ranger_test_def <- la_liga_ranger_test21 %>%
   filter(position %in% c("LB", "CB", "RB")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
   head(5) %>% 
-  mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 4, "Starter", "Bench"), Position = 3)
+  mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 2, "Starter", "Bench"), Position = 3)
 ```
 
 ```{r 21laligapredictALL}
@@ -828,8 +903,8 @@ kable(la_liga_tots_formatted, align = c(rep('c',11)))  %>%
   row_spec(0) %>% 
   kable_styling(full_width = F) %>% 
   add_header_above(c("La Liga 2021 Predicted TOTS" = 11), background = "navy", color = "red") %>% 
-  row_spec(1:8, background = "green", color = "white") %>% 
-  row_spec(9:15, background = "red", color = "white") 
+  row_spec(1:10, background = "green", color = "white") %>% 
+  row_spec(11:15, background = "red", color = "white") 
 ```
 
 
@@ -1157,7 +1232,7 @@ ligue1_ranger_test_def <- ligue1_ranger_test21 %>%
   filter(position %in% c("LB", "CB", "RB")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
   head(5) %>% 
-  mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 4, "Starter", "Bench"), Position = 3)
+  mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 2, "Starter", "Bench"), Position = 3)
 ```
 
 
@@ -1173,8 +1248,8 @@ kable(ligue1_tots_formatted, align = c(rep('c',11)))  %>%
   row_spec(0) %>% 
   kable_styling(full_width = F) %>% 
   add_header_above(c("Ligue 1 2021 Predicted TOTS" = 11), background = "navy", color = "white") %>% 
-  row_spec(1:8, background = "green", color = "white") %>% 
-  row_spec(9:15, background = "red", color = "white") 
+  row_spec(1:10, background = "green", color = "white") %>% 
+  row_spec(11:15, background = "red", color = "white") 
 ```
 
 ![Ligue 1 Team of the Season](Ligue1TOTS.jpg)
@@ -1511,7 +1586,7 @@ bundesliga_ranger_test_def <- bundesliga_ranger_test21 %>%
   filter(position %in% c("LB", "CB", "RB")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
   head(5) %>% 
-  mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 4, "Starter", "Bench"), Position = 3)
+  mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 2, "Starter", "Bench"), Position = 3)
 ```
 
 ```{r 21lbundesligapredictALL}
@@ -1526,8 +1601,8 @@ kable(bundesliga_tots_formatted, align = c(rep('c',11)))  %>%
   row_spec(0) %>% 
   kable_styling(full_width = F) %>% 
   add_header_above(c("Bundesliga 2021 Predicted TOTS" = 11), background = "red", color = "white") %>% 
-  row_spec(1:8, background = "green", color = "white") %>% 
-  row_spec(9:15, background = "red", color = "white") 
+  row_spec(1:10, background = "green", color = "white") %>% 
+  row_spec(11:15, background = "red", color = "white") 
 ```
 
 ![Bundesliga Team of the Season](BundesligaTOTS.jpg)
@@ -1869,11 +1944,11 @@ serie_a_ranger_test_def <- serie_a_ranger_test21 %>%
   filter(position %in% c("LB", "CB", "RB")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
   head(5) %>% 
-  mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 4, "Starter", "Bench"), Position = 3)
+  mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 2, "Starter", "Bench"), Position = 3)
 ```
 
 
-```{r 21lbundesligapredictALL}
+```{r 21serieapredictALL}
 serie_a_tots_21 <- rbind(serie_a_ranger_test_att, serie_a_ranger_test_mid, serie_a_ranger_test_def) %>% 
   arrange(desc(Role), Position) %>% 
   distinct(Player, Role, position, Squad, Gls, Ast, Pts, Rk, MP, Min, .pred_TOTS) %>% 
@@ -1885,8 +1960,8 @@ kable(serie_a_tots_formatted, align = c(rep('c',11)))  %>%
   row_spec(0) %>% 
   kable_styling(full_width = F) %>% 
   add_header_above(c("Serie A 2021 Predicted TOTS" = 11), background = "red", color = "#00FF00") %>% 
-  row_spec(1:8, background = "green", color = "white") %>% 
-  row_spec(9:15, background = "red", color = "white") 
+  row_spec(1:10, background = "green", color = "white") %>% 
+  row_spec(11:15, background = "red", color = "white") 
 ```
 
 

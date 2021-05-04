@@ -1358,6 +1358,9 @@ kable(ligue1_tots_formatted, align = c(rep('c',11)))  %>%
 
 
 ## German Bundesliga
+\
+Considered the league of the people due to its rule of forcing every club to be 51% fan owned, the German Bundesliga is considered the second best defensive league behind the Premier League. Bayern Munich have dominated the league for many years, often poaching the best players from other teams in the league.
+\
 
 ```{r bundesligamod1, echo = FALSE}
 fifa19_modeling_bundesliga2 <- fifa19_modeling_bundesliga %>%
@@ -1718,6 +1721,9 @@ kable(bundesliga_tots_formatted, align = c(rep('c',11)))  %>%
 
 
 ## Italian Serie A
+\
+The Serie A has one of the richest histories in Europe, with the likes of AC Milan, Inter Milan, and Juventus all having great success. However, in recent history the league has been completely dominated by Juventus with them winning 9 titles in a row before being stopped this year by Inter.
+\
 
 
 ```{r serieamod1, echo = FALSE}
@@ -2133,6 +2139,26 @@ ggdraw() + draw_image("https://resources.premierleague.com/premierleague/photos/
 ## All Leagues Combined (and why it does not work)
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+##Conclusion
+\
+In conclusion, we found that this is something that is very hard to predict. Our models in no way predicting the binary of TOTS or not properly, but they did seem to order the predicted probabilities fairly well. The best stats that our models seemed to use was how well the player's team is doing and how much the player is playing. Obviously they used other stats fairly effectively as well, but they struggled to predict players that played well on worse teams. Thus these models likely couldn't be used for much other than proving that much of what EA Sports does is subjective in terms of picking who gets these cards. Making these models confirmed our suspicion that they have no method to their madness. One interesting implication of this could be how getting or not getting one of these cards affects the public's perception of the player. Are there players that should be more highly rated by soccer fans, but they didn't get a team of the season so they aren't (and vice versa).
 
 
 

@@ -290,7 +290,6 @@ premnames19 <-premnames19 %>%
   mutate(Player = str_replace_all(Player1, "-", " "))
 ```
 
-
 ```{r}
 prem19_names <- fifa19_names %>% 
   filter(league == "Premier League") %>% 
@@ -1906,7 +1905,6 @@ not_real_name21 <- not_missing_21 %>%
   select(-Player1, -player_name, -player_extended_name)
 ```
 
-
 ```{r}
 weird_names21 <- last_names21 %>% 
   inner_join(bundesliga21_names, by = c("Player_short" = "player_name")) %>% 
@@ -1945,102 +1943,51 @@ fifa21_modeling_bundesliga <- fifa21_standard_plus_table_bundesliga %>%
   mutate(Nation = sub('.* ', '', Nation)) 
 ```
 
-
-
-
-
 \
 \
-
-
-
-
-
-
 
 ## Introduction
 
 The video game FIFA, which is developed by Electronic Arts (EA) Sports, has become the most popular sports video game in the world in recent years, largely due to its game mode Ultimate Team. The objective of Ultimate Team is to build the best team possible through both buying and selling players, as well as buying packs of cards similarly to how people buy soccer trading cards in real life. Each player receives ratings in various categories based on their real life abilities, and each of these ratings factor into their overall rating. At the end of each season, EA Sports creates a Team of the Season (TOTS), where they select the best player at each position in each league from that season based on how they performed in real life. The players who receive TOTS cards also receive a boost to their overall rating to reflect their abilities in real life. Although most of their choices for TOTS are understandable, there are some choices that confuse and sometimes anger fans. Along with this, EA has never explained how they make their choices. Through the use of machine learning methods and predictive modeling, we aim to determine which variables are most important when choosing a player for TOTS, as well as predict the Team of the Season for Europe's top five leagues based on this season's statistics.
 
-
-
-
-
-
 \
 \
-
-
-
-
 
 ## Methods and Materials
 
-**Materials**: We retrieved complete player datasets for FIFA 17, FIFA 18, and FIFA 19 from [here](https://www.kaggle.com/stefanoleone992/fifa-21-ultimate-team-players-and-prices-dataset). We retrieved real life statistics from the 2016-2017, 2017-2018, and 2018-2019 seasons from [fbref.com](https://fbref.com/en/). We did not use data from the 2019-2020 season because COVID-19 caused each season to prematurely end in March of 2020.
-\
+**Materials**: We retrieved complete player datasets for FIFA 17, FIFA 18, and FIFA 19 from [here](https://www.kaggle.com/stefanoleone992/fifa-21-ultimate-team-players-and-prices-dataset). We retrieved real life statistics from the 2016-2017, 2017-2018, and 2018-2019 seasons from [fbref.com](https://fbref.com/en/). We did not use data from the 2019-2020 season because COVID-19 caused each season to prematurely end in March of 2020.\
 
-
-**Methods**: 
-\
-Using these data sets we went about predicting team of the season players using a Random Forest machine learning model. OTher models were tested, but we found that this method was the best. This makes many decision trees using the data to predict what players will be in the team of the season based upon the information that we feed into it. It then puts all of those trees together in order to make a decision on whether or not a player should be in the team of the season. We can then apply that model to data that it did not use in deciding how to decide whether or not a player is in the team of the season in order to check how good our model really is. 
-
-
-
-
-
-
+**Methods**:\
+Using these data sets we went about predicting team of the season players using a Random Forest machine learning model. OTher models were tested, but we found that this method was the best. This makes many decision trees using the data to predict what players will be in the team of the season based upon the information that we feed into it. It then puts all of those trees together in order to make a decision on whether or not a player should be in the team of the season. We can then apply that model to data that it did not use in deciding how to decide whether or not a player is in the team of the season in order to check how good our model really is.
 
 \
 \
 
 ## Variable Legend
 
-Revision: Whether the card is "Normal" or "Team of the Season (TOTS)"
-\
-Int : Interceptions
-\
-TklW : Tackles Won
-\
-OG : Own Goals
-\
-Pkcon : Penalties Conceded
-\
-MP: Matches Played
-\
-Min : Minutes
-\
-Gls : Goals
-\
-Ast: Assists
-\
-Non_Pk_G : Non Penalty Goals (Goals from Open Play or Free Kicks)
-\
-Pk: Penalty Kicks
-\
-Pkatt: Penalty Attempts
-\
-CrdY : Yellow Cards
-\
-CrdR : Red Cards
-\
-G_per90 : Goals per 90 minutes 
-\
-A_per90 : Assists per 90 minutes
-\
-G_plus_A_per90 : Goals plus Assists per 90 minutes
-\
-G_minus_pk_per90 : Non Penalty Goals per 90 minutes
-\
-Rk : Table Position
-\
-GF : Goals For (Goals your team has scored)
-\
-GA : Goals Against (Goals your team has conceded)
-\
-GD : Goal Difference (GF-GA)
-\
+Revision: Whether the card is "Normal" or "Team of the Season (TOTS)"\
+Int : Interceptions\
+TklW : Tackles Won\
+OG : Own Goals\
+Pkcon : Penalties Conceded\
+MP: Matches Played\
+Min : Minutes\
+Gls : Goals\
+Ast: Assists\
+Non_Pk_G : Non Penalty Goals (Goals from Open Play or Free Kicks)\
+Pk: Penalty Kicks\
+Pkatt: Penalty Attempts\
+CrdY : Yellow Cards\
+CrdR : Red Cards\
+G_per90 : Goals per 90 minutes\
+A_per90 : Assists per 90 minutes\
+G_plus_A\_per90 : Goals plus Assists per 90 minutes\
+G_minus_pk_per90 : Non Penalty Goals per 90 minutes\
+Rk : Table Position\
+GF : Goals For (Goals your team has scored)\
+GA : Goals Against (Goals your team has conceded)\
+GD : Goal Difference (GF-GA)\
 Pts : Team Points for the Season (3 for a win, 1 for a draw, 0 for a loss)
-
 
 \
 \
@@ -2121,7 +2068,6 @@ serie_a_modeling <- fifa17_modeling_serie_a2%>%
   mutate(revision = as.factor(revision), Nation = as.factor(Nation))
 ```
 
-
 ```{r echo = FALSE}
 prem_summarized <- prem_modeling %>% 
   summarize(Goals = round(mean(Gls, na.rm = T),2), Assists = round(mean(Ast, na.rm = T),2), `Non PK Goals` = round(mean(Non_PK_G, na.rm = T),2), PK = round(mean(PK, na.rm = T),2), `Team Rank` = round(mean(Rk, na.rm = T),2), `Minutes Per 90` = round(mean(Min, na.rm = T)/90,2) , `Goals SD` = round(sd(Gls, na.rm = T),2), `Assists SD` = round(sd(Ast, na.rm = T),2), `Non PK Goals SD` = round(sd(Non_PK_G, na.rm = T),2),`Team Rank SD` = round(sd(Rk, na.rm = T),2), `Minutes Per 90 SD` = round(sd(Min, na.rm = T)/90,2)) %>% 
@@ -2158,11 +2104,10 @@ kable(leagues_formatted, align = c(rep("c", 12))) %>%
   add_header_above(c("Comparison of 5 Largest Global Soccer Leagues for Suspected KPIs (2017-2019)" = 12), background = "black", color = "white")
 ```
 
-
-
 ## English Premier League
+
 \
-The Premier League is widely considered the best league in the world. A league full of tradition and history that has seen many dominant teams and outstanding players. In recent history the league has been generally dominated by Manchester City and Liverpool, both of which won league titles by large margins. With the influx of foreign money in the league the talent gap between the top and the bottom of the league has seen steady growth, but those at the bottom continue to make it competitive. 
+The Premier League is widely considered the best league in the world. A league full of tradition and history that has seen many dominant teams and outstanding players. In recent history the league has been generally dominated by Manchester City and Liverpool, both of which won league titles by large margins. With the influx of foreign money in the league the talent gap between the top and the bottom of the league has seen steady growth, but those at the bottom continue to make it competitive.
 
 ```{r premmod1, echo = FALSE}
 fifa19_modeling2 <- fifa19_modeling %>%
@@ -2211,9 +2156,6 @@ prem_prop_logo <- ggdraw() + draw_image("https://www.fifplay.com/img/public/prem
 prem_prop_logo
 ```
 
-
-
-
 ```{r premplot2, echo = FALSE}
 prem_goals_density <- prem_modeling %>% 
   rename(Revision = revision) %>% 
@@ -2228,7 +2170,6 @@ prem_goals_logo <- ggdraw() + draw_image("https://www.fifplay.com/img/public/pre
 
 prem_goals_logo
 ```
-
 
 ```{r premplot3, echo = FALSE}
 prem_tablepos_density <- prem_modeling %>% 
@@ -2274,7 +2215,6 @@ prem_positions_logo <- ggdraw() + draw_image("https://www.fifplay.com/img/public
 prem_positions_logo
 ```
 
-
 ```{r premmod3, echo = FALSE}
 prem_modeling_outfield <- prem_modeling %>% 
   filter(position != "GK") %>% 
@@ -2282,7 +2222,6 @@ prem_modeling_outfield <- prem_modeling %>%
   mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", position))) %>% 
   select(-Goals_allowed, -GA90, -SoTA, -Saves, -Save_percent, -W, -L, -D, -CS, -CS_percent, -Pkatt_against, -PKA, -PKsv, -Pk_Save_percent, -PKm)
 ```
-
 
 ```{r premmod4, echo = FALSE}
 set.seed(494)
@@ -2327,7 +2266,6 @@ prem_ranger_recipe %>%
   juice()
 ```
 
-
 ```{r premranger2, echo = FALSE}
 prem_ranger <- rand_forest(mtry = tune(), 
               min_n = tune(), 
@@ -2342,7 +2280,6 @@ prem_ranger_wf <-
 
 prem_ranger_wf
 ```
-
 
 ```{r premranger3, echo = FALSE}
 set.seed(494)
@@ -2360,20 +2297,19 @@ prem_ranger_cv <- prem_ranger_wf %>%
 collect_metrics(prem_ranger_cv)
 ```
 
-
 ```{r premranger4, echo = FALSE}
 prem_best1 <- prem_ranger_cv %>% 
   select_best(metric = "accuracy")
 
 prem_ranger_final_wf<- prem_ranger_wf %>% 
   finalize_workflow(prem_best1)
+
+prem_ranger_fit <- prem_ranger_final_wf %>% 
+  fit(prem_training)
 ```
 
 ```{r premranger5, echo = FALSE}
 set.seed(494)
-prem_ranger_fit <- prem_ranger_final_wf %>% 
-  fit(prem_training)
-
 
 prem_rf_explain <- 
   explain_tidymodels(
@@ -2385,15 +2321,19 @@ prem_rf_explain <-
 ```
 
 ```{r premvip1, echo = FALSE}
+set.seed(494)
+
 prem_rf_var_imp <- 
   model_parts(
     prem_rf_explain
     )
 
-plot(prem_rf_var_imp)
+prem_plot_vip <- plot(prem_rf_var_imp)
+
+ggsave('RF_premier_league.PNG', prem_plot_vip)
 ```
 
-
+![VIP](RF_premier_league.PNG)
 
 ```{r premranger6, echo = FALSE}
 prem_ranger_test <- prem_ranger_final_wf %>% 
@@ -2411,6 +2351,13 @@ prem_preds1 %>%
   conf_mat(`revision`, .pred_class)
 ```
 
+```{r}
+saveRDS(prem_ranger_test, file = 'somethingdifferent.Rds')
+```
+
+```{r}
+zzz <- readRDS('somethingdifferent.Rds')
+```
 
 ```{r premranger7, message = FALSE, echo = FALSE}
 prem_ranger_test <- prem_testing %>% 
@@ -2439,7 +2386,6 @@ prem_ranger_test %>%
   filter(revision != .pred_class)
 ```
 
-
 ```{r 21prem, echo = FALSE}
 prem_modeling21 <- fifa21_modeling %>% 
   mutate(revision = as.factor(revision), Nation = as.factor(Nation), Age = as.integer(Age))
@@ -2451,7 +2397,6 @@ prem_modeling_outfield21 <- prem_modeling21 %>%
   filter(minutes_played_divided_by90 >= 19) %>% 
   mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", position)))
 ```
-
 
 ```{r 21premranger1_1, echo = FALSE}
 prem_ranger_test21 <- prem_modeling_outfield21 %>% 
@@ -2474,7 +2419,6 @@ prem_ranger_test_mid <- prem_ranger_test21 %>%
   head(5) %>% 
   mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 3, "Starter", "Bench"), Position = 2)
 ```
-
 
 ```{r 21prempredictDEF, echo = FALSE}
 prem_ranger_test_def <- prem_ranger_test21 %>% 
@@ -2502,26 +2446,13 @@ kable(prem_tots_formatted, align = c(rep('c',12)))  %>%
 
 ![Premier League Team of the Season](PremTOTS.jpg)
 
-
-
-
-
-
-
-
-
-
 \
 \
-
-
-
 
 ## La Liga (Spain)
-\
-La Liga has been dominated for many years by Barcelona and Real Madrid, two of the most storied clubs in the world. For the past decade it has been the story of Messi vs Ronaldo, best vs best. These two clubs have won the most Champions League trophies in the last decade and it is rare that one of them does not win the league. Outside of those two clubs the league somewhat struggles for talent, especially defensively, but the gap has seen some closing in the last few years.
-\
 
+\
+La Liga has been dominated for many years by Barcelona and Real Madrid, two of the most storied clubs in the world. For the past decade it has been the story of Messi vs Ronaldo, best vs best. These two clubs have won the most Champions League trophies in the last decade and it is rare that one of them does not win the league. Outside of those two clubs the league somewhat struggles for talent, especially defensively, but the gap has seen some closing in the last few years.\
 
 ```{r laligamod1, echo = FALSE}
 fifa19_modeling_la_liga2 <- fifa19_modeling_la_liga %>%
@@ -2568,7 +2499,6 @@ la_liga_prop_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wikiped
 
 la_liga_prop_logo
 ```
-
 
 ```{r laligaplot2, echo = FALSE}
 la_liga_goals_density <- la_liga_modeling %>% 
@@ -2629,7 +2559,6 @@ la_liga_positions_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wi
 la_liga_positions_logo
 ```
 
-
 ```{r laligamod3, echo = FALSE}
 la_liga_modeling_outfield <- la_liga_modeling %>% 
   filter(position != "GK") %>% 
@@ -2637,7 +2566,6 @@ la_liga_modeling_outfield <- la_liga_modeling %>%
   mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", ifelse(position == "CF", "ST", position)))) %>% 
   select(-Goals_allowed, -GA90, -SoTA, -Saves, -Save_percent, -W, -L, -D, -CS, -CS_percent, -Pkatt_against, -PKA, -PKsv, -Pk_Save_percent, -PKm)
 ```
-
 
 ```{r laligamod4, echo = FALSE}
 set.seed(494)
@@ -2669,7 +2597,6 @@ kable(la_liga_metrics_table, align = c(rep('c', 1))) %>%
   add_header_above(c("La Liga Training and Testing Group Comparison for Suspected KPIs" = 13), background = "navy", color = "red")
 ```
 
-
 ```{r laligaranger1, echo = FALSE}
 la_liga_ranger_recipe <- recipe(revision ~., data = la_liga_training) %>% 
   step_rm(Player, Nation, Squad, Born, G_per90, A_per90, minutes_played_divided_by90, OG, Attendance) %>% 
@@ -2680,7 +2607,6 @@ la_liga_ranger_recipe %>%
   prep(la_liga_training) %>% 
   juice()
 ```
-
 
 ```{r laligaranger2, echo = FALSE}
 la_liga_ranger <- rand_forest(mtry = tune(), 
@@ -2697,7 +2623,6 @@ la_liga_ranger_wf <-
 la_liga_ranger_wf
 ```
 
-
 ```{r laligaranger3, echo = FALSE}
 set.seed(494)
 la_liga_cv <- vfold_cv(la_liga_training, v = 5)
@@ -2713,7 +2638,6 @@ la_liga_ranger_cv <- la_liga_ranger_wf %>%
 
 collect_metrics(la_liga_ranger_cv)
 ```
-
 
 ```{r laligaranger4, echo = FALSE}
 la_liga_best1 <- la_liga_ranger_cv %>% 
@@ -2795,8 +2719,6 @@ la_liga_ranger_test %>%
   filter(revision != .pred_class)
 ```
 
-
-
 ```{r 21laligamod1, echo = FALSE}
 la_liga_modeling21 <- fifa21_modeling_la_liga %>% 
   mutate(revision = as.factor(revision), Nation = as.factor(Nation), Age = as.integer(Age))
@@ -2809,13 +2731,11 @@ la_liga_modeling_outfield21 <- la_liga_modeling21 %>%
   mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", ifelse(position == "CF", "ST", position))))
 ```
 
-
 ```{r 21laligaranger1, echo = FALSE}
 la_liga_ranger_test21 <- la_liga_modeling_outfield21 %>% 
   bind_cols(predict(la_liga_ranger_fit, new_data = la_liga_modeling_outfield21, type = "prob")) %>% 
   bind_cols(predict(la_liga_ranger_fit, new_data = la_liga_modeling_outfield21)) 
 ```
-
 
 ```{r 21laligapredictATT, echo = FALSE}
 la_liga_ranger_test_att <- la_liga_ranger_test21 %>% 
@@ -2832,7 +2752,6 @@ la_liga_ranger_test_mid <- la_liga_ranger_test21 %>%
   head(5) %>% 
   mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 3, "Starter", "Bench"), Position = 2)
 ```
-
 
 ```{r 21laligapredictDEF, echo = FALSE}
 la_liga_ranger_test_def <- la_liga_ranger_test21 %>% 
@@ -2858,35 +2777,15 @@ la_liga_tots_formatted <- formattable(la_liga_tots_21[1:15,1:11])
 #   row_spec(11:15, background = "red", color = "white") 
 ```
 
-
-
-
-
-
-
 ![La Liga Team of the Season](LaLigaTOTS.jpg)
 
-
-
-
-
-
-
 \
 \
-
-
-
-
-
-
-
-
 
 ## French Ligue 1
+
 \
-Generally considered the worst of the top 5 European leagues, Ligue 1 has been completely dominated by PSG for many years. Often called a "farmer's league" and sometimes not even considered among the best leagues in the world. However, there is no doubt that PSG is one of the best teams in the world. With the likes of Mbappe and Neymar they managed to make it to the Champions League final last season and are in the semi-finals currently.
-\
+Generally considered the worst of the top 5 European leagues, Ligue 1 has been completely dominated by PSG for many years. Often called a "farmer's league" and sometimes not even considered among the best leagues in the world. However, there is no doubt that PSG is one of the best teams in the world. With the likes of Mbappe and Neymar they managed to make it to the Champions League final last season and are in the semi-finals currently.\
 
 We began our modeling for Ligue 1 by joining the Ligue 1 datasets from 2017, 2018, and 2019.
 
@@ -2925,7 +2824,6 @@ ligue1_prop_logo
 ```
 
 Next, we looked at the density of goals scored between regular players and TOTS players. We were able to see that in general, a larger proportion of TOTS players score a higher number of goals.
-
 
 ```{r ligue1plot2, echo = FALSE}
 ligue1_goals_density <- ligue1_modeling %>% 
@@ -2992,7 +2890,6 @@ ligue1_positions_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wik
 ligue1_positions_logo
 ```
 
-
 ```{r ligue1mod2, echo = FALSE}
 ligue1_modeling_outfield <- ligue1_modeling %>% 
   filter(position != "GK") %>% 
@@ -3000,7 +2897,6 @@ ligue1_modeling_outfield <- ligue1_modeling %>%
   mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", position))) %>% 
   select(-Goals_allowed, -GA90, -SoTA, -Saves, -Save_percent, -W, -L, -D, -CS, -CS_percent, -Pkatt_against, -PKA, -PKsv, -Pk_Save_percent, -PKm)
 ```
-
 
 ```{r ligue1mod3, echo = FALSE}
 set.seed(494)
@@ -3045,7 +2941,6 @@ ligue1_ranger_recipe %>%
   juice()
 ```
 
-
 ```{r ligue1ranger2, echo = FALSE}
 ligue1_ranger <- rand_forest(mtry = tune(), 
               min_n = tune(), 
@@ -3078,7 +2973,6 @@ ligue1_ranger_cv <- ligue1_ranger_wf %>%
 
 collect_metrics(ligue1_ranger_cv)
 ```
-
 
 ```{r ligue1ranger4, echo = FALSE}
 ligue1_best1 <- ligue1_ranger_cv %>% 
@@ -3114,7 +3008,6 @@ ligue1_rf_var_imp <-
 plot(ligue1_rf_var_imp)
 ```
 
-
 After running the random forest model, our model accuracy comes out to about 86.56%. This is likely due to many players outperforming their card rank, as well as many teams outperforming their projections.
 
 ```{r ligue1ranger6, echo = FALSE}
@@ -3133,7 +3026,7 @@ ligue1_preds1 <- ligue1_ranger_test %>%
 
 Overall, this model predicted that 18 players met our criteria to be selected for team of the season, while also misclassifying 15 players.
 
-```{r ligue1ranger7, message = FALSE, echo = FALSE} 
+```{r ligue1ranger7, message = FALSE, echo = FALSE}
 ligue1_ranger_test <- ligue1_testing %>% 
   bind_cols(predict(ligue1_ranger_fit, new_data = ligue1_testing, type = "prob")) %>% 
   bind_cols(predict(ligue1_ranger_fit, new_data = ligue1_testing)) 
@@ -3174,7 +3067,6 @@ ligue1_modeling_outfield21 <- ligue1_modeling21 %>%
   mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", position)))
 ```
 
-
 ```{r 21ligue1ranger, echo = FALSE}
 ligue1_ranger_test21 <- ligue1_modeling_outfield21 %>% 
   bind_cols(predict(ligue1_ranger_fit, new_data = ligue1_modeling_outfield21, type = "prob")) %>% 
@@ -3191,7 +3083,7 @@ ligue1_ranger_test_att <- ligue1_ranger_test21 %>%
   mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 3, "Starter", "Bench"), Position = 1)
 ```
 
-The model also shows that Jonathan Bamba, Idrissa Gana Gueye, Aurelien Tchouameni, Maxence Cqueret, and Ander Herrera are the top 5 midfielders in Ligue 1. 
+The model also shows that Jonathan Bamba, Idrissa Gana Gueye, Aurelien Tchouameni, Maxence Cqueret, and Ander Herrera are the top 5 midfielders in Ligue 1.
 
 ```{r 21ligue1predictMID, echo = FALSE}
 ligue1_ranger_test_mid <- ligue1_ranger_test21 %>% 
@@ -3211,7 +3103,6 @@ ligue1_ranger_test_def <- ligue1_ranger_test21 %>%
   mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 2, "Starter", "Bench"), Position = 3)
 ```
 
-
 ```{r 21ligue1predictALL}
 ligue1_tots_21 <- rbind(ligue1_ranger_test_att, ligue1_ranger_test_mid, ligue1_ranger_test_def) %>% 
   arrange(desc(Role), Position) %>% 
@@ -3230,25 +3121,13 @@ kable(ligue1_tots_formatted, align = c(rep('c',11)))  %>%
 
 ![Ligue 1 Team of the Season](Ligue1TOTS.jpg)
 
-
-
-
-
-
-
 \
 \
-
-
-
-
-
-
 
 ## German Bundesliga
+
 \
-Considered the league of the people due to its rule of forcing every club to be 51% fan owned, the German Bundesliga is considered the second best defensive league behind the Premier League. Bayern Munich have dominated the league for many years, often poaching the best players from other teams in the league.
-\
+Considered the league of the people due to its rule of forcing every club to be 51% fan owned, the German Bundesliga is considered the second best defensive league behind the Premier League. Bayern Munich have dominated the league for many years, often poaching the best players from other teams in the league.\
 
 ```{r bundesligamod1, echo = FALSE}
 fifa19_modeling_bundesliga2 <- fifa19_modeling_bundesliga %>%
@@ -3295,7 +3174,6 @@ bundesliga_prop_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wiki
 
 bundesliga_prop_logo
 ```
-
 
 ```{r bundesligaplot3, echo = FALSE}
 bundesliga_goals_density <- bundesliga_modeling %>% 
@@ -3356,7 +3234,6 @@ bundesliga_positions_logo <- ggdraw() + draw_image("https://upload.wikimedia.org
 bundesliga_positions_logo
 ```
 
-
 ```{r bundesligamod2, echo = FALSE}
 bundesliga_modeling_outfield <- bundesliga_modeling %>% 
   filter(position != "GK") %>% 
@@ -3364,7 +3241,6 @@ bundesliga_modeling_outfield <- bundesliga_modeling %>%
   mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", ifelse(position == "RW", "RM", ifelse(position == "LW", "LM", position))))) %>% 
   select(-Goals_allowed, -GA90, -SoTA, -Saves, -Save_percent, -W, -L, -D, -CS, -CS_percent, -Pkatt_against, -PKA, -PKsv, -Pk_Save_percent, -PKm)
 ```
-
 
 ```{r bundesligamod3, echo = FALSE}
 set.seed(494)
@@ -3407,7 +3283,6 @@ bundesliga_ranger_recipe %>%
   juice()
 ```
 
-
 ```{r bundesligaranger2, echo = FALSE}
 bundesliga_ranger <- rand_forest(mtry = tune(), 
               min_n = tune(), 
@@ -3422,7 +3297,6 @@ bundesliga_ranger_wf <-
 
 bundesliga_ranger_wf
 ```
-
 
 ```{r bundesligaranger3, echo = FALSE}
 set.seed(494)
@@ -3439,7 +3313,6 @@ bundesliga_ranger_cv <- bundesliga_ranger_wf %>%
 
 collect_metrics(bundesliga_ranger_cv)
 ```
-
 
 ```{r bundesligaranger4, echo = FALSE}
 bundesliga_best1 <- bundesliga_ranger_cv %>% 
@@ -3472,10 +3345,6 @@ bundesliga_rf_var_imp <-
 
 plot(bundesliga_rf_var_imp)
 ```
-
-
-
-
 
 ```{r bundesligaranger6, echo = FALSE}
 bundesliga_ranger_test <- bundesliga_ranger_final_wf %>% 
@@ -3537,7 +3406,6 @@ bundesliga_modeling_outfield21 <- bundesliga_modeling21 %>%
   mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", ifelse(position == "RW", "RM", ifelse(position == "LW", "LM", position)))))
 ```
 
-
 ```{r 21bundesligaranger, echo = FALSE}
 bundesliga_ranger_test21 <- bundesliga_modeling_outfield21 %>% 
   bind_cols(predict(bundesliga_ranger_fit, new_data = bundesliga_modeling_outfield21, type = "prob")) %>% 
@@ -3586,33 +3454,13 @@ kable(bundesliga_tots_formatted, align = c(rep('c',11)))  %>%
 
 ![Bundesliga Team of the Season](BundesligaTOTS.jpg)
 
-
-
-
-
-
-
-
-
-
 \
 \
-
-
-
-
-
-
-
-
-
-
 
 ## Italian Serie A
-\
-The Serie A has one of the richest histories in Europe, with the likes of AC Milan, Inter Milan, and Juventus all having great success. However, in recent history the league has been completely dominated by Juventus with them winning 9 titles in a row before being stopped this year by Inter.
-\
 
+\
+The Serie A has one of the richest histories in Europe, with the likes of AC Milan, Inter Milan, and Juventus all having great success. However, in recent history the league has been completely dominated by Juventus with them winning 9 titles in a row before being stopped this year by Inter.\
 
 ```{r serieamod1, echo = FALSE}
 fifa19_modeling_serie_a2 <- fifa19_modeling_serie_a %>%
@@ -3642,9 +3490,10 @@ serie_a_modeling %>%
   facet_wrap(vars(variable), 
              scales = "free")
 ```
+
 \
-First we made a bar chart to see the number of team of the season players in the Serie A.
-\
+First we made a bar chart to see the number of team of the season players in the Serie A.\
+
 ```{r serieaplot2, echo = FALSE}
 theme_set(theme_cowplot())
 serie_a_prop <- serie_a_modeling %>% 
@@ -3662,8 +3511,7 @@ serie_a_prop_logo
 ```
 
 \
-Next we made a density plot of goals. Team of the season players tend to score slightly more goals than normal players.
-\
+Next we made a density plot of goals. Team of the season players tend to score slightly more goals than normal players.\
 
 ```{r serieaplot3, echo = FALSE}
 serie_a_goals_density <- serie_a_modeling %>% 
@@ -3679,9 +3527,10 @@ serie_a_goals_logo <- ggdraw() + draw_image("https://static.wikia.nocookie.net/l
 
 serie_a_goals_logo
 ```
+
 \
-Then we made a density plot of team rank of the team of the season players vs normal players. We can see that the team of the season players finish much higher in the table.
-\
+Then we made a density plot of team rank of the team of the season players vs normal players. We can see that the team of the season players finish much higher in the table.\
+
 ```{r serieaplot4, echo = FALSE}
 serie_a_tablepos_density <- serie_a_modeling %>% 
   rename(Revision = revision) %>% 
@@ -3696,9 +3545,10 @@ serie_a_tablepos_logo <- ggdraw() + draw_image("https://static.wikia.nocookie.ne
 
 serie_a_tablepos_logo
 ```
+
 \
-Next we made a distribution plot of how much the team of the season players play vs normal players. As you can see the team of the seaon players tend to play a lot more.
-\
+Next we made a distribution plot of how much the team of the season players play vs normal players. As you can see the team of the seaon players tend to play a lot more.\
+
 ```{r serieaaplot5, echo = FALSE}
 serie_a_mppn_density <- serie_a_modeling %>% 
   rename(Revision = revision) %>% 
@@ -3713,9 +3563,10 @@ serie_a_mppn_logo <- ggdraw() + draw_image("https://static.wikia.nocookie.net/lo
 
 serie_a_mppn_logo
 ```
+
 \
-We then made a plot of the positional breakdown of all the players. It seems that the distribution of the players is heavily in center backs, center mids, and strikers.
-\
+We then made a plot of the positional breakdown of all the players. It seems that the distribution of the players is heavily in center backs, center mids, and strikers.\
+
 ```{r serieaplot6, echo = FALSE}
 serie_a_positions <- serie_a_modeling %>% 
   rename(Revision = revision) %>% 
@@ -3739,7 +3590,6 @@ serie_a_modeling_outfield <- serie_a_modeling %>%
   select(-Goals_allowed, -GA90, -SoTA, -Saves, -Save_percent, -W, -L, -D, -CS, -CS_percent, -Pkatt_against, -PKA, -PKsv, -Pk_Save_percent, -PKm)
 ```
 
-
 ```{r serieamod3, echo = FALSE}
 set.seed(494)
 serie_a_split <- initial_split(serie_a_modeling_outfield, prop = .75, strata = "revision")
@@ -3748,8 +3598,8 @@ serie_a_testing <- testing(serie_a_split)
 ```
 
 \
-Next we made a table to compare important stats for the training and testing data.
-\
+Next we made a table to compare important stats for the training and testing data.\
+
 ```{r serieatable1, echo - FALSE}
 serie_a_train_metrics <- serie_a_training %>% 
   mutate(Type = "Training") %>% 
@@ -3784,7 +3634,6 @@ serie_a_ranger_recipe %>%
   juice()
 ```
 
-
 ```{r seriearanger2, echo = FALSE}
 serie_a_ranger <- rand_forest(mtry = tune(), 
               min_n = tune(), 
@@ -3799,7 +3648,6 @@ serie_a_ranger_wf <-
 
 serie_a_ranger_wf
 ```
-
 
 ```{r seriearanger3, echo = FALSE}
 set.seed(494)
@@ -3816,7 +3664,6 @@ serie_a_ranger_cv <- serie_a_ranger_wf %>%
 
 collect_metrics(serie_a_ranger_cv)
 ```
-
 
 ```{r seriearanger4, echo = FALSE}
 serie_a_best1 <- serie_a_ranger_cv %>% 
@@ -3840,9 +3687,10 @@ serie_a_rf_explain <-
     label = "rf"
   )
 ```
+
 \
-Here is a plot of the most important variables in our Serie A model. It seems that "Minutes Played", "Tackles Won", and "Assists" seem to be the most important.
-\
+Here is a plot of the most important variables in our Serie A model. It seems that "Minutes Played", "Tackles Won", and "Assists" seem to be the most important.\
+
 ```{r serieavip, echo = FALSE}
 serie_a_rf_var_imp <- 
   model_parts(
@@ -3851,10 +3699,6 @@ serie_a_rf_var_imp <-
 
 plot(serie_a_rf_var_imp)
 ```
-
-
-
-
 
 ```{r seriearanger6, echo = FALSE}
 serie_a_ranger_test <- serie_a_ranger_final_wf %>% 
@@ -3873,8 +3717,8 @@ preds1 %>%
 ```
 
 \
-Here is a confusion matrix of the predictions and true values for the testing data. As you can see we predicted 9 team of the season players correctly and 10 incorrectly. While this is not great, it seems to be mostly ok because the predicted probabilities are seem to be ordered fairly well.
-\
+Here is a confusion matrix of the predictions and true values for the testing data. As you can see we predicted 9 team of the season players correctly and 10 incorrectly. While this is not great, it seems to be mostly ok because the predicted probabilities are seem to be ordered fairly well.\
+
 ```{r seriearanger7, echo = FALSE}
 serie_a_ranger_test <- serie_a_testing %>% 
   bind_cols(predict(serie_a_ranger_fit, new_data = serie_a_testing, type = "prob")) %>% 
@@ -3892,20 +3736,18 @@ serie_a_final_confusion <- ggdraw() + draw_image("https://static.wikia.nocookie.
 serie_a_final_confusion 
 ```
 
-
 ```{r serieaconfuse2, echo = FALSE}
 serie_a_ranger_test %>% 
   conf_mat(revision, .pred_class)
 ```
+
 \
-Here are the players in the testing data that our model predicted wrong. As you can see it is a wide variety of players, some being predicted wrong likely due to position, others due to team performance and others due to personal performance.
-\
+Here are the players in the testing data that our model predicted wrong. As you can see it is a wide variety of players, some being predicted wrong likely due to position, others due to team performance and others due to personal performance.\
 
 ```{r serieawrong, echo = FALSE}
 serie_a_ranger_test %>% 
   filter(revision != .pred_class)
 ```
-
 
 ```{r 21serieamod1, echo = FALSE}
 serie_a_modeling21 <- fifa21_modeling_serie_a %>% 
@@ -3918,7 +3760,6 @@ serie_a_modeling_outfield21 <- serie_a_modeling21 %>%
   filter(minutes_played_divided_by90 >= 14) %>% 
   mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", position)))
 ```
-
 
 ```{r 21seriearanger, echo = FALSE}
 serie_a_ranger_test21 <- serie_a_modeling_outfield21 %>% 
@@ -3949,9 +3790,9 @@ serie_a_ranger_test_def <- serie_a_ranger_test21 %>%
   head(5) %>% 
   mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 2, "Starter", "Bench"), Position = 3)
 ```
+
 \
-Here are the predicted team of the season players for the Serie A this year:
-\
+Here are the predicted team of the season players for the Serie A this year:\
 
 ```{r 21serieapredictALL}
 serie_a_tots_21 <- rbind(serie_a_ranger_test_att, serie_a_ranger_test_mid, serie_a_ranger_test_def) %>% 
@@ -3969,14 +3810,12 @@ kable(serie_a_tots_formatted, align = c(rep('c',11)))  %>%
   row_spec(11:15, background = "red", color = "white") 
 ```
 
-
 ![Serie A Team of the Season](SerieA_TOTS.jpg)
 
 ## Kevin De Bruyne Across Leagues
-\
-Here we show how Kevin De Bruyne would be modeled in all the different leagues had he played in them in order to demonstrate the similarities and differences between the models.
-\
 
+\
+Here we show how Kevin De Bruyne would be modeled in all the different leagues had he played in them in order to demonstrate the similarities and differences between the models.\
 
 ```{r echo = FALSE}
 new_obs_1 <- prem_ranger_test21 %>% filter(Player == "Kevin De Bruyne") %>% slice(1)
@@ -4031,57 +3870,15 @@ ggdraw() + draw_image("https://resources.premierleague.com/premierleague/photos/
   
 ```
 
-
-
 \
 In all of the leagues he preforms fairly well, but we can see that some of the models have assists as a more important stat thus making him do better. And some of the leagues place more negative weight on the fact that he has played slightly less this season, etc.
 
-
-
-
-
 \
 \
-
-
-
-
-
-
-
-
-
 
 ## All Leagues Combined (and why it does not work)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Conclusion
+
 \
 In conclusion, we found that this is something that is very hard to predict. Our models in no way predicting the binary of TOTS or not properly, but they did seem to order the predicted probabilities fairly well. The best stats that our models seemed to use was how well the player's team is doing and how much the player is playing. Obviously they used other stats fairly effectively as well, but they struggled to predict players that played well on worse teams. Thus these models likely couldn't be used for much other than proving that much of what EA Sports does is subjective in terms of picking who gets these cards. Making these models confirmed our suspicion that they have no method to their madness. One interesting implication of this could be how getting or not getting one of these cards affects the public's perception of the player. Are there players that should be more highly rated by soccer fans, but they didn't get a team of the season so they aren't (and vice versa).
-
-
-
-
-
-
-
-
-
-

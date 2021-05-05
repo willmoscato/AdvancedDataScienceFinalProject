@@ -1,5 +1,5 @@
 ---
-title: "Predicting EA Sports FIFA Team of the Season in Europe's Five Leagues"
+title: "Predicting EA Sports FIFA Team of the Season in Europe's Five Leagues\n"
 output:
   html_document:
     toc: TRUE
@@ -8,7 +8,9 @@ output:
 ---
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(include = TRUE, echo = FALSE, message = FALSE, warning = FALSE)
+knitr::opts_chunk$set(include = TRUE, echo = FALSE, 
+                      message = FALSE, warning = FALSE,
+                      fig.align = 'center')
 ```
 
 ```{r libraries, include = FALSE}
@@ -1966,29 +1968,29 @@ Using these data sets we went about predicting team of the season players using 
 
 ## Variable Legend
 
-Revision: Whether the card is "Normal" or "Team of the Season (TOTS)"\
-Int : Interceptions\
-TklW : Tackles Won\
-OG : Own Goals\
-Pkcon : Penalties Conceded\
-MP: Matches Played\
-Min : Minutes\
-Gls : Goals\
-Ast: Assists\
-Non_Pk_G : Non Penalty Goals (Goals from Open Play or Free Kicks)\
-Pk: Penalty Kicks\
-Pkatt: Penalty Attempts\
-CrdY : Yellow Cards\
-CrdR : Red Cards\
-G_per90 : Goals per 90 minutes\
-A_per90 : Assists per 90 minutes\
-G_plus_A\_per90 : Goals plus Assists per 90 minutes\
-G_minus_pk_per90 : Non Penalty Goals per 90 minutes\
-Rk : Table Position\
-GF : Goals For (Goals your team has scored)\
-GA : Goals Against (Goals your team has conceded)\
-GD : Goal Difference (GF-GA)\
-Pts : Team Points for the Season (3 for a win, 1 for a draw, 0 for a loss)
+**Revision**: Whether the card is "Normal" or "Team of the Season (TOTS)"\
+**Int** : Interceptions\
+**TklW** : Tackles Won\
+**OG** : Own Goals\
+**Pkcon** : Penalties Conceded\
+**MP**: Matches Played\
+**Min** : Minutes\
+**Gls** : Goals\
+**Ast**: Assists\
+**Non_Pk_G** : Non Penalty Goals (Goals from Open Play or Free Kicks)\
+**Pk**: Penalty Kicks\
+**Pkatt**: Penalty Attempts\
+**CrdY** : Yellow Cards\
+**CrdR** : Red Cards\
+**G_per90** : Goals per 90 minutes\
+**A_per90** : Assists per 90 minutes\
+**G_plus_A\_per90** : Goals plus Assists per 90 minutes\
+**G_minus_pk_per90** : Non Penalty Goals per 90 minutes\
+**Rk** : Table Position\
+**GF** : Goals For (Goals your team has scored)\
+**GA** : Goals Against (Goals your team has conceded)\
+**GD** : Goal Difference (GF-GA)\
+**Pts** : Team Points for the Season (3 for a win, 1 for a draw, 0 for a loss)
 
 \
 \
@@ -2069,6 +2071,11 @@ serie_a_modeling <- fifa17_modeling_serie_a2%>%
   mutate(revision = as.factor(revision), Nation = as.factor(Nation))
 ```
 
+In this project, we will work with data from the five major global soccer leagues (Premier League, La Liga, Ligue 1, Bundesliga, and Serie A) to predict the Team of the Season (TOTS) for each league. Before digging into the individual evaluation of each league, we examined each of their averages to get an idea of their play styles. The table above exhibits that overall, the Premier League has the highest goal scoring enviroment, with the highest average number of both Goals and Assists. This could ultimately indicate that a higher threshold of offense will be required for a player at an offensive-oriented position to secure TOTS honors for the Premier League, as they are likely to face more fierce competition in terms of these counting stats. Meanwile, leagues like La Liga and Serie A also boast relatively offensive enviroments, while Bundesliga and Ligue 1 are more defensive environments based on their far more scarce frequency of Goals. 
+
+\
+\
+
 ```{r echo = FALSE}
 prem_summarized <- prem_modeling %>% 
   summarize(Goals = round(mean(Gls, na.rm = T),2), Assists = round(mean(Ast, na.rm = T),2), `Non PK Goals` = round(mean(Non_PK_G, na.rm = T),2), PK = round(mean(PK, na.rm = T),2), `Team Rank` = round(mean(Rk, na.rm = T),2), `Minutes Per 90` = round(mean(Min, na.rm = T)/90,2) , `Goals SD` = round(sd(Gls, na.rm = T),2), `Assists SD` = round(sd(Ast, na.rm = T),2), `Non PK Goals SD` = round(sd(Non_PK_G, na.rm = T),2),`Team Rank SD` = round(sd(Rk, na.rm = T),2), `Minutes Per 90 SD` = round(sd(Min, na.rm = T)/90,2)) %>% 
@@ -2105,8 +2112,9 @@ kable(leagues_formatted, align = c(rep("c", 12))) %>%
   add_header_above(c("Comparison of 5 Largest Global Soccer Leagues for Suspected KPIs (2017-2019)" = 12), background = "black", color = "white")
 ```
 \
+\
 
-In this project, we will work with data from the five major global soccer leagues (Premier League, La Liga, Ligue 1, Bundesliga, and Serie A) to predict the Team of the Season (TOTS) for each league. Before digging into the individual evaluation of each league, we examined each of their averages to get an idea of their play styles. The table above exhibits that overall, the Premier League has the highest goal scoring enviroment, with the highest average number of both Goals and Assists. This could ultimately indicate that a higher threshold of offense will be required for a player at an offensive-oriented position to secure TOTS honors for the Premier League, as they are likely to face more fierce competition in terms of these counting stats. Meanwile, leagues like La Liga and Serie A also boast relatively offensive enviroments, while Bundesliga and Ligue 1 are more defensive environments based on their far more scarce frequency of Goals. 
+
 
 ## English Premier League
 
@@ -2279,19 +2287,25 @@ After seeing that our training and testing sets performed similarly, we created 
 
 Using our random forest model, we were able to observe which variables were most important to our model. It appears that goals against each player's team, minutes played, and matches played. 
 
-![Premier League Variable Importance Plot](prem_vip.png)
+![](prem_vip.png)
 
 The confusion matrix below shows that 17 players were classified as TOTS. 10 of these players were correctly classified, while the model felt that 7 players who were not given TOTS cards should have been given one. It also felt that 7 players who were given TOTS cards should not have been given one.
 
-![Premier League Confusion Matrix](prem_confusion.png)
+![](prem_confusion.png)
 
 Below are the players that our testing model incorrectly classified. Many of these players were either undervalued or overvalued based on the performance of their team. It is clear that the choices for TOTS are someone subjective.
 
 Finally, we applied our model to the Premier League stats from the 2020-2021 season. The players who were chosen for TOTS are shown below.
 
-![Premier League Team of the Season Prediction Table](prem_pred_tots.png)
+![](prem_pred_tots.png)
 
-![Premier League Team of the Season](PremTOTS.jpg)
+
+<center>
+
+![](PremTOTS.jpg)
+
+</center>
+
 
 \
 \
@@ -2480,7 +2494,11 @@ Here is our predicted team of the season for La Liga 20/21:
 \
 
 ![](laligatotstable.png)
-![La Liga Team of the Season](LaLigaTOTS.jpg)
+
+<center>
+![](LaLigaTOTS.jpg)
+</center>
+
 
 \
 \
@@ -2637,21 +2655,25 @@ We then examined the accuracy rates of the different models in the different fol
 
 In this model, the most important variables are minutes played, goal differential, and goals plus assists per 90 minutes. These three variables contribute to the card classification significantly more than the other variables.
 
-![Ligue 1 Variable Importance Plot](ligue1VIP.png)
+![](ligue1VIP.png)
 
 After running the random forest model, our model accuracy comes out to about 86.56%. This is likely due to many players outperforming their card rank, as well as many teams outperforming their projections.
 
 Overall, this model predicted that 18 players met our criteria to be selected for team of the season, while also misclassifying 15 players.
 
-![Ligue 1 Confusion Matrix](ligue1confusion.png)
+![](ligue1confusion.png)
 
 The misclassified players are shown below:
 
 The model also shows that Jonathan Bamba, Idrissa Gana Gueye, Aurelien Tchouameni, Maxence Cqueret, and Ander Herrera are the top 5 midfielders in Ligue 1.
 
-![Ligue 1 Team of the Season Prediction Table](ligue1totstable.png)
+![](ligue1totstable.png)
 
-![Ligue 1 Team of the Season](Ligue1TOTS.jpg)
+
+<center>
+![](Ligue1TOTS.jpg)
+</center>
+
 
 \
 \
@@ -2836,7 +2858,10 @@ Here are our predicted team of the season players in the Bundesliga:
 
 ![](bundesligatotstable.png)
 
-![Bundesliga Team of the Season](BundesligaTOTS.jpg)
+<center>
+![](BundesligaTOTS.jpg)
+</center>
+
 
 \
 \
@@ -2861,18 +2886,6 @@ fifa17_modeling_serie_a2 <- fifa17_modeling_serie_a %>%
 serie_a_modeling <- fifa17_modeling_serie_a2%>% 
   bind_rows(fifa18_modeling_serie_a2, fifa19_modeling_serie_a2) %>% 
   mutate(revision = as.factor(revision), Nation = as.factor(Nation))
-```
-
-```{r serieaplot1, echo = FALSE}
-serie_a_modeling %>% 
-  select(where(is.numeric)) %>% 
-  pivot_longer(cols = everything(),
-               names_to = "variable", 
-               values_to = "value") %>% 
-  ggplot(aes(x = value)) +
-  geom_histogram(bins = 30) +
-  facet_wrap(vars(variable), 
-             scales = "free")
 ```
 
 \
@@ -3010,12 +3023,12 @@ kable(serie_a_metrics_table, align = c(rep('c', 1))) %>%
 \
 Here is a plot of the most important variables in our Serie A model. It seems that "Minutes Played", "Tackles Won", and "Assists" seem to be the most important.\
 
-![Serie A Variable Importance Plot](serie_a_vip.png)
+![](serie_a_vip.png)
 
 \
 Here is a confusion matrix of the predictions and true values for the testing data. As you can see we predicted 9 team of the season players correctly and 10 incorrectly. While this is not great, it seems to be mostly ok because the predicted probabilities are seem to be ordered fairly well.\
 
-![Serie A Confusion Matrix](serie_a_confusion.png)
+![](serie_a_confusion.png)
 
 \
 Here are the players in the testing data that our model predicted wrong. As you can see it is a wide variety of players, some being predicted wrong likely due to position, others due to team performance and others due to personal performance.\
@@ -3023,15 +3036,27 @@ Here are the players in the testing data that our model predicted wrong. As you 
 \
 Here are the predicted team of the season players for the Serie A this year:\
 
-![Serie A Team of the Season Prediction Table](serie_a_tots_pred.png)
+![](serie_a_tots_pred.png)
 
-![Serie A Team of the Season](SerieA_TOTS.jpg)
+<center>
+![](SerieA_TOTS.jpg)
+</center>
 
 ## Kevin De Bruyne Across Leagues
 
 \
 Here we show how Kevin De Bruyne would be modeled in all the different leagues had he played in them in order to demonstrate the similarities and differences between the models.\
 
+<center>
+![](de_bruyne_prem.png)
+\
+![](de_bruyne_laliga.png)
+\
+![](de_bruyne_ligue1.png)
+\
+![](de_bruyne_bundesliga.png)
+\
+![](de_bruyne_seriea.png)
 
 
 \

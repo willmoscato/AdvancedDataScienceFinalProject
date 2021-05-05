@@ -529,12 +529,12 @@ la_liga_tots_21 <- rbind(la_liga_ranger_test_att, la_liga_ranger_test_mid, la_li
 
 la_liga_tots_formatted <- formattable(la_liga_tots_21[1:15,1:11])
 
-# kable(la_liga_tots_formatted, align = c(rep('c',11)))  %>% 
-#   row_spec(0) %>% 
-#   kable_styling(full_width = F) %>% 
-#   add_header_above(c("La Liga 2021 Predicted TOTS" = 11), background = "navy", color = "red") %>% 
-#   row_spec(1:10, background = "green", color = "white") %>% 
-#   row_spec(11:15, background = "red", color = "white") 
+kable(la_liga_tots_formatted, align = c(rep('c',11)))  %>%
+  row_spec(0) %>%
+  kable_styling(full_width = F) %>%
+  add_header_above(c("La Liga 2021 Predicted TOTS" = 11), background = "navy", color = "red") %>%
+  row_spec(1:10, background = "green", color = "white") %>%
+  row_spec(11:15, background = "red", color = "white")
 ```
 
 ```{r ligue1mod, echo = FALSE}

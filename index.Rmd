@@ -2635,7 +2635,7 @@ We then examined the accuracy rates of the different models in the different fol
 
 In this model, the most important variables are minutes played, goal differential, and goals plus assists per 90 minutes. These three variables contribute to the card classification significantly more than the other variables.
 
-![Ligue 1 Variable Importance Plot](ligue1VIP.PNG)
+![Ligue 1 Variable Importance Plot](ligue1VIP.png)
 
 After running the random forest model, our model accuracy comes out to about 86.56%. This is likely due to many players outperforming their card rank, as well as many teams outperforming their projections.
 

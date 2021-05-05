@@ -1,5 +1,6 @@
 ---
-title: "Predicting EA Sports FIFA Team of the Season in Europe's Five Leagues\n"
+title: "Predicting EA Sports FIFA Team of the Season in Europe's Five Leagues"
+author: "Alexander Denzler, Jake Greenberg, Michael Helton, William Moscato"
 output:
   html_document:
     toc: TRUE

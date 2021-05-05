@@ -2289,7 +2289,7 @@ Using our random forest model, we were able to observe which variables were most
 
 ![](prem_vip.png)
 
-The confusion matrix below shows that 17 players were classified as TOTS. 10 of these players were correctly classified, while the model felt that 7 players who were not given TOTS cards should have been given one. It also felt that 7 players who were given TOTS cards should not have been given one.
+The confusion matrix below shows that 17 players were classified as TOTS. 7 of these players were correctly classified, while the model felt that 5 players who were not given TOTS cards should have been given one. It also felt that 10 players who were given TOTS cards should not have been given one.
 
 ![](prem_confusion.png)
 
@@ -2475,7 +2475,7 @@ kable(la_liga_metrics_table, align = c(rep('c', 1))) %>%
 
 
 \
-The plot below show the importance of the variables in the La Liga model, the most important stats are "Minutes Played" and "Team Goal Differential".
+The plot below show the importance of the variables in the La Liga model, the most important stats are "Minutes Played", "Assists" and "Team Goal Differential".
 \
 
 ![](laligaVIP.png)
@@ -2651,7 +2651,7 @@ In this model, the most important variables were minutes played, goal differenti
 
 ![](ligue1VIP.png)
 
-Overall, this model predicted that 18 players met our criteria to be selected for team of the season, while also misclassifying 15 players.
+Overall, this model predicted that 19 players met our criteria to be selected for team of the season, while also misclassifying 16 players.
 
 ![](ligue1confusion.png)
 
@@ -2830,7 +2830,7 @@ kable(bundesliga_metrics_table, align = c(rep('c', 1))) %>%
 ```
 
 \
-Below is the variable importance plot for the Bundesliga model. The most important variables are "Minutes Played", "Non Penalty Goals", "Goals Against (Team)" and "Non Penalty Goals plus Assists per 90 Minutes".
+Below is the variable importance plot for the Bundesliga model. The most important variables are "Minutes Played", "Goals Against (Team)" and "Non Penalty Goals plus Assists per 90 Minutes".
 \
 
 ![](bundesligaVIP.png)

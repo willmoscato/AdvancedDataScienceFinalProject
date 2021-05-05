@@ -9,6 +9,7 @@ output:
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(include = TRUE, echo = FALSE)
+set.seed(494)
 ```
 
 ```{r libraries, include = FALSE}

@@ -2652,197 +2652,25 @@ kable(la_liga_metrics_table, align = c(rep('c', 1))) %>%
 ```
 
 
-```{r laligaranger1, echo = FALSE, include=FALSE}
-la_liga_ranger_recipe <- recipe(revision ~., data = la_liga_training) %>% 
-  step_rm(Player, Nation, Squad, Born, G_per90, A_per90, minutes_played_divided_by90, OG, Attendance) %>% 
-  step_upsample(revision, over_ratio = .5) %>% 
-  step_mutate_at(all_numeric(), fn = ~as.numeric(.))
 
-la_liga_ranger_recipe %>% 
-  prep(la_liga_training) %>% 
-  juice()
-```
-
-
-
-```{r laligaranger2, echo = FALSE, include=FALSE}
-la_liga_ranger <- rand_forest(mtry = tune(), 
-              min_n = tune(), 
-              trees = 100) %>% 
-  set_mode("classification") %>% 
-  set_engine("ranger")
-
-la_liga_ranger_wf <- 
-  workflow() %>% 
-  add_recipe(la_liga_ranger_recipe) %>% 
-  add_model(la_liga_ranger) 
-
-la_liga_ranger_wf
-```
-
-
-```{r laligaranger3, echo = FALSE, include=FALSE}
-set.seed(494)
-la_liga_cv <- vfold_cv(la_liga_training, v = 5)
-
-la_liga_rf_grid <- grid_regular(min_n(), finalize(mtry(), la_liga_training %>% select(-revision)), levels = 3)
-
-ctrl_res <- control_stack_grid()
-
-la_liga_ranger_cv <- la_liga_ranger_wf %>% 
-  tune_grid(resamples = la_liga_cv,
-           grid = la_liga_rf_grid,
-           control = ctrl_res)
-
-collect_metrics(la_liga_ranger_cv)
-```
-
-```{r laligaranger4, echo = FALSE}
-la_liga_best1 <- la_liga_ranger_cv %>% 
-  select_best(metric = "accuracy")
-
-la_liga_ranger_final_wf<- la_liga_ranger_wf %>% 
-  finalize_workflow(la_liga_best1)
-```
-
-```{r laligaranger5, echo = FALSE, include=FALSE}
-set.seed(494)
-la_liga_ranger_fit <- la_liga_ranger_final_wf %>% 
-  fit(la_liga_training)
-
-
-la_liga_rf_explain <- 
-  explain_tidymodels(
-    model = la_liga_ranger_fit,
-    data = la_liga_training %>% select(-revision), 
-    y = as.numeric(la_liga_training$revision == "TOTS"),
-    label = "rf"
-  )
-```
 \
-The plot below show the importance of the variables in the La Liga model, the most important stats are "Minutes Played", "Tackles Won", and "Penalty Kicks Scored".
+The plot below show the importance of the variables in the La Liga model, the most important stats are "Minutes Played" and "Team Goal Differential".
 \
 
-```{r laligavip1, echo = FALSE}
-la_liga_rf_var_imp <- 
-  model_parts(
-    la_liga_rf_explain
-    )
+![](laligaVIP.png)
 
-plot(la_liga_rf_var_imp)
-```
 
-```{r laligaranger6, echo = FALSE, include=FALSE}
-la_liga_ranger_test <- la_liga_ranger_final_wf %>% 
-  last_fit(la_liga_split)
-
-la_liga_ranger_test %>% 
-  collect_metrics()
-```
-
-```{r laligaconfuse1, echo = FALSE, include=FALSE}
-preds1 <- la_liga_ranger_test %>% 
-  collect_predictions()
-
-preds1 %>% 
-  conf_mat(revision, .pred_class)
-```
-
-```{r laligaranger7, echo = FALSE}
-la_liga_ranger_test <- la_liga_testing %>% 
-  bind_cols(predict(la_liga_ranger_fit, new_data = la_liga_testing, type = "prob")) %>% 
-  bind_cols(predict(la_liga_ranger_fit, new_data = la_liga_testing)) 
-```
-
-```{r laligaconfuse2, echo = FALSE, include=FALSE}
-la_liga_ranger_test %>% 
-  conf_mat(revision, .pred_class)
-```
 \
-The confusion matrix below shows us that we guessed 9 TOTS rights, 112 normal cards right, and 12 total wrong in the testing data for La Liga.
+The confusion matrix below shows us that we guessed 9 TOTS rights, 114 normal cards right, and 10 total wrong in the testing data for La Liga.
 \
 
-```{r message = FALSE, echo = FALSE}
-la_liga_ranger_test <- la_liga_testing %>% 
-  bind_cols(predict(la_liga_ranger_fit, new_data = la_liga_testing, type = "prob")) %>% 
-  bind_cols(predict(la_liga_ranger_fit, new_data = la_liga_testing)) 
+![](laligaconfusion.png)
 
-la_liga_rf_preds <- la_liga_ranger_test %>% 
-  conf_mat(revision, .pred_class)
-
-la_liga_rf_ggconfusion <- autoplot(la_liga_rf_preds, type = "heatmap") + labs(title = "Confusion Matrix of La Liga Random Forest Model") + scale_fill_gradient(low = "blue", high = "red") + theme(plot.title = element_text(hjust = .5, size = 15))
-
-la_liga_rf_final_confusion <- ggdraw() + draw_image("https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/LaLiga.svg/1200px-LaLiga.svg.png", x = -.43, y = .4, scale = .18) + 
-  draw_plot(la_liga_rf_ggconfusion)
-
-la_liga_rf_final_confusion 
-```
-
-```{r laligawrong1, echo = FALSE, include=FALSE}
-la_liga_ranger_test %>% 
-  filter(revision != .pred_class)
-```
-
-```{r 21laligamod1, echo = FALSE}
-la_liga_modeling21 <- fifa21_modeling_la_liga %>% 
-  mutate(revision = as.factor(revision), Nation = as.factor(Nation), Age = as.integer(Age))
-```
-
-```{r 21laligaoutfield, echo = FALSE}
-la_liga_modeling_outfield21 <- la_liga_modeling21 %>% 
-  filter(position != "GK") %>% 
-  filter(minutes_played_divided_by90 >= 14) %>% 
-  mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", ifelse(position == "CF", "ST", position))))
-```
-
-```{r 21laligaranger1, echo = FALSE}
-la_liga_ranger_test21 <- la_liga_modeling_outfield21 %>% 
-  bind_cols(predict(la_liga_ranger_fit, new_data = la_liga_modeling_outfield21, type = "prob")) %>% 
-  bind_cols(predict(la_liga_ranger_fit, new_data = la_liga_modeling_outfield21)) 
-```
-
-```{r 21laligapredictATT, echo = FALSE}
-la_liga_ranger_test_att <- la_liga_ranger_test21 %>% 
-  filter(position %in% c("ST", "RW", "CF", "LW")) %>% 
-  arrange(desc(.pred_TOTS)) %>% 
-  head(5) %>% 
-  mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 3, "Starter", "Bench"), Position = 1)
-```
-
-```{r 21laligapredictMID, echo = FALSE}
-la_liga_ranger_test_mid <- la_liga_ranger_test21 %>% 
-  filter(position %in% c("CAM", "CM", "CDM", "LM", "RM")) %>% 
-  arrange(desc(.pred_TOTS)) %>% 
-  head(5) %>% 
-  mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 3, "Starter", "Bench"), Position = 2)
-```
-
-```{r 21laligapredictDEF, echo = FALSE}
-la_liga_ranger_test_def <- la_liga_ranger_test21 %>% 
-  filter(position %in% c("LB", "CB", "RB")) %>% 
-  arrange(desc(.pred_TOTS)) %>% 
-  head(5) %>% 
-  mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 2, "Starter", "Bench"), Position = 3)
-```
 \
 Here is our predicted team of the season for La Liga 20/21:
 \
-```{r 21laligapredictALL}
-la_liga_tots_21 <- rbind(la_liga_ranger_test_att, la_liga_ranger_test_mid, la_liga_ranger_test_def) %>% 
-  arrange(desc(Role), Position) %>% 
-  distinct(Player, Role, position, Squad, Gls, Ast, Pts, Rk, MP, Min, .pred_TOTS) %>% 
-  rename(Position = position, Goals = Gls, Assists = Ast, Points = Pts, `Team Rank` = Rk, `Minutes Played` = MP, `Predicted TOTS Probability` = .pred_TOTS, `Projected Role` = Role)
 
-la_liga_tots_formatted <- formattable(la_liga_tots_21[1:15,1:11])
-
-# kable(la_liga_tots_formatted, align = c(rep('c',11)))  %>% 
-#   row_spec(0) %>% 
-#   kable_styling(full_width = F) %>% 
-#   add_header_above(c("La Liga 2021 Predicted TOTS" = 11), background = "navy", color = "red") %>% 
-#   row_spec(1:10, background = "green", color = "white") %>% 
-#   row_spec(11:15, background = "red", color = "white") 
-```
-
+![](laligatotstable.png)
 ![La Liga Team of the Season](LaLigaTOTS.jpg)
 
 \
@@ -3359,198 +3187,24 @@ kable(bundesliga_metrics_table, align = c(rep('c', 1))) %>%
   add_header_above(c("Bundesliga Training and Testing Group Comparison for Suspected KPIs" = 13), background = "red", color = "white")
 ```
 
-```{r bundesliaranger1, echo = FALSE, include=FALSE}
-bundesliga_ranger_recipe <- recipe(revision ~., data = bundesliga_training) %>% 
-  step_rm(Player, Nation, Squad, G_per90, A_per90, minutes_played_divided_by90, Attendance, Born) %>% 
-  step_upsample(revision, over_ratio = .55) %>% 
-  step_mutate_at(all_numeric(), fn = ~as.numeric(.))
-
-bundesliga_ranger_recipe %>% 
-  prep(bundesliga_training) %>% 
-  juice()
-```
-
-
-```{r bundesligaranger2, echo = FALSE, include=FALSE}
-bundesliga_ranger <- rand_forest(mtry = tune(), 
-              min_n = tune(), 
-              trees = 100) %>% 
-  set_mode("classification") %>% 
-  set_engine("ranger")
-
-bundesliga_ranger_wf <- 
-  workflow() %>% 
-  add_recipe(bundesliga_ranger_recipe) %>% 
-  add_model(bundesliga_ranger) 
-
-bundesliga_ranger_wf
-```
-
-
-```{r bundesligaranger3, echo = FALSE, include=FALSE}
-set.seed(494)
-bundesliga_cv <- vfold_cv(bundesliga_training, v = 5)
-
-bundesliga_rf_grid <- grid_regular(min_n(), finalize(mtry(), bundesliga_training %>% select(-revision)), levels = 3)
-
-ctrl_res <- control_stack_grid()
-
-bundesliga_ranger_cv <- bundesliga_ranger_wf %>% 
-  tune_grid(resamples = bundesliga_cv,
-           grid = bundesliga_rf_grid,
-           control = ctrl_res)
-
-collect_metrics(bundesliga_ranger_cv)
-```
-
-```{r bundesligaranger4, echo = FALSE}
-bundesliga_best1 <- bundesliga_ranger_cv %>% 
-  select_best(metric = "accuracy")
-
-bundesliga_ranger_final_wf<- bundesliga_ranger_wf %>% 
-  finalize_workflow(bundesliga_best1)
-```
-
-```{r bundesligaranger5, echo = FALSE}
-set.seed(494)
-bundesliga_ranger_fit <- bundesliga_ranger_final_wf %>% 
-  fit(bundesliga_training)
-
-
-bundesliga_rf_explain <- 
-  explain_tidymodels(
-    model = bundesliga_ranger_fit,
-    data = bundesliga_training %>% select(-revision), 
-    y = as.numeric(bundesliga_training$revision == "TOTS"),
-    label = "rf"
-  )
-```
 \
-Below is the variable importance plot for the bundesliga model. The most important variables are "Minutes Played", "Non Penalty Goals", and "Assists".
+Below is the variable importance plot for the Bundesliga model. The most important variables are "Minutes Played", "Non Penalty Goals", "Goals Against (Team)" and "Non Penalty Goals plus Assists per 90 Minutes".
 \
 
-```{r bundesligavip, echo = FALSE}
-bundesliga_rf_var_imp <- 
-  model_parts(
-    bundesliga_rf_explain
-    )
-
-plot(bundesliga_rf_var_imp)
-```
+![](bundesligaVIP.png)
 
 
-
-
-
-```{r bundesligaranger6, echo = FALSE, include=FALSE}
-bundesliga_ranger_test <- bundesliga_ranger_final_wf %>% 
-  last_fit(bundesliga_split)
-
-bundesliga_ranger_test %>% 
-  collect_metrics()
-```
-
-```{r bundesligaconfuse1, echo = FALSE, include= FALSE}
-preds1 <- bundesliga_ranger_test %>% 
-  collect_predictions()
-
-preds1 %>% 
-  conf_mat(revision, .pred_class)
-```
-
-```{r bundesligaranger7,message = FALSE, echo = FALSE, include= FALSE}
-bundesliga_ranger_test <- bundesliga_testing %>% 
-  bind_cols(predict(bundesliga_ranger_fit, new_data = bundesliga_testing, type = "prob")) %>% 
-  bind_cols(predict(bundesliga_ranger_fit, new_data = bundesliga_testing)) 
-
-bundesliga_ranger_test %>% 
-  conf_mat(revision, .pred_class)
-
-bundesliga_confusion_table <- bundesliga_ranger_test %>% 
-  conf_mat(revision, .pred_class)
-```
 \
 This shows us how well we did in predicting on the testing data. We predicted 7 TOTS correctly, 85 normal correctly, and 17 total incorrectly.
 \
-```{r message = FALSE, echo = FALSE}
-bundesliga_rf_ggconfusion <- autoplot(bundesliga_confusion_table, type = "heatmap") + labs(title = "Confusion Matrix of Bundesliga Random Forest Model") + scale_fill_gradient(low = "blue", high = "red") + theme(plot.title = element_text(hjust = .5, size = 15))
 
+![](bundesligaconfusion.png)
 
-bundesliga_rf_final_confusion <- ggdraw() + draw_image("https://upload.wikimedia.org/wikipedia/en/thumb/d/df/Bundesliga_logo_%282017%29.svg/1200px-Bundesliga_logo_%282017%29.svg.png", x = -.43, y = .4, scale = .18) + 
-  draw_plot(bundesliga_rf_ggconfusion)
-
-bundesliga_rf_final_confusion 
-```
-
-```{r bundesligaconfuse2, echo = FALSE, include= FALSE}
-bundesliga_ranger_test %>% 
-  conf_mat(revision, .pred_class)
-```
-
-```{r bundesligawrong, echo = FALSE, include= FALSE}
-bundesliga_ranger_test %>% 
-  filter(revision != .pred_class)
-```
-
-```{r 21bundesligamod, echo = FALSE}
-bundesliga_modeling21 <- fifa21_modeling_bundesliga %>% 
-  mutate(revision = as.factor(revision), Nation = as.factor(Nation), Age = as.integer(Age))
-```
-
-```{r 21bundesligaoutfield, echo = FALSE}
-bundesliga_modeling_outfield21 <- bundesliga_modeling21 %>% 
-  filter(position != "GK") %>% 
-  filter(minutes_played_divided_by90 >= 18) %>% 
-  mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", ifelse(position == "RW", "RM", ifelse(position == "LW", "LM", position)))))
-```
-
-```{r 21bundesligaranger, echo = FALSE}
-bundesliga_ranger_test21 <- bundesliga_modeling_outfield21 %>% 
-  bind_cols(predict(bundesliga_ranger_fit, new_data = bundesliga_modeling_outfield21, type = "prob")) %>% 
-  bind_cols(predict(bundesliga_ranger_fit, new_data = bundesliga_modeling_outfield21)) 
-```
-
-```{r bundesligapredictATT, echo = FALSE}
-bundesliga_ranger_test_att <- bundesliga_ranger_test21 %>% 
-  filter(position %in% c("ST", "RW", "CF", "LW")) %>% 
-  arrange(desc(.pred_TOTS)) %>% 
-  head(5) %>% 
-  mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 3, "Starter", "Bench"), Position = 1)
-```
-
-```{r bundesligapredictMID, echo = FALSE}
-bundesliga_ranger_test_mid <- bundesliga_ranger_test21 %>% 
-  filter(position %in% c("CAM", "CM", "CDM", "LM", "RM")) %>% 
-  arrange(desc(.pred_TOTS)) %>% 
-  head(5) %>% 
-  mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 3, "Starter", "Bench"), Position = 2)
-```
-
-```{r bundesligapredictDEF, echo = FALSE}
-bundesliga_ranger_test_def <- bundesliga_ranger_test21 %>% 
-  filter(position %in% c("LB", "CB", "RB")) %>% 
-  arrange(desc(.pred_TOTS)) %>% 
-  head(5) %>% 
-  mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 2, "Starter", "Bench"), Position = 3)
-```
 \
 Here are our predicted team of the season players in the Bundesliga:
 \
-```{r 21lbundesligapredictALL}
-bundesliga_tots_21 <- rbind(bundesliga_ranger_test_att, bundesliga_ranger_test_mid, bundesliga_ranger_test_def) %>% 
-  arrange(desc(Role), Position) %>% 
-  distinct(Player, Role, position, Squad, Gls, Ast, Pts, Rk, MP, Min, .pred_TOTS) %>% 
-  rename(Position = position, Goals = Gls, Assists = Ast, Points = Pts, `Team Rank` = Rk, `Minutes Played` = MP, `Predicted TOTS Probability` = .pred_TOTS, `Projected Role` = Role)
 
-bundesliga_tots_formatted <- formattable(bundesliga_tots_21[1:15,1:11])
-
-kable(bundesliga_tots_formatted, align = c(rep('c',11)))  %>% 
-  row_spec(0) %>% 
-  kable_styling(full_width = F) %>% 
-  add_header_above(c("Bundesliga 2021 Predicted TOTS" = 11), background = "red", color = "white") %>% 
-  row_spec(1:10, background = "green", color = "white") %>% 
-  row_spec(11:15, background = "red", color = "white") 
-```
+![](bundesligatotstable.png)
 
 ![Bundesliga Team of the Season](BundesligaTOTS.jpg)
 
@@ -3917,58 +3571,7 @@ kable(serie_a_tots_formatted, align = c(rep('c',11)))  %>%
 \
 Here we show how Kevin De Bruyne would be modeled in all the different leagues had he played in them in order to demonstrate the similarities and differences between the models.\
 
-```{r echo = FALSE}
-new_obs_1 <- prem_ranger_test21 %>% filter(Player == "Kevin De Bruyne") %>% slice(1)
 
-#Pulls together the data needed for the break-down plot
-pp_sterling_rf_prem <- predict_parts(explainer = prem_rf_explain,
-                          new_observation = new_obs_1,
-                          type = "break_down") #default
-
-pp_sterling_rf_la_liga <- predict_parts(explainer = la_liga_rf_explain,
-                          new_observation = new_obs_1,
-                          type = "break_down") #default
-
-pp_sterling_rf_ligue1 <- predict_parts(explainer = ligue1_rf_explain,
-                          new_observation = new_obs_1,
-                          type = "break_down") #default
-
-pp_sterling_rf_bundesliga <- predict_parts(explainer = bundesliga_rf_explain,
-                          new_observation = new_obs_1,
-                          type = "break_down") #default
-
-pp_sterling_rf_serie_a <- predict_parts(explainer = serie_a_rf_explain,
-                          new_observation = new_obs_1,
-                          type = "break_down") #default
-
-# Break-down plot
-sterling_prem_pp <- plot(pp_sterling_rf_prem, title = "Kevin De Bruyne Premier League 2021 Prediction") + theme(plot.title = element_text(hjust = .5, size = 15, color = "black", face = "bold"))
-
-sterling_la_liga_pp <- plot(pp_sterling_rf_la_liga, title = "Kevin De Bruyne La Liga 2021 Prediction") + theme(plot.title = element_text(hjust = .5, size = 15, color = "black", face = "bold"))
-
-sterling_ligue1_pp <- plot(pp_sterling_rf_ligue1, title = "Kevin De Bruyne Ligue 1 2021 Prediction") + theme(plot.title = element_text(hjust = .5, size = 15, color = "black", face = "bold"))
-
-sterling_bundesliga_pp <- plot(pp_sterling_rf_bundesliga, title = "Kevin De Bruyne Bundesliga 2021 Prediction") + theme(plot.title = element_text(hjust = .5, size = 15, color = "black", face = "bold"))
-
-sterling_serie_a_pp <- plot(pp_sterling_rf_serie_a, title = "Kevin De Bruyne Serie A 2021 Prediction") + theme(plot.title = element_text(hjust = .5, size = 15, color = "black", face = "bold"))
-
-
-ggdraw() + draw_image("https://resources.premierleague.com/premierleague/photos/players/250x250/p61366.png", x = -.43, y = .4, scale = .18) + 
-  draw_plot(sterling_prem_pp)
-
-ggdraw() + draw_image("https://resources.premierleague.com/premierleague/photos/players/250x250/p61366.png", x = .45, y = .4, scale = .18) + 
-  draw_plot(sterling_la_liga_pp)
-
-ggdraw() + draw_image("https://resources.premierleague.com/premierleague/photos/players/250x250/p61366.png", x = -.43, y = .4, scale = .18) + 
-  draw_plot(sterling_ligue1_pp)
-
-ggdraw() + draw_image("https://resources.premierleague.com/premierleague/photos/players/250x250/p61366.png", x = -.43, y = .4, scale = .18) + 
-  draw_plot(sterling_bundesliga_pp)
-
-ggdraw() + draw_image("https://resources.premierleague.com/premierleague/photos/players/250x250/p61366.png", x = -.43, y = .4, scale = .18) + 
-  draw_plot(sterling_serie_a_pp)
-  
-```
 
 \
 In all of the leagues he preforms fairly well, but we can see that some of the models have assists as a more important stat thus making him do better. And some of the leagues place more negative weight on the fact that he has played slightly less this season, etc.

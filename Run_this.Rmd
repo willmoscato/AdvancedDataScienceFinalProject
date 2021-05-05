@@ -1238,3 +1238,56 @@ kable(serie_a_tots_formatted, align = c(rep('c',11)))  %>%
   row_spec(1:10, background = "green", color = "white") %>% 
   row_spec(11:15, background = "red", color = "white") 
 ```
+
+```{r echo = FALSE}
+new_obs_1 <- prem_ranger_test21 %>% filter(Player == "Kevin De Bruyne") %>% slice(1)
+
+#Pulls together the data needed for the break-down plot
+pp_sterling_rf_prem <- predict_parts(explainer = prem_rf_explain,
+                          new_observation = new_obs_1,
+                          type = "break_down") #default
+
+pp_sterling_rf_la_liga <- predict_parts(explainer = la_liga_rf_explain,
+                          new_observation = new_obs_1,
+                          type = "break_down") #default
+
+pp_sterling_rf_ligue1 <- predict_parts(explainer = ligue1_rf_explain,
+                          new_observation = new_obs_1,
+                          type = "break_down") #default
+
+pp_sterling_rf_bundesliga <- predict_parts(explainer = bundesliga_rf_explain,
+                          new_observation = new_obs_1,
+                          type = "break_down") #default
+
+pp_sterling_rf_serie_a <- predict_parts(explainer = serie_a_rf_explain,
+                          new_observation = new_obs_1,
+                          type = "break_down") #default
+
+# Break-down plot
+sterling_prem_pp <- plot(pp_sterling_rf_prem, title = "Kevin De Bruyne Premier League 2021 Prediction") + theme(plot.title = element_text(hjust = .5, size = 15, color = "black", face = "bold"))
+
+sterling_la_liga_pp <- plot(pp_sterling_rf_la_liga, title = "Kevin De Bruyne La Liga 2021 Prediction") + theme(plot.title = element_text(hjust = .5, size = 15, color = "black", face = "bold"))
+
+sterling_ligue1_pp <- plot(pp_sterling_rf_ligue1, title = "Kevin De Bruyne Ligue 1 2021 Prediction") + theme(plot.title = element_text(hjust = .5, size = 15, color = "black", face = "bold"))
+
+sterling_bundesliga_pp <- plot(pp_sterling_rf_bundesliga, title = "Kevin De Bruyne Bundesliga 2021 Prediction") + theme(plot.title = element_text(hjust = .5, size = 15, color = "black", face = "bold"))
+
+sterling_serie_a_pp <- plot(pp_sterling_rf_serie_a, title = "Kevin De Bruyne Serie A 2021 Prediction") + theme(plot.title = element_text(hjust = .5, size = 15, color = "black", face = "bold"))
+
+
+ggdraw() + draw_image("https://resources.premierleague.com/premierleague/photos/players/250x250/p61366.png", x = -.43, y = .4, scale = .18) + 
+  draw_plot(sterling_prem_pp)
+
+ggdraw() + draw_image("https://resources.premierleague.com/premierleague/photos/players/250x250/p61366.png", x = .45, y = .4, scale = .18) + 
+  draw_plot(sterling_la_liga_pp)
+
+ggdraw() + draw_image("https://resources.premierleague.com/premierleague/photos/players/250x250/p61366.png", x = -.43, y = .4, scale = .18) + 
+  draw_plot(sterling_ligue1_pp)
+
+ggdraw() + draw_image("https://resources.premierleague.com/premierleague/photos/players/250x250/p61366.png", x = -.43, y = .4, scale = .18) + 
+  draw_plot(sterling_bundesliga_pp)
+
+ggdraw() + draw_image("https://resources.premierleague.com/premierleague/photos/players/250x250/p61366.png", x = -.43, y = .4, scale = .18) + 
+  draw_plot(sterling_serie_a_pp)
+  
+```

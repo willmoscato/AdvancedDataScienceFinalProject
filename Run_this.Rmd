@@ -286,7 +286,7 @@ prem_ranger_test_def <- prem_ranger_test21 %>%
 prem_tots_21 <- rbind(prem_ranger_test_att, prem_ranger_test_mid, prem_ranger_test_def) %>% 
   arrange(desc(Role), Position) %>% 
   distinct(Player, Role, position, Squad, Gls, Ast, Pts, Rk, MP, Starts, Min, .pred_TOTS) %>% 
-  rename(Position = position, Goals = Gls, Assists = Ast, Points = Pts, `Team Rank` = Rk, `Minutes Played` = MP, `Predicted TOTS Probability` = .pred_TOTS, `Projected Role` = Role)
+  rename(Position = position, Goals = Gls, Assists = Ast, Points = Pts, `Team Rank` = Rk, `Matches Played` = MP, `Predicted TOTS Probability` = .pred_TOTS, `Projected Role` = Role)
 
 prem_tots_formatted <- formattable(prem_tots_21[1:15,1:12])
 
@@ -525,7 +525,7 @@ la_liga_ranger_test_def <- la_liga_ranger_test21 %>%
 la_liga_tots_21 <- rbind(la_liga_ranger_test_att, la_liga_ranger_test_mid, la_liga_ranger_test_def) %>% 
   arrange(desc(Role), Position) %>% 
   distinct(Player, Role, position, Squad, Gls, Ast, Pts, Rk, MP, Min, .pred_TOTS) %>% 
-  rename(Position = position, Goals = Gls, Assists = Ast, Points = Pts, `Team Rank` = Rk, `Minutes Played` = MP, `Predicted TOTS Probability` = .pred_TOTS, `Projected Role` = Role)
+  rename(Position = position, Goals = Gls, Assists = Ast, Points = Pts, `Team Rank` = Rk, `Matches Played` = MP, `Predicted TOTS Probability` = .pred_TOTS, `Projected Role` = Role)
 
 la_liga_tots_formatted <- formattable(la_liga_tots_21[1:15,1:11])
 
@@ -755,7 +755,7 @@ ligue1_ranger_test_def <- ligue1_ranger_test21 %>%
 ligue1_tots_21 <- rbind(ligue1_ranger_test_att, ligue1_ranger_test_mid, ligue1_ranger_test_def) %>% 
   arrange(desc(Role), Position) %>% 
   distinct(Player, Role, position, Squad, Gls, Ast, Pts, Rk, MP, Min, .pred_TOTS) %>% 
-  rename(Position = position, Goals = Gls, Assists = Ast, Points = Pts, `Team Rank` = Rk, `Minutes Played` = MP, `Predicted TOTS Probability` = .pred_TOTS, `Projected Role` = Role)
+  rename(Position = position, Goals = Gls, Assists = Ast, Points = Pts, `Team Rank` = Rk, `Matches Played` = MP, `Predicted TOTS Probability` = .pred_TOTS, `Projected Role` = Role)
 
 ligue1_tots_formatted <- formattable(ligue1_tots_21[1:15,1:11])
 
@@ -996,7 +996,7 @@ bundesliga_ranger_test_def <- bundesliga_ranger_test21 %>%
 bundesliga_tots_21 <- rbind(bundesliga_ranger_test_att, bundesliga_ranger_test_mid, bundesliga_ranger_test_def) %>% 
   arrange(desc(Role), Position) %>% 
   distinct(Player, Role, position, Squad, Gls, Ast, Pts, Rk, MP, Min, .pred_TOTS) %>% 
-  rename(Position = position, Goals = Gls, Assists = Ast, Points = Pts, `Team Rank` = Rk, `Minutes Played` = MP, `Predicted TOTS Probability` = .pred_TOTS, `Projected Role` = Role)
+  rename(Position = position, Goals = Gls, Assists = Ast, Points = Pts, `Team Rank` = Rk, `Matches Played` = MP, `Predicted TOTS Probability` = .pred_TOTS, `Projected Role` = Role)
 
 bundesliga_tots_formatted <- formattable(bundesliga_tots_21[1:15,1:11])
 
@@ -1227,7 +1227,7 @@ serie_a_ranger_test_def <- serie_a_ranger_test21 %>%
 serie_a_tots_21 <- rbind(serie_a_ranger_test_att, serie_a_ranger_test_mid, serie_a_ranger_test_def) %>% 
   arrange(desc(Role), Position) %>% 
   distinct(Player, Role, position, Squad, Gls, Ast, Pts, Rk, MP, Min, .pred_TOTS) %>% 
-  rename(Position = position, Goals = Gls, Assists = Ast, Points = Pts, `Team Rank` = Rk, `Minutes Played` = MP, `Predicted TOTS Probability` = .pred_TOTS, `Projected Role` = Role)
+  rename(Position = position, Goals = Gls, Assists = Ast, Points = Pts, `Team Rank` = Rk, `Matches Played` = MP, `Predicted TOTS Probability` = .pred_TOTS, `Projected Role` = Role)
 
 serie_a_tots_formatted <- formattable(serie_a_tots_21[1:15,1:11])
 

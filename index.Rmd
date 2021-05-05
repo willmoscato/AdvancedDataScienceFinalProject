@@ -8,8 +8,7 @@ output:
 ---
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(include = TRUE, echo = FALSE)
-set.seed(494)
+knitr::opts_chunk$set(include = TRUE, echo = FALSE, message = FALSE, warning = FALSE)
 ```
 
 ```{r libraries, include = FALSE}
@@ -3038,7 +3037,6 @@ In all of the leagues he preforms fairly well, but we can see that some of the m
 \
 \
 
-## All Leagues Combined (and why it does not work)
 
 ## Conclusion
 

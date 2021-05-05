@@ -2071,7 +2071,7 @@ serie_a_modeling <- fifa17_modeling_serie_a2%>%
   mutate(revision = as.factor(revision), Nation = as.factor(Nation))
 ```
 
-In this project, we will work with data from the five major global soccer leagues (Premier League, La Liga, Ligue 1, Bundesliga, and Serie A) to predict the Team of the Season (TOTS) for each league. Before digging into the individual evaluation of each league, we examined each of their averages to get an idea of their play styles. The table above exhibits that overall, the Premier League has the highest goal scoring enviroment, with the highest average number of both Goals and Assists. This could ultimately indicate that a higher threshold of offense will be required for a player at an offensive-oriented position to secure TOTS honors for the Premier League, as they are likely to face more fierce competition in terms of these counting stats. Meanwile, leagues like La Liga and Serie A also boast relatively offensive enviroments, while Bundesliga and Ligue 1 are more defensive environments based on their far more scarce frequency of Goals. 
+In this project, we will work with data from the five major global soccer leagues (Premier League, La Liga, Ligue 1, Bundesliga, and Serie A) to predict the Team of the Season (TOTS) for each league. Before digging into the individual evaluation of each league, we examined each of their averages to get an idea of their play styles. The table above exhibits that overall, the Premier League has the highest goal scoring environment, with the highest average number of both Goals and Assists. This could ultimately indicate that a higher threshold of offense will be required for a player at an offensive-oriented position to secure TOTS honors for the Premier League, as they are likely to face more fierce competition in terms of these counting stats. Meanwhile, leagues like La Liga and Serie A also boast relatively offensive environments, while Bundesliga and Ligue 1 are more defensive environments based on their far more scarce frequency of Goals. 
 
 \
 \
@@ -2383,7 +2383,7 @@ la_liga_goals_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wikipe
 la_liga_goals_logo
 ```
 \
-Next, we have a density plot of table position for team of the season players and normal player, TOTS player tend to finsish higher in the table.
+Next, we have a density plot of table position for team of the season players and normal player, TOTS player tend to finish higher in the table.
 \
 ```{r laligaplot3, echo = FALSE}
 la_liga_tablepos_density <- la_liga_modeling %>% 
@@ -2712,7 +2712,7 @@ bundesliga_modeling %>%
              scales = "free")
 ```
 \
-First, we looked at how many TOTS players there are vs normal players in our bundesliga data set. As you can see TOTS is a prestigious award not given to many players.
+First, we looked at how many TOTS players there are vs normal players in our Bundesliga data set. As you can see TOTS is a prestigious award not given to many players.
 \
 ```{r bundesligaplot2, echo = FALSE}
 theme_set(theme_cowplot())
@@ -2783,7 +2783,7 @@ bundesliga_mppn_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wiki
 bundesliga_mppn_logo
 ```
 \
-Lastly, we have a distribution of the positions and what positions got team of the seasons. As you can see there are not many wingers in the bundesliga, so they have been converted to left and right mids.
+Lastly, we have a distribution of the positions and what positions got team of the seasons. As you can see there are not many wingers in the Bundesliga, so they have been converted to left and right midfielders.
 \
 ```{r bundesligaplot6, echo = FALSE}
 bundesliga_positions <- bundesliga_modeling %>% 
@@ -2944,7 +2944,7 @@ serie_a_tablepos_logo
 ```
 
 \
-Next we made a distribution plot of how much the team of the season players play vs normal players. As you can see the team of the seaon players tend to play a lot more.\
+Next we made a distribution plot of how much the team of the season players play vs normal players. As you can see the team of the season players tend to play a lot more.\
 
 ```{r serieaaplot5, echo = FALSE}
 serie_a_mppn_density <- serie_a_modeling %>% 
@@ -2962,7 +2962,7 @@ serie_a_mppn_logo
 ```
 
 \
-We then made a plot of the positional breakdown of all the players. It seems that the distribution of the players is heavily in center backs, center mids, and strikers.\
+We then made a plot of the positional breakdown of all the players. It seems that the distribution of the players is heavily in center backs, center midfielders, and strikers.\
 
 ```{r serieaplot6, echo = FALSE}
 serie_a_positions <- serie_a_modeling %>% 
@@ -3026,7 +3026,7 @@ Here is a plot of the most important variables in our Serie A model. It seems th
 ![](serie_a_vip.png)
 
 \
-Here is a confusion matrix of the predictions and true values for the testing data. As you can see we predicted 9 team of the season players correctly and 10 incorrectly. While this is not great, it seems to be mostly ok because the predicted probabilities are seem to be ordered fairly well.\
+Here is a confusion matrix of the predictions and true values for the testing data. As you can see we predicted 9 team of the season players correctly and 10 incorrectly. While this is not great, it seems to be mostly acceptable because the predicted probabilities are seem to be ordered fairly well.\
 
 ![](serie_a_confusion.png)
 

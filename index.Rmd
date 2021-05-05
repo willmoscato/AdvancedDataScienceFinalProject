@@ -2296,7 +2296,7 @@ The confusion matrix below shows that 17 players were classified as TOTS. 7 of t
 
 Finally, we applied our model to the Premier League stats from the 2020-2021 season. The players who were chosen for TOTS are shown below.
 
-![](prem_pred_tots.png)
+![](prem_tots_pred.png)
 
 
 <center>

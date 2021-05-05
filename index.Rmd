@@ -1958,10 +1958,10 @@ The video game FIFA, which is developed by Electronic Arts (EA) Sports, has beco
 ## Methods and Materials
 
 **Materials**:\
-We retrieved complete player datasets for FIFA 17, FIFA 18, and FIFA 19 from [here](https://www.kaggle.com/stefanoleone992/fifa-21-ultimate-team-players-and-prices-dataset). We retrieved real life statistics from the 2016-2017, 2017-2018, and 2018-2019 seasons from [fbref.com](https://fbref.com/en/). We did not use data from the 2019-2020 season because COVID-19 caused each season to prematurely end in March of 2020.\
+We retrieved complete player datasets for FIFA 17, FIFA 18, and FIFA 19 from [Kaggle](https://www.kaggle.com/stefanoleone992/fifa-21-ultimate-team-players-and-prices-dataset). We retrieved real life statistics from the 2016-2017, 2017-2018, and 2018-2019 seasons from [fbref.com](https://fbref.com/en/). We did not use data from the 2019-2020 season because COVID-19 caused each season to prematurely end in March of 2020.\
 
 **Methods**:\
-Using these data sets we went about predicting team of the season players using a Random Forest machine learning model. OTher models were tested, but we found that this method was the best. This makes many decision trees using the data to predict what players will be in the team of the season based upon the information that we feed into it. It then puts all of those trees together in order to make a decision on whether or not a player should be in the team of the season. We can then apply that model to data that it did not use in deciding how to decide whether or not a player is in the team of the season in order to check how good our model really is.
+Using these datasets, we predicted TOTS players using a Random Forest machine learning model. Other models were tested, but we found that this method was the best. This creates many decision trees using the data to predict which players will be in the TOTS based upon the information that we feed into it. Then, it combines all of the trees together in order to make a decision on whether or not a player should be in the TOTS. We can then apply that model to data that it did not use in determining how to classify whether or not a player is in the TOTS. This allowed us to discover how good our model really was.
 
 \
 \
@@ -2071,7 +2071,7 @@ serie_a_modeling <- fifa17_modeling_serie_a2%>%
   mutate(revision = as.factor(revision), Nation = as.factor(Nation))
 ```
 
-In this project, we will work with data from the five major global soccer leagues (Premier League, La Liga, Ligue 1, Bundesliga, and Serie A) to predict the Team of the Season (TOTS) for each league. Before digging into the individual evaluation of each league, we examined each of their averages to get an idea of their play styles. The table above exhibits that overall, the Premier League has the highest goal scoring environment, with the highest average number of both Goals and Assists. This could ultimately indicate that a higher threshold of offense will be required for a player at an offensive-oriented position to secure TOTS honors for the Premier League, as they are likely to face more fierce competition in terms of these counting stats. Meanwhile, leagues like La Liga and Serie A also boast relatively offensive environments, while Bundesliga and Ligue 1 are more defensive environments based on their far more scarce frequency of Goals. 
+In this project, we worked with data from the five major global soccer leagues, Premier League, La Liga, Ligue 1, Bundesliga, and Serie A, to predict the TOTS for each league. Before digging into the individual evaluation of each league, we examined each of their averages to get an idea of their play styles. The table below exhibits that overall, the Premier League has the highest goal scoring environment, with the highest average number of both goals and assists. This could ultimately indicate that a higher threshold of offense will be required for a player at an offensive-oriented position to secure TOTS honors for the Premier League, as they are likely to face more fierce competition in terms of these counting stats. Meanwhile, La Liga and Serie A also boast relatively offensive environments, while Bundesliga and Ligue 1 are more defensive environments based on their more scarce frequency of goals. 
 
 \
 \
@@ -2119,7 +2119,7 @@ kable(leagues_formatted, align = c(rep("c", 12))) %>%
 ## English Premier League
 
 \
-The Premier League is widely considered the best league in the world. A league full of tradition and history that has seen many dominant teams and outstanding players. In recent history the league has been generally dominated by Manchester City and Liverpool, both of which won league titles by large margins. With the influx of foreign money in the league the talent gap between the top and the bottom of the league has seen steady growth, but those at the bottom continue to make it competitive.
+The Premier League is widely considered the best league in the world, one full of tradition and history that has seen many dominant teams and outstanding players. In recent history, the league has been generally dominated by Manchester City and Liverpool, both of which won league titles by large margins. With the influx of foreign money into the league, the talent gap between the top and the bottom of the league has seen steady growth, but those at the bottom continue to make it competitive.
 
 ```{r premmod1, echo = FALSE}
 fifa19_modeling2 <- fifa19_modeling %>%
@@ -2150,7 +2150,7 @@ prem_modeling %>%
              scales = "free")
 ```
 
-Before diving into modeling, we first must explore the data to observe basic trends. First, we looked at the proportion of Premier League cards that are given the TOTS designation. Below, we see that a select few cards are given the TOTS designation.
+Before diving into modeling, we explored the data to observe basic trends. First, we looked at the proportion of Premier League cards that are given the TOTS designation. Below, we see that a select few cards are given the TOTS designation.
 
 ```{r echo = FALSE}
 theme_set(theme_cowplot())
@@ -2189,7 +2189,7 @@ prem_goals_logo
 ```
 
 
-We also found that final table position and player card status were highly correlated, specifically that players with TOTS cards generally played for teams that finished highly in the table. In the past three years, each team of the season has generally been filled with many of the top teams' players, and the density plot below reflects this.
+We also found that final table position and player card status were highly correlated, specifically that players with TOTS cards generally played for teams that finished higher in the table. In the past three years, each team of the season has generally been filled with many of the top teams' players, and the density plot below reflects this.
 
 
 ```{r premplot3, echo = FALSE}
@@ -2215,7 +2215,7 @@ prem_mppn_density <- prem_modeling %>%
   ggplot(aes(x = minutes_played_divided_by90, fill = Revision)) +
   geom_density(alpha = 0.5) +
   scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
-  labs(x = "Total Minutes Played Dived by 90 (Full Games Played)", y = "Density", title = "Density Plot of Premier League Minutes Played (Per 90 Minutes) by Revision Status", subtitle = "Players who accrue more minutes per contest are more likely to be picked for Premier League TOTS") + 
+  labs(x = "Total Minutes Played Divided by 90 (Full Games Played)", y = "Density", title = "Density Plot of Premier League Minutes Played (Per 90 Minutes) by Revision Status", subtitle = "Players who accrue more minutes per contest are more likely to be picked for Premier League TOTS") + 
 theme(plot.subtitle = element_text(hjust = .45, size = 8), plot.title = element_text(hjust = .5, size = 11))
 
 prem_mppn_logo <- ggdraw() + draw_image("https://www.fifplay.com/img/public/premier-league-2-logo.png", x = .42, y = .2, scale = .25) + 
@@ -2255,7 +2255,7 @@ prem_training <- training(prem_split)
 prem_testing <- testing(prem_split)
 ```
 
-Before modeling the data, we must split the data into training and testing sets. The training data is the data that we give to the model to learn from, while the testing data is what we use to test our model. It is important that the Key Performance Indicators (KPIs) are similar in each dataset, as this indicates that the model that has learned from the training data is correctly being applied to the testing data.
+Before modeling the data, we split the data into training and testing sets. The training data is the data that we gave to the model to learn from, while the testing data is what we used to test our model. It is important that the Key Performance Indicators (KPIs) are similar in each dataset, as this indicates that the model that has learned from the training data is correctly being applied to the testing data.
 
 ```{r message = FALSE, warning = FALSE, echo = FALSE}
 prem_train_metrics <- prem_training %>% 
@@ -2285,15 +2285,13 @@ kable(prem_metrics_table, align = c(rep('c', 1))) %>%
 After seeing that our training and testing sets performed similarly, we created a random forest model to predict whether a player would be classified as TOTS or not. Our random forest model was made up of 100 decision trees. Each of these trees are uncorrelated, which helps provide stability and accuracy to the model. We also created a LASSO model, which filters out explanatory variables based on their importance to the outcome, for the training and testing data, however we found that the random forest was more accurate.
 
 
-Using our random forest model, we were able to observe which variables were most important to our model. It appears that goals against each player's team, minutes played, and matches played. 
+Using our random forest model, we were able to observe which variables were most important to our model. It appears that goals against each player's team, minutes played, and matches played were the most important. 
 
 ![](prem_vip.png)
 
 The confusion matrix below shows that 17 players were classified as TOTS. 10 of these players were correctly classified, while the model felt that 7 players who were not given TOTS cards should have been given one. It also felt that 7 players who were given TOTS cards should not have been given one.
 
 ![](prem_confusion.png)
-
-Below are the players that our testing model incorrectly classified. Many of these players were either undervalued or overvalued based on the performance of their team. It is clear that the choices for TOTS are someone subjective.
 
 Finally, we applied our model to the Premier League stats from the 2020-2021 season. The players who were chosen for TOTS are shown below.
 
@@ -2313,7 +2311,7 @@ Finally, we applied our model to the Premier League stats from the 2020-2021 sea
 ## La Liga (Spain)
 
 \
-La Liga has been dominated for many years by Barcelona and Real Madrid, two of the most storied clubs in the world. For the past decade it has been the story of Messi vs Ronaldo, best vs best. These two clubs have won the most Champions League trophies in the last decade and it is rare that one of them does not win the league. Outside of those two clubs the league somewhat struggles for talent, especially defensively, but the gap has seen some closing in the last few years.\
+La Liga has been dominated for many years by Barcelona and Real Madrid, two of the most storied clubs in the world. For the past decade it has been the story of Leo Messi vs. Cristiano Ronaldo, best vs. best. These two clubs have won the most Champions League trophies in the last decade and it is rare that one of them does not win the league. Outside of those two clubs the league somewhat struggles for talent, especially defensively, but the gap has seen some closing in the last few years.\
 
 ```{r laligamod1, echo = FALSE}
 fifa19_modeling_la_liga2 <- fifa19_modeling_la_liga %>%
@@ -2345,7 +2343,7 @@ la_liga_modeling %>%
              scales = "free")
 ```
 \
-The first exploratory plot we looked at was the number of TOTS vs Normal cards, and as you can see there are not many team of the season players in the data set.
+The first exploratory plot we looked at was the number of TOTS vs Normal cards. Once again, see there are not many TOTS players in the data set.
 \
 
 ```{r laligaplot1, echo = FALSE}
@@ -2365,7 +2363,7 @@ la_liga_prop_logo
 ```
 
 \
-Then we looked at goals scored by TOTS and normal players, and while both the densities are low, TOTS players tend to score more goals.
+Then, we looked at goals scored by TOTS and normal players. While both of the densities are low, TOTS players tend to score more goals.
 \
 
 ```{r laligaplot2, echo = FALSE}
@@ -2383,7 +2381,7 @@ la_liga_goals_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wikipe
 la_liga_goals_logo
 ```
 \
-Next, we have a density plot of table position for team of the season players and normal player, TOTS player tend to finish higher in the table.
+Next, we created a density plot of table position for TOTS players and normal players. TOTS player tended to finish higher in the table.
 \
 ```{r laligaplot3, echo = FALSE}
 la_liga_tablepos_density <- la_liga_modeling %>% 
@@ -2400,7 +2398,7 @@ la_liga_tablepos_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wik
 la_liga_tablepos_logo
 ```
 \
-Next, we have a density plot of minutes played for the team of the season players vs the normal players. Clearly the TOTS players play more.
+We then, created a density plot of minutes played for the TOTS players vs the normal players. Much like in the Premier League, TOTS players played more.
 \
 
 ```{r lalligaplot4, echo = FALSE}
@@ -2409,7 +2407,7 @@ la_liga_mppn_density <- la_liga_modeling %>%
   ggplot(aes(x = minutes_played_divided_by90, fill = Revision)) +
   geom_density(alpha = 0.5) +
   scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
-  labs(x = "Total Minutes Played Dived by 90 (Full Games Played)", y = "Density", title = "Density Plot of La Liga Minutes Played (Per 90 Minutes) by Revision Status", subtitle = "Players who accrue more minutes per contest were more likely to be selected for La Liga TOTS") + 
+  labs(x = "Total Minutes Played Divided by 90 (Full Games Played)", y = "Density", title = "Density Plot of La Liga Minutes Played (Per 90 Minutes) by Revision Status", subtitle = "Players who accrue more minutes per contest were more likely to be selected for La Liga TOTS") + 
 theme(plot.subtitle = element_text(hjust = .3, size = 10), plot.title = element_text(hjust = .4, size = 13))
 
 la_liga_mppn_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/LaLiga.svg/1200px-LaLiga.svg.png", x = .42, y = .22, scale = .25) + 
@@ -2418,7 +2416,7 @@ la_liga_mppn_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wikiped
 la_liga_mppn_logo
 ```
 \
-This last exploratory plot shows us the distribution of the positions. As you can see there are not many center forwards, so those have been converted to strikers.
+Finally, the last exploratory plot shows the distribution of the positions. There are not many center forwards, so they have been converted to strikers.
 \
 ```{r laligaplot5, echo = FALSE}
 la_liga_positions <- la_liga_modeling %>% 
@@ -2449,7 +2447,7 @@ la_liga_training <- training(la_liga_split)
 la_liga_testing <- testing(la_liga_split)
 ```
 \
-This table below shows us a comparison of important stats in the training and testing data. As you can see the difference between the two is minimal.
+This table below shows us a comparison of important stats in the training and testing data. The difference between the two is minimal.
 \
 ```{r message = FALSE, warning = FALSE, echo = FALSE}
 la_liga_train_metrics <- la_liga_training %>% 
@@ -2484,13 +2482,13 @@ The plot below show the importance of the variables in the La Liga model, the mo
 
 
 \
-The confusion matrix below shows us that we guessed 9 TOTS rights, 114 normal cards right, and 10 total wrong in the testing data for La Liga.
+The confusion matrix below shows us that we predicted 9 TOTS correctly, 114 normal cards correctly, and 10 total incorrectly in the testing data for La Liga.
 \
 
 ![](laligaconfusion.png)
 
 \
-Here is our predicted team of the season for La Liga 20/21:
+Below is the predicted team of the season for La Liga during the 2020-2021 season.
 \
 
 ![](laligatotstable.png)
@@ -2506,9 +2504,7 @@ Here is our predicted team of the season for La Liga 20/21:
 ## French Ligue 1
 
 \
-Generally considered the worst of the top 5 European leagues, Ligue 1 has been completely dominated by PSG for many years. Often called a "farmer's league" and sometimes not even considered among the best leagues in the world. However, there is no doubt that PSG is one of the best teams in the world. With the likes of Mbappe and Neymar they managed to make it to the Champions League final last season and are in the semi-finals currently.\
-
-We began our modeling for Ligue 1 by joining the Ligue 1 datasets from 2017, 2018, and 2019.
+Generally considered the worst of the Top 5 European leagues, Ligue 1 has been dominated by PSG for many years. Often called a "farmer's league", Ligue 1 is sometimes not even considered among the best leagues in the world. However, there is no doubt that PSG is one of the best teams in the world. With the likes of Kylian Mbappe and Neymar, they managed to make it to the Champions League Final last season, and are in the final currently.\
 
 ```{r ligue1mod, echo = FALSE}
 ligue1_fifa19_modeling <- ligue1_fifa19_modeling %>%
@@ -2525,7 +2521,7 @@ ligue1_modeling <- ligue1_fifa17_modeling %>%
   mutate(revision = as.factor(revision), Nation = as.factor(Nation))
 ```
 
-We then began with exploratory plots. The first plot showed us how many players were given TOTS cards in the three combined datasets. We are able to see that once again only a small proportion of players are given TOTS cards.
+We began with exploratory plots once again. The first plot showed us how many players were given TOTS cards. Once again, only a small proportion of players were given TOTS cards.
 
 ```{r ligue1plot1, echo = FALSE}
 theme_set(theme_cowplot())
@@ -2544,7 +2540,7 @@ ligue1_prop_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wikipedi
 ligue1_prop_logo
 ```
 
-Next, we looked at the density of goals scored between regular players and TOTS players. We were able to see that in general, a larger proportion of TOTS players score a higher number of goals.
+Next, we looked at the density of goals scored between regular players and TOTS players. We were able to see that in general, a larger proportion of TOTS players scored a higher number of goals.
 
 ```{r ligue1plot2, echo = FALSE}
 ligue1_goals_density <- ligue1_modeling %>% 
@@ -2561,7 +2557,7 @@ ligue1_goals_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wikiped
 ligue1_goals_logo
 ```
 
-Next, we looked at the density of table position by card type. We see that there is an even density of table position for normal cards, while the majority of TOTS players play for better teams.
+Next, we looked at the density of table position by card type. We see that there was an even density of table position for normal cards, while the majority of TOTS players played for better teams.
 
 ```{r ligue1plot3, echo = FALSE}
 ligue1_tablepos_density <- ligue1_modeling %>% 
@@ -2578,7 +2574,7 @@ ligue1_tablepos_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wiki
 ligue1_tablepos_logo
 ```
 
-We then looked at the density of minutes played per match and, unsurprisingly, players who are given TOTS cards tend to play more minutes per contest.
+We then looked at the density of minutes played per match and, unsurprisingly, players who were given TOTS cards played more minutes per contest.
 
 ```{r ligue1plot4, echo = FALSE}
 ligue1_mppn_density <- ligue1_modeling %>% 
@@ -2586,7 +2582,7 @@ ligue1_mppn_density <- ligue1_modeling %>%
   ggplot(aes(x = minutes_played_divided_by90, fill = Revision)) +
   geom_density(alpha = 0.5) +
   scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
-  labs(x = "Total Minutes Played Dived by 90 (Full Games Played)", y = "Density", title = "Density Plot of Minutes Played (Per 90 Minutes) by Revision Status", subtitle = "Players who accrue more minutes per contest are more likely to be selected for Ligue 1 TOTS") + 
+  labs(x = "Total Minutes Played Divided by 90 (Full Games Played)", y = "Density", title = "Density Plot of Minutes Played (Per 90 Minutes) by Revision Status", subtitle = "Players who played more minutes per contest are more likely to be selected for Ligue 1 TOTS") + 
 theme(plot.subtitle = element_text(hjust = .3, size = 10), plot.title = element_text(hjust = .8, size = 13))
 
 ligue1_mppn_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Ligue1.svg/1200px-Ligue1.svg.png", x = .42, y = .2, scale = .25) + 
@@ -2595,7 +2591,7 @@ ligue1_mppn_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wikipedi
 ligue1_mppn_logo
 ```
 
-Finally, we looked at the distribution of TOTS cards by position. We are able to see that there is an overwhelming number of strikers and center backs in Ligue 1, and that players who play in the center of the field.
+Finally, we looked at the distribution of TOTS cards by position. We were able to see that there is an overwhelming number of strikers and center backs in Ligue 1.
 
 ```{r ligue1plot5, echo = FALSE}
 ligue1_positions <- ligue1_modeling %>% 
@@ -2651,21 +2647,15 @@ kable(ligue1_metrics_table, align = c(rep('c', 1))) %>%
   add_header_above(c("Ligue 1 Training and Testing Group Comparison for Suspected KPIs" = 13), background = "navy", color = "white")
 ```
 
-We then examined the accuracy rates of the different models in the different folds. The second model in the first fold is the most accurate at 94.3% accuracy.
-
-In this model, the most important variables are minutes played, goal differential, and goals plus assists per 90 minutes. These three variables contribute to the card classification significantly more than the other variables.
+In this model, the most important variables were minutes played, goal differential, and goals plus assists per 90 minutes. These three variables contributed to the card classification significantly more than the other variables.
 
 ![](ligue1VIP.png)
-
-After running the random forest model, our model accuracy comes out to about 86.56%. This is likely due to many players outperforming their card rank, as well as many teams outperforming their projections.
 
 Overall, this model predicted that 18 players met our criteria to be selected for team of the season, while also misclassifying 15 players.
 
 ![](ligue1confusion.png)
 
-The misclassified players are shown below:
-
-The model also shows that Jonathan Bamba, Idrissa Gana Gueye, Aurelien Tchouameni, Maxence Cqueret, and Ander Herrera are the top 5 midfielders in Ligue 1.
+Finally, the Ligue 1 TOTS is shown below.
 
 ![](ligue1totstable.png)
 
@@ -2712,7 +2702,7 @@ bundesliga_modeling %>%
              scales = "free")
 ```
 \
-First, we looked at how many TOTS players there are vs normal players in our Bundesliga data set. As you can see TOTS is a prestigious award not given to many players.
+First, we looked at how many TOTS players there were vs normal players in our Bundesliga data set. Once again, TOTS was not given to many players.
 \
 ```{r bundesligaplot2, echo = FALSE}
 theme_set(theme_cowplot())
@@ -2731,7 +2721,7 @@ bundesliga_prop_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wiki
 bundesliga_prop_logo
 ```
 \
-Then we looked at a density of goals scored. As we can see the top for both TOTS and not is fairly low, but the TOTS tend to score more.
+Next, we looked at a density of goals scored. The top for both TOTS and normal cards was fairly low, but the TOTS tended to score more.
 \
 
 ```{r bundesligaplot3, echo = FALSE}
@@ -2749,7 +2739,7 @@ bundesliga_goals_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wik
 bundesliga_goals_logo
 ```
 \
-Next, we have a density plot of the table position of TOTS vs normal players, and as with the other leagues the TOTS players tend to do better.
+Next, we created a density plot of the table position of TOTS vs normal players. As with the other leagues, the TOTS players tended to play for better teams.
 \
 ```{r bundesligaplot4, echo = FALSE}
 bundesliga_tablepos_density <- bundesliga_modeling %>% 
@@ -2766,7 +2756,7 @@ bundesliga_tablepos_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/
 bundesliga_tablepos_logo
 ```
 \
-Next, we have a density plot of the minutes played of the normal cards vs TOTS cards and it is clear that the team of the season players play much more.
+Subsequently, we created a density plot of the minutes played of the normal cards vs TOTS cards, and  the team of the season players played much more.
 \
 ```{r bundesligaplot5, echo = FALSE}
 bundesliga_mppn_density <- bundesliga_modeling %>% 
@@ -2774,7 +2764,7 @@ bundesliga_mppn_density <- bundesliga_modeling %>%
   ggplot(aes(x = minutes_played_divided_by90, fill = Revision)) +
   geom_density(alpha = 0.5) +
   scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
-  labs(x = "Total Minutes Played Dived by 90 (Full Games Played)", y = "Density", title = "Density Plot of Minutes Played (Per 90 Minutes) by Revision Status", subtitle = "Players who accrue more minutes per contest are more likely to be selected for Bundesliga TOTS") + 
+  labs(x = "Total Minutes Played Divided by 90 (Full Games Played)", y = "Density", title = "Density Plot of Minutes Played (Per 90 Minutes) by Revision Status", subtitle = "Players who accrue more minutes per contest are more likely to be selected for Bundesliga TOTS") + 
 theme(plot.subtitle = element_text(hjust = .3, size = 10), plot.title = element_text(hjust = .8, size = 13))
 
 bundesliga_mppn_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wikipedia/en/thumb/d/df/Bundesliga_logo_%282017%29.svg/1200px-Bundesliga_logo_%282017%29.svg.png", x = .42, y = .2, scale = .25) + 
@@ -2783,7 +2773,7 @@ bundesliga_mppn_logo <- ggdraw() + draw_image("https://upload.wikimedia.org/wiki
 bundesliga_mppn_logo
 ```
 \
-Lastly, we have a distribution of the positions and what positions got team of the seasons. As you can see there are not many wingers in the Bundesliga, so they have been converted to left and right midfielders.
+Lastly, we plotted a distribution of the positions and which positions got TOTS cards. There are not many wing players in the Bundesliga, so they were converted to left and right midfielders.
 \
 ```{r bundesligaplot6, echo = FALSE}
 bundesliga_positions <- bundesliga_modeling %>% 
@@ -2814,7 +2804,7 @@ bundesliga_training <- training(bundesliga_split)
 bundesliga_testing <- testing(bundesliga_split)
 ```
 \
-In the table below we have some comparisons of the important stats for the training and testing data sets. As you can see the difference between the two is minimal.
+In the table below, we compared the important stats for the training and testing data sets. Again, the difference between the two is minimal.
 \
 ```{r bundesligatable1, echo = FALSE}
 bundesliga_train_metrics <- bundesliga_training %>% 
@@ -2847,13 +2837,13 @@ Below is the variable importance plot for the Bundesliga model. The most importa
 
 
 \
-This shows us how well we did in predicting on the testing data. We predicted 7 TOTS correctly, 85 normal correctly, and 17 total incorrectly.
+The confusion matrix below details the accuracy of the predictions for the testing data. 7 TOTS were predicted correctly, 85 normal cards were predicted correctly, and 17 total cards were predicted incorrectly.
 \
 
 ![](bundesligaconfusion.png)
 
 \
-Here are our predicted team of the season players in the Bundesliga:
+Finally, below is the predicted team of the season players in the Bundesliga:
 \
 
 ![](bundesligatotstable.png)
@@ -2889,7 +2879,7 @@ serie_a_modeling <- fifa17_modeling_serie_a2%>%
 ```
 
 \
-First we made a bar chart to see the number of team of the season players in the Serie A.\
+First, we made a bar chart to see the number of TOTS players in Serie A.\
 
 ```{r serieaplot2, echo = FALSE}
 theme_set(theme_cowplot())
@@ -2908,7 +2898,7 @@ serie_a_prop_logo
 ```
 
 \
-Next we made a density plot of goals. Team of the season players tend to score slightly more goals than normal players.\
+Next we created a density plot of goals scored. TOTS players scored slightly more goals than normal players.\
 
 ```{r serieaplot3, echo = FALSE}
 serie_a_goals_density <- serie_a_modeling %>% 
@@ -2926,7 +2916,7 @@ serie_a_goals_logo
 ```
 
 \
-Then we made a density plot of team rank of the team of the season players vs normal players. We can see that the team of the season players finish much higher in the table.\
+Then, we made a density plot of team rank of the TOTS players vs normal players. TOTS players finished much higher in the table.\
 
 ```{r serieaplot4, echo = FALSE}
 serie_a_tablepos_density <- serie_a_modeling %>% 
@@ -2944,7 +2934,7 @@ serie_a_tablepos_logo
 ```
 
 \
-Next we made a distribution plot of how much the team of the season players play vs normal players. As you can see the team of the season players tend to play a lot more.\
+Next, we made a distribution plot of how much the TOTS players played vs normal players. The TOTS players played much more than the normal players.\
 
 ```{r serieaaplot5, echo = FALSE}
 serie_a_mppn_density <- serie_a_modeling %>% 
@@ -2952,7 +2942,7 @@ serie_a_mppn_density <- serie_a_modeling %>%
   ggplot(aes(x = minutes_played_divided_by90, fill = Revision)) +
   geom_density(alpha = 0.5) +
   scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
-  labs(x = "Total Minutes Played Dived by 90 (Full Games Played)", y = "Density", title = "Density Plot of Minutes Played (Per 90 Minutes) by Revision Status", subtitle = "Players who accrue more minutes per contest tend to have a better chance at Serie A TOTS") + 
+  labs(x = "Total Minutes Played Divided by 90 (Full Games Played)", y = "Density", title = "Density Plot of Minutes Played (Per 90 Minutes) by Revision Status", subtitle = "Players who accrue more minutes per contest tend to have a better chance at Serie A TOTS") + 
 theme(plot.subtitle = element_text(hjust = .3, size = 10), plot.title = element_text(hjust = .8, size = 13))
 
 serie_a_mppn_logo <- ggdraw() + draw_image("https://static.wikia.nocookie.net/logopedia/images/1/12/Serie_A_2019.svg/revision/latest/scale-to-width-down/140?cb=20190710115458", x = .42, y = .2, scale = .25) + 
@@ -2962,7 +2952,7 @@ serie_a_mppn_logo
 ```
 
 \
-We then made a plot of the positional breakdown of all the players. It seems that the distribution of the players is heavily in center backs, center midfielders, and strikers.\
+Finally, we made a plot of the positional breakdown of all the players. The distribution of the players is heavily in center backs, center midfielders, and strikers.\
 
 ```{r serieaplot6, echo = FALSE}
 serie_a_positions <- serie_a_modeling %>% 
@@ -2995,7 +2985,7 @@ serie_a_testing <- testing(serie_a_split)
 ```
 
 \
-Next we made a table to compare important stats for the training and testing data.\
+Next we made a table to compare important stats for the training and testing data. There was no significant difference between the training and testing metrics.\
 
 ```{r serieatable1, echo - FALSE}
 serie_a_train_metrics <- serie_a_training %>% 
@@ -3021,20 +3011,18 @@ kable(serie_a_metrics_table, align = c(rep('c', 1))) %>%
 ```
 
 \
-Here is a plot of the most important variables in our Serie A model. It seems that "Minutes Played", "Tackles Won", and "Assists" seem to be the most important.\
+Below is a plot of the most important variables in our Serie A model. "Minutes Played", "Tackles Won", and "Assists" were the most important variables.\
 
 ![](serie_a_vip.png)
 
 \
-Here is a confusion matrix of the predictions and true values for the testing data. As you can see we predicted 9 team of the season players correctly and 10 incorrectly. While this is not great, it seems to be mostly acceptable because the predicted probabilities are seem to be ordered fairly well.\
+We also created a confusion matrix of the predictions and true values for the testing data. We predicted 9 TOTS players correctly, and 10 incorrectly. While this is not great, this result is good enough because the predicted probabilities are ordered fairly well.\
 
 ![](serie_a_confusion.png)
 
 \
-Here are the players in the testing data that our model predicted wrong. As you can see it is a wide variety of players, some being predicted wrong likely due to position, others due to team performance and others due to personal performance.\
 
-\
-Here are the predicted team of the season players for the Serie A this year:\
+Finally, here is the predicted TOTS for Serie A this year.\
 
 ![](serie_a_tots_pred.png)
 
@@ -3045,7 +3033,7 @@ Here are the predicted team of the season players for the Serie A this year:\
 ## Kevin De Bruyne Across Leagues
 
 \
-Here we show how Kevin De Bruyne would be modeled in all the different leagues had he played in them in order to demonstrate the similarities and differences between the models.\
+Here we show how Manchester City midfielder Kevin De Bruyne would be modeled in all the different leagues had he played in them. This demonstrates the similarities and differences between the models, and the subtle differences between each league.\
 
 <center>
 ![](de_bruyne_prem.png)
@@ -3061,7 +3049,7 @@ Here we show how Kevin De Bruyne would be modeled in all the different leagues h
 </center>
 
 \
-In all of the leagues he preforms fairly well, but we can see that some of the models have assists as a more important stat thus making him do better. And some of the leagues place more negative weight on the fact that he has played slightly less this season, etc.
+In all of the leagues he performs well. However, the Bundesliga model favors assists as a more important stat, while La Liga and Ligue 1 favor goal differential as more important stats. Overall, each league favors certain stats in terms of importance. Because of this, we were unable to create a model for all players across all leagues.
 
 \
 \
@@ -3070,4 +3058,4 @@ In all of the leagues he preforms fairly well, but we can see that some of the m
 ## Conclusion
 
 \
-In conclusion, we found that this is something that is very hard to predict. Our models in no way predicting the binary of TOTS or not properly, but they did seem to order the predicted probabilities fairly well. The best stats that our models seemed to use was how well the player's team is doing and how much the player is playing. Obviously they used other stats fairly effectively as well, but they struggled to predict players that played well on worse teams. Thus these models likely couldn't be used for much other than proving that much of what EA Sports does is subjective in terms of picking who gets these cards. Making these models confirmed our suspicion that they have no method to their madness. One interesting implication of this could be how getting or not getting one of these cards affects the public's perception of the player. Are there players that should be more highly rated by soccer fans, but they didn't get a team of the season so they aren't (and vice versa).
+In conclusion, we found that this is something that is very hard to predict. Our models did not predict the binary of TOTS or not exactly, but they did seem to order the predicted probabilities well. The stats that our models favored most were how well the player's team performed during each season, and how much the player played. The models also used other stats fairly effectively, but they struggled to predict players that played well on worse teams. Therefore, these models likely could not be used for much other than proving that much of what EA Sports does is subjective in terms of picking who gets these cards. Building these models confirmed our suspicion that there is no exact method to EA's madness. An interesting implication of this could be how getting or not getting one of these cards affects the public's perception of the player. Are there players that should be more highly rated by soccer fans, but are not due to them not getting a TOTS card? This is one of the many possible connections to EA's choices for TOTS.

@@ -1,5 +1,6 @@
 ---
-title: "Predicting EA Sports FIFA Team of the Season in Europe's Five Leagues\n"
+title: "Predicting EA Sports FIFA Team of the Season in Europe's Five Leagues"
+author: "Alexander Denzler, Jake Greenberg, Michael Helton, William Moscato"
 output:
   html_document:
     toc: TRUE
@@ -2504,7 +2505,7 @@ Below is the predicted team of the season for La Liga during the 2020-2021 seaso
 ## French Ligue 1
 
 \
-Generally considered the worst of the Top 5 European leagues, Ligue 1 has been dominated by PSG for many years. Often called a "farmer's league", Ligue 1 is sometimes not even considered among the best leagues in the world. However, there is no doubt that PSG is one of the best teams in the world. With the likes of Kylian Mbappe and Neymar, they managed to make it to the Champions League Final last season, and are in the final currently.\
+Generally considered the worst of the Top 5 European leagues, Ligue 1 has been dominated by PSG for many years. Often called a "farmer's league", Ligue 1 is sometimes not even considered among the best leagues in the world. However, there is no doubt that PSG is one of the best teams in the world. With the likes of Kylian Mbappe and Neymar, they managed to make it to the Champions League Final last season, and most recently lost in the semi-final this year.\
 
 ```{r ligue1mod, echo = FALSE}
 ligue1_fifa19_modeling <- ligue1_fifa19_modeling %>%

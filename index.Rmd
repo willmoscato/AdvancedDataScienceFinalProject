@@ -2104,6 +2104,9 @@ kable(leagues_formatted, align = c(rep("c", 12))) %>%
   kable_styling(full_width = F) %>% 
   add_header_above(c("Comparison of 5 Largest Global Soccer Leagues for Suspected KPIs (2017-2019)" = 12), background = "black", color = "white")
 ```
+\
+
+In this project, we will work with data from the five major global soccer leagues (Premier League, La Liga, Ligue 1, Bundesliga, and Serie A) to predict the Team of the Season (TOTS) for each league. Before digging into the individual evaluation of each league, we examined each of their averages to get an idea of their play styles. The table above exhibits that overall, the Premier League has the highest goal scoring enviroment, with the highest average number of both Goals and Assists. This could ultimately indicate that a higher threshold of offense will be required for a player at an offensive-oriented position to secure TOTS honors for the Premier League, as they are likely to face more fierce competition in terms of these counting stats. Meanwile, leagues like La Liga and Serie A also boast relatively offensive enviroments, while Bundesliga and Ligue 1 are more defensive environments based on their far more scarce frequency of Goals. 
 
 ## English Premier League
 

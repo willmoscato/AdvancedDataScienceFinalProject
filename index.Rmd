@@ -3058,6 +3058,7 @@ Here we show how Kevin De Bruyne would be modeled in all the different leagues h
 \
 ![](de_bruyne_seriea.png)
 
+</center>
 
 \
 In all of the leagues he preforms fairly well, but we can see that some of the models have assists as a more important stat thus making him do better. And some of the leagues place more negative weight on the fact that he has played slightly less this season, etc.

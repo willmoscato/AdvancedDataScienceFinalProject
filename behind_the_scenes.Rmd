@@ -1,22 +1,34 @@
 ---
 title: "Behind The Scenes"
 author: "Will Moscato, Alex Denzler, Jake Greenberg, Michael Helton"
-date: "5/3/2021"
-toc_float : TRUE
-code_download : TRUE
-output: html_document
+output:
+  html_document:
+    toc: TRUE
+    toc_float : TRUE
+    code_download : TRUE
 ---
 
 
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+```{r setup}
+knitr::opts_chunk$set(echo = TRUE, include = TRUE, eval = TRUE)
 ```
 
 ```{r}
 library(tidyverse)
 library(tidymodels)
 library(lubridate)
+library(vip)
+library(stacks)
+library(DALEX)
+library(DALEXtra)
+library(themis)
+library(formattable)
+library(kableExtra)
+library(cowplot)
+library(formattable)
+library(kableExtra)
+library(cvms)
 ```
 # Data Cleaning
 \
@@ -2414,7 +2426,7 @@ We will now take you through the exploratory plots and the modeling stage of the
 First we added a year tag to the end of the player names in order to differentiate the same players from year to year when looking at what we got right and wrong. We also created the full modeling data set and made some of the characters factors so they can be used by the model.
 \
 
-```{r premmod1, echo = FALSE}
+```{r premmod1}
 fifa19_modeling2 <- fifa19_modeling %>%
   mutate(Player = paste(Player, '19'))
 
@@ -2433,7 +2445,7 @@ prem_modeling <- fifa17_modeling2 %>%
 \
 Next we filtered out the players and stats we didn't want in the modeling. We used 19 as the minutes_played_divided_by90 because that is half of the games, thus those people should be the starters. We have a bunch of extra variables that we got rid of because we thought we were going to try to do goalkeepers too, but there wasn't enough data.
 \
-```{r premmod3, echo = FALSE}
+```{r premmod3}
 prem_modeling_outfield <- prem_modeling %>% 
   filter(position != "GK") %>% 
   filter(minutes_played_divided_by90 >= 19) %>% 
@@ -2443,7 +2455,7 @@ prem_modeling_outfield <- prem_modeling %>%
 \
 We then made the split.
 \
-```{r premmod4, echo = FALSE}
+```{r premmod4}
 set.seed(494)
 prem_split <- initial_split(prem_modeling_outfield, prop = .75, strata = "revision")
 prem_training <- training(prem_split)
@@ -2452,7 +2464,7 @@ prem_testing <- testing(prem_split)
 \
 Here is our first exploratory plot looking at the difference in the stats between training and testing.
 \
-```{r message = FALSE, warning = FALSE, echo = FALSE}
+```{r message = FALSE, warning = FALSE}
 prem_train_metrics <- prem_training %>% 
   mutate(Type = "Training") %>% 
   rename(Revision = revision) %>% 
@@ -2477,10 +2489,123 @@ kable(prem_metrics_table, align = c(rep('c', 1))) %>%
   add_header_above(c("Premier League Training and Testing Group Comparison for Suspected KPIs" = 13), background = "purple", color = "white")
 ```
 \
+Before diving into modeling, we explored the data to observe basic trends.
+\
+
+```{r premmod2}
+prem_modeling %>% 
+  select(where(is.numeric)) %>% 
+  pivot_longer(cols = everything(),
+               names_to = "variable", 
+               values_to = "value") %>% 
+  ggplot(aes(x = value)) +
+  geom_histogram(bins = 30) +
+  facet_wrap(vars(variable), 
+             scales = "free")
+```
+\
+First, we looked at the proportion of Premier League cards that are given the TOTS designation. Below, we see that a select few cards are given the TOTS designation.
+\
+```{r }
+theme_set(theme_cowplot())
+
+prem_prop <- prem_modeling %>% 
+  rename(Revision = revision) %>% 
+  ggplot(aes(x = Revision, fill = Revision)) +
+  geom_bar() +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
+  labs(x = "Revision", y = "Count", title = "Proportion of Revisions Within Premier League Dataset Selected for TOTS") +
+  theme(plot.title = element_text(hjust = .25, size = 13.5)) +
+  geom_vline(xintercept = 0, linetype = "dotted") 
+
+prem_prop_logo <- ggdraw() + draw_image("https://www.fifplay.com/img/public/premier-league-2-logo.png", x = .42, y = .23, scale = .25) + 
+  draw_plot(prem_prop)
+
+prem_prop_logo
+```
+
+\
+We then made a density plot of the goalscoring between tots and not to see how important goals are.
+\
+
+
+```{r premplot2}
+prem_goals_density <- prem_modeling %>% 
+  rename(Revision = revision) %>% 
+  ggplot(aes(x = Gls, fill = Revision)) +
+  geom_density(alpha = 0.5) +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
+  labs(x = "Goals", y = "Density", title = "Density Plot of Goals Scored in Premier League Season by Revision Status", subtitle = "TOTS players tend to score goals more prolifically than their non-selected counterparts") + 
+theme(plot.subtitle = element_text(hjust = -.35, size = 11), plot.title = element_text(hjust = .3, size = 13.5))
+
+prem_goals_logo <- ggdraw() + draw_image("https://www.fifplay.com/img/public/premier-league-2-logo.png", x = .42, y = .2, scale = .25) + 
+  draw_plot(prem_goals_density)
+
+prem_goals_logo
+```
+
+\
+Then we made a density plot of table position between tots and not to see if how good the team of the player is important.
+\
+
+
+```{r premplot3}
+prem_tablepos_density <- prem_modeling %>% 
+  rename(Revision = revision) %>% 
+  ggplot(aes(x = Rk, fill = Revision)) +
+  geom_density(alpha = 0.5) +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
+  labs(x = "Table Position", y = "Density", title = "Density Plot of Premier League Table Position by Revision Status", subtitle = "Players on winning teams (lower table position) make up a substantial proportion of the Premier League TOTS dataset") + 
+theme(plot.subtitle = element_text(hjust = .4, size = 8), plot.title = element_text(hjust = .1, size = 13.5))
+
+prem_tablepos_logo <- ggdraw() + draw_image("https://www.fifplay.com/img/public/premier-league-2-logo.png", x = .42, y = .2, scale = .25) + 
+  draw_plot(prem_tablepos_density)
+
+prem_tablepos_logo
+```
+
+\
+Then we looked at how much tots played vs non tots to see if it is only starters that get the cards.
+\
+
+```{r premplot4}
+prem_mppn_density <- prem_modeling %>% 
+  rename(Revision = revision) %>% 
+  ggplot(aes(x = minutes_played_divided_by90, fill = Revision)) +
+  geom_density(alpha = 0.5) +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
+  labs(x = "Total Minutes Played Divided by 90 (Full Games Played)", y = "Density", title = "Density Plot of Premier League Minutes Played (Per 90 Minutes) by Revision Status", subtitle = "Players who accrue more minutes per contest are more likely to be picked for Premier League TOTS") + 
+theme(plot.subtitle = element_text(hjust = .45, size = 8), plot.title = element_text(hjust = .5, size = 11))
+
+prem_mppn_logo <- ggdraw() + draw_image("https://www.fifplay.com/img/public/premier-league-2-logo.png", x = .42, y = .2, scale = .25) + 
+  draw_plot(prem_mppn_density)
+
+prem_mppn_logo
+```
+
+\
+Lastly, we looked at the positions of the players.
+\
+
+```{r premplot5}
+prem_positions <- prem_modeling %>% 
+  rename(Revision = revision) %>% 
+  ggplot(aes(x = position, fill = Revision)) +
+  geom_bar(position = "identity") +
+  scale_fill_manual(values = c("TOTS" = "blue", "Normal" = "gold")) +
+  labs(x = "Position", y = "Count", title = "Positional Breakdown Within Premier League Dataset")
+
+prem_positions_logo <- ggdraw() + draw_image("https://www.fifplay.com/img/public/premier-league-2-logo.png", x = .42, y = .22, scale = .25) + 
+  draw_plot(prem_positions)
+
+prem_positions_logo
+```
+
+\
 We then made the recipe for the model. We decided to use a random forest model because it made the most sense for predicting a binary response variable. We had also tried using a lasso model, but they were consistently worse for each league. We removed some redundant variables and some variables that are a little too specific to the certain player. We then decided to upsample the data to include more team of the seasons in the training data. This is where the different leagues really differ. We did some guess and check for each league in order to find the best upsampling that made the best model.
 \
 
-```{r premranger1, include = FALSE}
+```{r premranger1}
 prem_ranger_recipe <- recipe(revision ~., data = prem_training) %>% 
   step_rm(Player, Nation, Squad, G_per90, A_per90, minutes_played_divided_by90, Attendance, Born) %>% 
   step_upsample(revision, over_ratio = .33) %>% 
@@ -2494,7 +2619,7 @@ prem_ranger_recipe %>%
 Next we created the workflow.
 \
 
-```{r premranger2, include = FALSE}
+```{r premranger2}
 prem_ranger <- rand_forest(mtry = tune(), 
               min_n = tune(), 
               trees = 100) %>% 
@@ -2511,7 +2636,7 @@ prem_ranger_wf
 \
 Then we created the cross validation and tuned the model for the min n and mtry. Then we looked at the roc_auc and accuracy for the crossed validated model.
 \
-```{r premranger3, include = FALSE}
+```{r premranger3}
 set.seed(494)
 prem_cv <- vfold_cv(prem_training, v = 5)
 
@@ -2529,7 +2654,7 @@ collect_metrics(prem_ranger_cv)
 \
 Next we selected the best tuning using accuracy and finalized the workflow.
 \
-```{r premranger4, echo = FALSE}
+```{r premranger4}
 prem_best1 <- prem_ranger_cv %>% 
   select_best(metric = "accuracy")
 
@@ -2539,7 +2664,7 @@ prem_ranger_final_wf<- prem_ranger_wf %>%
 \
 Then we fit the model on the training data.
 \
-```{r premranger5, include = FALSE}
+```{r premranger5}
 set.seed(494)
 prem_ranger_fit <- prem_ranger_final_wf %>% 
   fit(prem_training)
@@ -2547,7 +2672,7 @@ prem_ranger_fit <- prem_ranger_final_wf %>%
 \
 And created an explainer.
 \
-```{r premranger5.1, echo = FALSE}
+```{r premranger5.1}
 set.seed(494)
 
 prem_rf_explain <- 
@@ -2562,7 +2687,7 @@ prem_rf_explain <-
 We used the explainer to created a variable importance plot as this felt like one of the questions we were really trying to answer.
 \
 
-```{r premvip1, echo = FALSE, eval=FALSE}
+```{r premvip1, }
 set.seed(494)
 
 prem_rf_var_imp <- 
@@ -2577,7 +2702,7 @@ plot(prem_rf_var_imp)
 \
 Then we fit the model on the training data and looked at accuracy and roc_auc.
 \
-```{r premranger6, include = FALSE}
+```{r premranger6}
 prem_ranger_test <- prem_ranger_final_wf %>% 
   last_fit(prem_split)
 
@@ -2587,7 +2712,7 @@ prem_ranger_test %>%
 \
 Then we made a confusion matrix of the model on the testing data to see how well the model was working. This is what we mostly used to decide if the model was good or if something (like the upsampling) needed to change.
 \
-```{r premconfuse1, include = FALSE}
+```{r premconfuse1}
 prem_preds1 <- prem_ranger_test %>% 
   collect_predictions()
 
@@ -2600,7 +2725,7 @@ Then we fit the model on the testing data in way that it would be usable to us a
 \
 
 
-```{r premranger7, message = FALSE, echo = FALSE}
+```{r premranger7, message = FALSE}
 prem_ranger_test <- prem_testing %>% 
   bind_cols(predict(prem_ranger_fit, new_data = prem_testing, type = "prob")) %>% 
   bind_cols(predict(prem_ranger_fit, new_data = prem_testing)) 
@@ -2617,7 +2742,7 @@ prem_rf_final_confusion <- ggdraw() + draw_image("https://www.fifplay.com/img/pu
 prem_rf_final_confusion 
 ```
 
-```{r premconfuse2, echo = FALSE}
+```{r premconfuse2}
 prem_ranger_test %>% 
   conf_mat(revision, .pred_class)
 ```
@@ -2626,19 +2751,19 @@ prem_ranger_test %>%
 Then we looked at what players the model was predicting incorrectly to better understand the pitfalls of the model.
 \
 
-```{r premwrong1, echo = FALSE}
+```{r premwrong1}
 prem_ranger_test %>% 
   filter(revision != .pred_class)
 ```
 \
 Then we created a modeling data set for the current season.
 \
-```{r 21prem, echo = FALSE}
+```{r 21prem}
 prem_modeling21 <- fifa21_modeling %>% 
   mutate(revision = as.factor(revision), Nation = as.factor(Nation), Age = as.integer(Age))
 ```
 
-```{r 21premoutfield, echo = FALSE}
+```{r 21premoutfield}
 prem_modeling_outfield21 <- prem_modeling21 %>% 
   filter(position != "GK") %>% 
   filter(minutes_played_divided_by90 >= 19) %>% 
@@ -2647,7 +2772,7 @@ prem_modeling_outfield21 <- prem_modeling21 %>%
 \
 And we fit our model to it in order to see how well the model preformed on new data.
 \
-```{r 21premranger1_1, echo = FALSE}
+```{r 21premranger1_1}
 prem_ranger_test21 <- prem_modeling_outfield21 %>% 
   bind_cols(predict(prem_ranger_fit, new_data = prem_modeling_outfield21, type = "prob")) %>% 
   bind_cols(predict(prem_ranger_fit, new_data = prem_modeling_outfield21)) 
@@ -2656,7 +2781,7 @@ prem_ranger_test21 <- prem_modeling_outfield21 %>%
 We then used that to show our predicted team of the season for each league this year. We used the top five predicted probabilities for each position group because the model did not predict a lot of team of the seasons, but it tended to order things well.
 \
 
-```{r, 21prempredictATT, echo = FALSE}
+```{r, 21prempredictATT}
 prem_ranger_test_att <- prem_ranger_test21 %>% 
   filter(position %in% c("ST", "RW", "CF", "LW")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
@@ -2664,7 +2789,7 @@ prem_ranger_test_att <- prem_ranger_test21 %>%
   mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 3, "Starter", "Bench"), Position = 1)
 ```
 
-```{r 21prempredictMID, echo = FALSE}
+```{r 21prempredictMID}
 prem_ranger_test_mid <- prem_ranger_test21 %>% 
   filter(position %in% c("CAM", "CM", "CDM", "LM", "RM")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
@@ -2672,7 +2797,7 @@ prem_ranger_test_mid <- prem_ranger_test21 %>%
   mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 3, "Starter", "Bench"), Position = 2)
 ```
 
-```{r 21prempredictDEF, echo = FALSE}
+```{r 21prempredictDEF}
 prem_ranger_test_def <- prem_ranger_test21 %>% 
   filter(position %in% c("LB", "CB", "RB")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
@@ -2696,7 +2821,7 @@ kable(prem_tots_formatted, align = c(rep('c',12)))  %>%
   row_spec(11:15, background = "red", color = "white") 
 ```
 ### Other Leagues Code
-```{r laligamod1, echo = FALSE}
+```{r laligamod1}
 fifa19_modeling_la_liga2 <- fifa19_modeling_la_liga %>%
   mutate(Player = paste(Player, '19'))
 
@@ -2714,7 +2839,7 @@ la_liga_modeling <- fifa17_modeling_la_liga2%>%
   mutate(revision = as.factor(revision), Nation = as.factor(Nation))
 ```
 
-```{r laligamod3, echo = FALSE}
+```{r laligamod3}
 la_liga_modeling_outfield <- la_liga_modeling %>% 
   filter(position != "GK") %>% 
   filter(minutes_played_divided_by90 >= 19) %>% 
@@ -2722,14 +2847,14 @@ la_liga_modeling_outfield <- la_liga_modeling %>%
   select(-Goals_allowed, -GA90, -SoTA, -Saves, -Save_percent, -W, -L, -D, -CS, -CS_percent, -Pkatt_against, -PKA, -PKsv, -Pk_Save_percent, -PKm)
 ```
 
-```{r laligamod4, echo = FALSE}
+```{r laligamod4}
 set.seed(494)
 la_liga_split <- initial_split(la_liga_modeling_outfield, prop = .75, strata = "revision")
 la_liga_training <- training(la_liga_split)
 la_liga_testing <- testing(la_liga_split)
 ```
 
-```{r message = FALSE, warning = FALSE, echo = FALSE}
+```{r message = FALSE, warning = FALSE}
 la_liga_train_metrics <- la_liga_training %>% 
   mutate(Type = "Training") %>% 
   rename(Revision = revision) %>% 
@@ -2752,7 +2877,7 @@ kable(la_liga_metrics_table, align = c(rep('c', 1))) %>%
   add_header_above(c("La Liga Training and Testing Group Comparison for Suspected KPIs" = 13), background = "navy", color = "red")
 ```
 
-```{r laligaranger1, echo = FALSE, include=FALSE}
+```{r laligaranger1, }
 la_liga_ranger_recipe <- recipe(revision ~., data = la_liga_training) %>% 
   step_rm(Player, Nation, Squad, Born, G_per90, A_per90, minutes_played_divided_by90, OG, Attendance) %>% 
   step_upsample(revision, over_ratio = .5) %>% 
@@ -2765,7 +2890,7 @@ la_liga_ranger_recipe %>%
 
 
 
-```{r laligaranger2, echo = FALSE, include=FALSE}
+```{r laligaranger2, }
 la_liga_ranger <- rand_forest(mtry = tune(), 
               min_n = tune(), 
               trees = 100) %>% 
@@ -2781,7 +2906,7 @@ la_liga_ranger_wf
 ```
 
 
-```{r laligaranger3, echo = FALSE, include=FALSE}
+```{r laligaranger3, }
 set.seed(494)
 la_liga_cv <- vfold_cv(la_liga_training, v = 5)
 
@@ -2797,7 +2922,7 @@ la_liga_ranger_cv <- la_liga_ranger_wf %>%
 collect_metrics(la_liga_ranger_cv)
 ```
 
-```{r laligaranger4, echo = FALSE}
+```{r laligaranger4}
 la_liga_best1 <- la_liga_ranger_cv %>% 
   select_best(metric = "accuracy")
 
@@ -2805,7 +2930,7 @@ la_liga_ranger_final_wf<- la_liga_ranger_wf %>%
   finalize_workflow(la_liga_best1)
 ```
 
-```{r laligaranger5, echo = FALSE, include=FALSE}
+```{r laligaranger5, }
 set.seed(494)
 la_liga_ranger_fit <- la_liga_ranger_final_wf %>% 
   fit(la_liga_training)
@@ -2820,7 +2945,7 @@ la_liga_rf_explain <-
   )
 ```
 
-```{r laligavip1, echo = FALSE}
+```{r laligavip1}
 la_liga_rf_var_imp <- 
   model_parts(
     la_liga_rf_explain
@@ -2829,7 +2954,7 @@ la_liga_rf_var_imp <-
 plot(la_liga_rf_var_imp)
 ```
 
-```{r laligaranger6, echo = FALSE, include=FALSE}
+```{r laligaranger6, }
 la_liga_ranger_test <- la_liga_ranger_final_wf %>% 
   last_fit(la_liga_split)
 
@@ -2837,7 +2962,7 @@ la_liga_ranger_test %>%
   collect_metrics()
 ```
 
-```{r laligaconfuse1, echo = FALSE, include=FALSE}
+```{r laligaconfuse1, }
 preds1 <- la_liga_ranger_test %>% 
   collect_predictions()
 
@@ -2845,18 +2970,18 @@ preds1 %>%
   conf_mat(revision, .pred_class)
 ```
 
-```{r laligaranger7, echo = FALSE}
+```{r laligaranger7}
 la_liga_ranger_test <- la_liga_testing %>% 
   bind_cols(predict(la_liga_ranger_fit, new_data = la_liga_testing, type = "prob")) %>% 
   bind_cols(predict(la_liga_ranger_fit, new_data = la_liga_testing)) 
 ```
 
-```{r laligaconfuse2, echo = FALSE, include=FALSE}
+```{r laligaconfuse2, }
 la_liga_ranger_test %>% 
   conf_mat(revision, .pred_class)
 ```
 
-```{r message = FALSE, echo = FALSE}
+```{r message = FALSE}
 la_liga_ranger_test <- la_liga_testing %>% 
   bind_cols(predict(la_liga_ranger_fit, new_data = la_liga_testing, type = "prob")) %>% 
   bind_cols(predict(la_liga_ranger_fit, new_data = la_liga_testing)) 
@@ -2872,30 +2997,30 @@ la_liga_rf_final_confusion <- ggdraw() + draw_image("https://upload.wikimedia.or
 la_liga_rf_final_confusion 
 ```
 
-```{r laligawrong1, echo = FALSE, include=FALSE}
+```{r laligawrong1, }
 la_liga_ranger_test %>% 
   filter(revision != .pred_class)
 ```
 
-```{r 21laligamod1, echo = FALSE}
+```{r 21laligamod1}
 la_liga_modeling21 <- fifa21_modeling_la_liga %>% 
   mutate(revision = as.factor(revision), Nation = as.factor(Nation), Age = as.integer(Age))
 ```
 
-```{r 21laligaoutfield, echo = FALSE}
+```{r 21laligaoutfield}
 la_liga_modeling_outfield21 <- la_liga_modeling21 %>% 
   filter(position != "GK") %>% 
   filter(minutes_played_divided_by90 >= 14) %>% 
   mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", ifelse(position == "CF", "ST", position))))
 ```
 
-```{r 21laligaranger1, echo = FALSE}
+```{r 21laligaranger1}
 la_liga_ranger_test21 <- la_liga_modeling_outfield21 %>% 
   bind_cols(predict(la_liga_ranger_fit, new_data = la_liga_modeling_outfield21, type = "prob")) %>% 
   bind_cols(predict(la_liga_ranger_fit, new_data = la_liga_modeling_outfield21)) 
 ```
 
-```{r 21laligapredictATT, echo = FALSE}
+```{r 21laligapredictATT}
 la_liga_ranger_test_att <- la_liga_ranger_test21 %>% 
   filter(position %in% c("ST", "RW", "CF", "LW")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
@@ -2903,7 +3028,7 @@ la_liga_ranger_test_att <- la_liga_ranger_test21 %>%
   mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 3, "Starter", "Bench"), Position = 1)
 ```
 
-```{r 21laligapredictMID, echo = FALSE}
+```{r 21laligapredictMID}
 la_liga_ranger_test_mid <- la_liga_ranger_test21 %>% 
   filter(position %in% c("CAM", "CM", "CDM", "LM", "RM")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
@@ -2911,7 +3036,7 @@ la_liga_ranger_test_mid <- la_liga_ranger_test21 %>%
   mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 3, "Starter", "Bench"), Position = 2)
 ```
 
-```{r 21laligapredictDEF, echo = FALSE}
+```{r 21laligapredictDEF}
 la_liga_ranger_test_def <- la_liga_ranger_test21 %>% 
   filter(position %in% c("LB", "CB", "RB")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
@@ -2935,7 +3060,7 @@ kable(la_liga_tots_formatted, align = c(rep('c',11)))  %>%
   row_spec(11:15, background = "red", color = "white")
 ```
 
-```{r ligue1mod, echo = FALSE}
+```{r ligue1mod}
 ligue1_fifa19_modeling <- ligue1_fifa19_modeling %>%
   mutate(Player = paste(Player, '19'))
 
@@ -2950,7 +3075,7 @@ ligue1_modeling <- ligue1_fifa17_modeling %>%
   mutate(revision = as.factor(revision), Nation = as.factor(Nation))
 ```
 
-```{r ligue1mod2, echo = FALSE}
+```{r ligue1mod2}
 ligue1_modeling_outfield <- ligue1_modeling %>% 
   filter(position != "GK") %>% 
   filter(minutes_played_divided_by90 >= 19) %>% 
@@ -2958,7 +3083,7 @@ ligue1_modeling_outfield <- ligue1_modeling %>%
   select(-Goals_allowed, -GA90, -SoTA, -Saves, -Save_percent, -W, -L, -D, -CS, -CS_percent, -Pkatt_against, -PKA, -PKsv, -Pk_Save_percent, -PKm)
 ```
 
-```{r ligue1mod3, echo = FALSE}
+```{r ligue1mod3}
 set.seed(494)
 ligue1_split <- initial_split(ligue1_modeling_outfield, prop = .75, strata = "revision")
 ligue1_training <- training(ligue1_split)
@@ -2988,7 +3113,7 @@ kable(ligue1_metrics_table, align = c(rep('c', 1))) %>%
   add_header_above(c("Ligue 1 Training and Testing Group Comparison for Suspected KPIs" = 13), background = "navy", color = "white")
 ```
 
-```{r ligue1ranger1, echo = FALSE}
+```{r ligue1ranger1}
 ligue1_ranger_recipe <- recipe(revision ~., data = ligue1_training) %>% 
   step_rm(Player, Nation, Squad, Born, minutes_played_divided_by90, G_per90, A_per90, Attendance) %>% 
   step_upsample(revision, over_ratio = .4) %>% 
@@ -2999,7 +3124,7 @@ ligue1_ranger_recipe %>%
   juice()
 ```
 
-```{r ligue1ranger2, echo = FALSE}
+```{r ligue1ranger2}
 ligue1_ranger <- rand_forest(mtry = tune(), 
               min_n = tune(), 
               trees = 100) %>% 
@@ -3014,7 +3139,7 @@ ligue1_ranger_wf <-
 ligue1_ranger_wf
 ```
 
-```{r ligue1ranger3, echo = FALSE}
+```{r ligue1ranger3}
 set.seed(494)
 ligue1_cv <- vfold_cv(ligue1_training, v = 5)
 
@@ -3030,7 +3155,7 @@ ligue1_ranger_cv <- ligue1_ranger_wf %>%
 collect_metrics(ligue1_ranger_cv)
 ```
 
-```{r ligue1ranger4, echo = FALSE}
+```{r ligue1ranger4}
 ligue1_best1 <- ligue1_ranger_cv %>% 
   select_best(metric = "accuracy")
 
@@ -3038,7 +3163,7 @@ ligue1_ranger_final_wf<- ligue1_ranger_wf %>%
   finalize_workflow(ligue1_best1)
 ```
 
-```{r ligue1ranger5, echo = FALSE}
+```{r ligue1ranger5}
 ligue1_ranger_fit <- ligue1_ranger_final_wf %>% 
   fit(ligue1_training)
 
@@ -3052,7 +3177,7 @@ ligue1_rf_explain <-
   )
 ```
 
-```{r ligue1vip, echo = FALSE}
+```{r ligue1vip}
 set.seed(494)
 ligue1_rf_var_imp <- 
   model_parts(
@@ -3062,7 +3187,7 @@ ligue1_rf_var_imp <-
 plot(ligue1_rf_var_imp)
 ```
 
-```{r ligue1ranger6, echo = FALSE}
+```{r ligue1ranger6}
 set.seed(494)
 ligue1_ranger_test <- ligue1_ranger_final_wf %>% 
   last_fit(ligue1_split)
@@ -3071,12 +3196,12 @@ ligue1_ranger_test %>%
   collect_metrics()
 ```
 
-```{r ligue1confuse1, echo = FALSE}
+```{r ligue1confuse1}
 ligue1_preds1 <- ligue1_ranger_test %>% 
   collect_predictions()
 ```
 
-```{r ligue1ranger7, message = FALSE, echo = FALSE}
+```{r ligue1ranger7, message = FALSE}
 ligue1_ranger_test <- ligue1_testing %>% 
   bind_cols(predict(ligue1_ranger_fit, new_data = ligue1_testing, type = "prob")) %>% 
   bind_cols(predict(ligue1_ranger_fit, new_data = ligue1_testing)) 
@@ -3093,29 +3218,29 @@ ligue1_rf_final_confusion <- ggdraw() + draw_image("https://upload.wikimedia.org
 ligue1_rf_final_confusion 
 ```
 
-```{r ligue1confuse2, echo = FALSE}
+```{r ligue1confuse2}
 ligue1_ranger_test %>% 
   conf_mat(revision, .pred_class)
 ```
 
-```{r ligue1wrong, echo = FALSE}
+```{r ligue1wrong}
 ligue1_ranger_test %>% 
   filter(revision != .pred_class)
 ```
 
-```{r 21ligue1mod1, echo = FALSE}
+```{r 21ligue1mod1}
 ligue1_modeling21 <- fifa21_modeling_ligue1 %>% 
   mutate(revision = as.factor(revision), Nation = as.factor(Nation), Age = as.integer(Age))
 ```
 
-```{r 21ligue1outfield, echo = FALSE}
+```{r 21ligue1outfield}
 ligue1_modeling_outfield21 <- ligue1_modeling21 %>% 
   filter(position != "GK") %>% 
   filter(minutes_played_divided_by90 >= 14) %>% 
   mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", position)))
 ```
 
-```{r 21ligue1ranger, echo = FALSE}
+```{r 21ligue1ranger}
 ligue1_ranger_test21 <- ligue1_modeling_outfield21 %>% 
   bind_cols(predict(ligue1_ranger_fit, new_data = ligue1_modeling_outfield21, type = "prob")) %>% 
   bind_cols(predict(ligue1_ranger_fit, new_data = ligue1_modeling_outfield21)) 
@@ -3123,7 +3248,7 @@ ligue1_ranger_test21 <- ligue1_modeling_outfield21 %>%
 
 
 
-```{r 21ligue1predictATT, echo = FALSE}
+```{r 21ligue1predictATT}
 ligue1_ranger_test_att <- ligue1_ranger_test21 %>% 
   filter(position %in% c("ST", "RW", "CF", "LW")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
@@ -3131,7 +3256,7 @@ ligue1_ranger_test_att <- ligue1_ranger_test21 %>%
   mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 3, "Starter", "Bench"), Position = 1)
 ```
 
-```{r 21ligue1predictMID, echo = FALSE}
+```{r 21ligue1predictMID}
 ligue1_ranger_test_mid <- ligue1_ranger_test21 %>% 
   filter(position %in% c("CAM", "CM", "CDM", "LM", "RM")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
@@ -3141,7 +3266,7 @@ ligue1_ranger_test_mid <- ligue1_ranger_test21 %>%
 
 
 
-```{r 21ligue1predictDEF, echo = FALSE}
+```{r 21ligue1predictDEF}
 ligue1_ranger_test_def <- ligue1_ranger_test21 %>% 
   filter(position %in% c("LB", "CB", "RB")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
@@ -3165,7 +3290,7 @@ kable(ligue1_tots_formatted, align = c(rep('c',11)))  %>%
   row_spec(11:15, background = "red", color = "white") 
 ```
 
-```{r bundesligamod1, echo = FALSE}
+```{r bundesligamod1}
 fifa19_modeling_bundesliga2 <- fifa19_modeling_bundesliga %>%
   mutate(Player = paste(Player, '19'))
 
@@ -3182,7 +3307,7 @@ bundesliga_modeling <- fifa17_modeling_bundesliga2%>%
   mutate(revision = as.factor(revision), Nation = as.factor(Nation))
 ```
 
-```{r bundesligamod2, echo = FALSE}
+```{r bundesligamod2}
 bundesliga_modeling_outfield <- bundesliga_modeling %>% 
   filter(position != "GK") %>% 
   filter(minutes_played_divided_by90 >= 19) %>% 
@@ -3190,14 +3315,14 @@ bundesliga_modeling_outfield <- bundesliga_modeling %>%
   select(-Goals_allowed, -GA90, -SoTA, -Saves, -Save_percent, -W, -L, -D, -CS, -CS_percent, -Pkatt_against, -PKA, -PKsv, -Pk_Save_percent, -PKm)
 ```
 
-```{r bundesligamod3, echo = FALSE}
+```{r bundesligamod3}
 set.seed(494)
 bundesliga_split <- initial_split(bundesliga_modeling_outfield, prop = .75, strata = "revision")
 bundesliga_training <- training(bundesliga_split)
 bundesliga_testing <- testing(bundesliga_split)
 ```
 
-```{r bundesligatable1, echo = FALSE}
+```{r bundesligatable1}
 bundesliga_train_metrics <- bundesliga_training %>% 
   mutate(Type = "Training") %>% 
   rename(Revision = revision) %>% 
@@ -3220,7 +3345,7 @@ kable(bundesliga_metrics_table, align = c(rep('c', 1))) %>%
   add_header_above(c("Bundesliga Training and Testing Group Comparison for Suspected KPIs" = 13), background = "red", color = "white")
 ```
 
-```{r bundesliaranger1, echo = FALSE, include=FALSE}
+```{r bundesliaranger1, }
 bundesliga_ranger_recipe <- recipe(revision ~., data = bundesliga_training) %>% 
   step_rm(Player, Nation, Squad, G_per90, A_per90, minutes_played_divided_by90, Attendance, Born) %>% 
   step_upsample(revision, over_ratio = .55) %>% 
@@ -3232,7 +3357,7 @@ bundesliga_ranger_recipe %>%
 ```
 
 
-```{r bundesligaranger2, echo = FALSE, include=FALSE}
+```{r bundesligaranger2, }
 bundesliga_ranger <- rand_forest(mtry = tune(), 
               min_n = tune(), 
               trees = 100) %>% 
@@ -3248,7 +3373,7 @@ bundesliga_ranger_wf
 ```
 
 
-```{r bundesligaranger3, echo = FALSE, include=FALSE}
+```{r bundesligaranger3, }
 set.seed(494)
 bundesliga_cv <- vfold_cv(bundesliga_training, v = 5)
 
@@ -3264,7 +3389,7 @@ bundesliga_ranger_cv <- bundesliga_ranger_wf %>%
 collect_metrics(bundesliga_ranger_cv)
 ```
 
-```{r bundesligaranger4, echo = FALSE}
+```{r bundesligaranger4}
 bundesliga_best1 <- bundesliga_ranger_cv %>% 
   select_best(metric = "accuracy")
 
@@ -3272,7 +3397,7 @@ bundesliga_ranger_final_wf<- bundesliga_ranger_wf %>%
   finalize_workflow(bundesliga_best1)
 ```
 
-```{r bundesligaranger5, echo = FALSE}
+```{r bundesligaranger5}
 set.seed(494)
 bundesliga_ranger_fit <- bundesliga_ranger_final_wf %>% 
   fit(bundesliga_training)
@@ -3287,7 +3412,7 @@ bundesliga_rf_explain <-
   )
 ```
 
-```{r bundesligavip, echo = FALSE}
+```{r bundesligavip}
 bundesliga_rf_var_imp <- 
   model_parts(
     bundesliga_rf_explain
@@ -3300,7 +3425,7 @@ plot(bundesliga_rf_var_imp)
 
 
 
-```{r bundesligaranger6, echo = FALSE, include=FALSE}
+```{r bundesligaranger6, }
 bundesliga_ranger_test <- bundesliga_ranger_final_wf %>% 
   last_fit(bundesliga_split)
 
@@ -3308,7 +3433,7 @@ bundesliga_ranger_test %>%
   collect_metrics()
 ```
 
-```{r bundesligaconfuse1, echo = FALSE, include= FALSE}
+```{r bundesligaconfuse1, , include= FALSE}
 preds1 <- bundesliga_ranger_test %>% 
   collect_predictions()
 
@@ -3316,7 +3441,7 @@ preds1 %>%
   conf_mat(revision, .pred_class)
 ```
 
-```{r bundesligaranger7,message = FALSE, echo = FALSE, include= FALSE}
+```{r bundesligaranger7,message = FALSE, , include= FALSE}
 bundesliga_ranger_test <- bundesliga_testing %>% 
   bind_cols(predict(bundesliga_ranger_fit, new_data = bundesliga_testing, type = "prob")) %>% 
   bind_cols(predict(bundesliga_ranger_fit, new_data = bundesliga_testing)) 
@@ -3328,7 +3453,7 @@ bundesliga_confusion_table <- bundesliga_ranger_test %>%
   conf_mat(revision, .pred_class)
 ```
 
-```{r message = FALSE, echo = FALSE}
+```{r message = FALSE}
 bundesliga_rf_ggconfusion <- autoplot(bundesliga_confusion_table, type = "heatmap") + labs(title = "Confusion Matrix of Bundesliga Random Forest Model") + scale_fill_gradient(low = "blue", high = "red") + theme(plot.title = element_text(hjust = .5, size = 15))
 
 
@@ -3338,35 +3463,35 @@ bundesliga_rf_final_confusion <- ggdraw() + draw_image("https://upload.wikimedia
 bundesliga_rf_final_confusion 
 ```
 
-```{r bundesligaconfuse2, echo = FALSE, include= FALSE}
+```{r bundesligaconfuse2, , include= FALSE}
 bundesliga_ranger_test %>% 
   conf_mat(revision, .pred_class)
 ```
 
-```{r bundesligawrong, echo = FALSE, include= FALSE}
+```{r bundesligawrong, , include= FALSE}
 bundesliga_ranger_test %>% 
   filter(revision != .pred_class)
 ```
 
-```{r 21bundesligamod, echo = FALSE}
+```{r 21bundesligamod}
 bundesliga_modeling21 <- fifa21_modeling_bundesliga %>% 
   mutate(revision = as.factor(revision), Nation = as.factor(Nation), Age = as.integer(Age))
 ```
 
-```{r 21bundesligaoutfield, echo = FALSE}
+```{r 21bundesligaoutfield}
 bundesliga_modeling_outfield21 <- bundesliga_modeling21 %>% 
   filter(position != "GK") %>% 
   filter(minutes_played_divided_by90 >= 18) %>% 
   mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", ifelse(position == "RW", "RM", ifelse(position == "LW", "LM", position)))))
 ```
 
-```{r 21bundesligaranger, echo = FALSE}
+```{r 21bundesligaranger}
 bundesliga_ranger_test21 <- bundesliga_modeling_outfield21 %>% 
   bind_cols(predict(bundesliga_ranger_fit, new_data = bundesliga_modeling_outfield21, type = "prob")) %>% 
   bind_cols(predict(bundesliga_ranger_fit, new_data = bundesliga_modeling_outfield21)) 
 ```
 
-```{r bundesligapredictATT, echo = FALSE}
+```{r bundesligapredictATT}
 bundesliga_ranger_test_att <- bundesliga_ranger_test21 %>% 
   filter(position %in% c("ST", "RW", "CF", "LW")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
@@ -3374,7 +3499,7 @@ bundesliga_ranger_test_att <- bundesliga_ranger_test21 %>%
   mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 3, "Starter", "Bench"), Position = 1)
 ```
 
-```{r bundesligapredictMID, echo = FALSE}
+```{r bundesligapredictMID}
 bundesliga_ranger_test_mid <- bundesliga_ranger_test21 %>% 
   filter(position %in% c("CAM", "CM", "CDM", "LM", "RM")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
@@ -3382,7 +3507,7 @@ bundesliga_ranger_test_mid <- bundesliga_ranger_test21 %>%
   mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 3, "Starter", "Bench"), Position = 2)
 ```
 
-```{r bundesligapredictDEF, echo = FALSE}
+```{r bundesligapredictDEF}
 bundesliga_ranger_test_def <- bundesliga_ranger_test21 %>% 
   filter(position %in% c("LB", "CB", "RB")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
@@ -3406,7 +3531,7 @@ kable(bundesliga_tots_formatted, align = c(rep('c',11)))  %>%
   row_spec(11:15, background = "red", color = "white") 
 ```
 
-```{r serieamod1, echo = FALSE}
+```{r serieamod1}
 fifa19_modeling_serie_a2 <- fifa19_modeling_serie_a %>%
   mutate(Player = paste(Player, '19'))
 
@@ -3423,7 +3548,7 @@ serie_a_modeling <- fifa17_modeling_serie_a2%>%
   mutate(revision = as.factor(revision), Nation = as.factor(Nation))
 ```
 
-```{r serieamod2, echo = FALSE}
+```{r serieamod2}
 serie_a_modeling_outfield <- serie_a_modeling %>% 
   filter(position != "GK") %>% 
   #filter(position %in% c("ST", "LW", "RW", "CF", "CAM")) %>% 
@@ -3432,7 +3557,7 @@ serie_a_modeling_outfield <- serie_a_modeling %>%
   select(-Goals_allowed, -GA90, -SoTA, -Saves, -Save_percent, -W, -L, -D, -CS, -CS_percent, -Pkatt_against, -PKA, -PKsv, -Pk_Save_percent, -PKm)
 ```
 
-```{r serieamod3, echo = FALSE}
+```{r serieamod3}
 set.seed(494)
 serie_a_split <- initial_split(serie_a_modeling_outfield, prop = .75, strata = "revision")
 serie_a_training <- training(serie_a_split)
@@ -3462,7 +3587,7 @@ kable(serie_a_metrics_table, align = c(rep('c', 1))) %>%
   add_header_above(c("Serie A Training and Testing Group Comparison for Suspected KPIs" = 13), background = "red", color = "#00FF00")
 ```
 
-```{r seriearanger1, echo = FALSE}
+```{r seriearanger1}
 serie_a_ranger_recipe <- recipe(revision ~., data = serie_a_training) %>% 
   step_rm(Player, Nation, Squad, Born, G_per90, A_per90, minutes_played_divided_by90, Attendance) %>% 
   step_upsample(revision, over_ratio = .4) %>% 
@@ -3473,7 +3598,7 @@ serie_a_ranger_recipe %>%
   juice()
 ```
 
-```{r seriearanger2, echo = FALSE}
+```{r seriearanger2}
 serie_a_ranger <- rand_forest(mtry = tune(), 
               min_n = tune(), 
               trees = 100) %>% 
@@ -3488,7 +3613,7 @@ serie_a_ranger_wf <-
 serie_a_ranger_wf
 ```
 
-```{r seriearanger3, echo = FALSE}
+```{r seriearanger3}
 set.seed(494)
 serie_a_cv <- vfold_cv(serie_a_training, v = 5)
 
@@ -3504,7 +3629,7 @@ serie_a_ranger_cv <- serie_a_ranger_wf %>%
 collect_metrics(serie_a_ranger_cv)
 ```
 
-```{r seriearanger4, echo = FALSE}
+```{r seriearanger4}
 serie_a_best1 <- serie_a_ranger_cv %>% 
   select_best(metric = "accuracy")
 
@@ -3512,7 +3637,7 @@ serie_a_ranger_final_wf<- serie_a_ranger_wf %>%
   finalize_workflow(serie_a_best1)
 ```
 
-```{r seriearanger5, echo = FALSE}
+```{r seriearanger5}
 set.seed(494)
 serie_a_ranger_fit <- serie_a_ranger_final_wf %>% 
   fit(serie_a_training)
@@ -3527,7 +3652,7 @@ serie_a_rf_explain <-
   )
 ```
 
-```{r serieavip, echo = FALSE}
+```{r serieavip}
 serie_a_rf_var_imp <- 
   model_parts(
     serie_a_rf_explain
@@ -3536,7 +3661,7 @@ serie_a_rf_var_imp <-
 plot(serie_a_rf_var_imp)
 ```
 
-```{r seriearanger6, echo = FALSE}
+```{r seriearanger6}
 serie_a_ranger_test <- serie_a_ranger_final_wf %>% 
   last_fit(serie_a_split)
 
@@ -3544,7 +3669,7 @@ serie_a_ranger_test %>%
   collect_metrics()
 ```
 
-```{r serieaconfuse1, echo = FALSE}
+```{r serieaconfuse1}
 preds1 <- serie_a_ranger_test %>% 
   collect_predictions()
 
@@ -3552,7 +3677,7 @@ preds1 %>%
   conf_mat(revision, .pred_class)
 ```
 
-```{r seriearanger7, echo = FALSE}
+```{r seriearanger7}
 serie_a_ranger_test <- serie_a_testing %>% 
   bind_cols(predict(serie_a_ranger_fit, new_data = serie_a_testing, type = "prob")) %>% 
   bind_cols(predict(serie_a_ranger_fit, new_data = serie_a_testing)) 
@@ -3569,35 +3694,35 @@ serie_a_final_confusion <- ggdraw() + draw_image("https://static.wikia.nocookie.
 serie_a_final_confusion 
 ```
 
-```{r serieaconfuse2, echo = FALSE}
+```{r serieaconfuse2}
 serie_a_ranger_test %>% 
   conf_mat(revision, .pred_class)
 ```
 
-```{r serieawrong, echo = FALSE}
+```{r serieawrong}
 serie_a_ranger_test %>% 
   filter(revision != .pred_class)
 ```
 
-```{r 21serieamod1, echo = FALSE}
+```{r 21serieamod1}
 serie_a_modeling21 <- fifa21_modeling_serie_a %>% 
   mutate(revision = as.factor(revision), Nation = as.factor(Nation), Age = as.integer(Age))
 ```
 
-```{r 21serieaoutfield, echo = FALSE}
+```{r 21serieaoutfield}
 serie_a_modeling_outfield21 <- serie_a_modeling21 %>% 
   filter(position != "GK") %>% 
   filter(minutes_played_divided_by90 >= 14) %>% 
   mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", position)))
 ```
 
-```{r 21seriearanger, echo = FALSE}
+```{r 21seriearanger}
 serie_a_ranger_test21 <- serie_a_modeling_outfield21 %>% 
   bind_cols(predict(serie_a_ranger_fit, new_data = serie_a_modeling_outfield21, type = "prob")) %>% 
   bind_cols(predict(serie_a_ranger_fit, new_data = serie_a_modeling_outfield21)) 
 ```
 
-```{r serieapredictATT, echo = FALSE}
+```{r serieapredictATT}
 serie_a_ranger_test_att <- serie_a_ranger_test21 %>% 
   filter(position %in% c("ST", "RW", "CF", "LW")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
@@ -3605,7 +3730,7 @@ serie_a_ranger_test_att <- serie_a_ranger_test21 %>%
     mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 3, "Starter", "Bench"), Position = 1)
 ```
 
-```{r serieapredictMID, echo = FALSE}
+```{r serieapredictMID}
 serie_a_ranger_test_mid <- serie_a_ranger_test21 %>% 
   filter(position %in% c("CAM", "CM", "CDM", "LM", "RM")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
@@ -3613,7 +3738,7 @@ serie_a_ranger_test_mid <- serie_a_ranger_test21 %>%
   mutate(Role = ifelse(rank(.pred_TOTS, ties.method = c("first")) >= 3, "Starter", "Bench"), Position = 2)
 ```
 
-```{r serieapredictDEF, echo = FALSE}
+```{r serieapredictDEF}
 serie_a_ranger_test_def <- serie_a_ranger_test21 %>% 
   filter(position %in% c("LB", "CB", "RB")) %>% 
   arrange(desc(.pred_TOTS)) %>% 
@@ -3636,8 +3761,12 @@ kable(serie_a_tots_formatted, align = c(rep('c',11)))  %>%
   row_spec(1:10, background = "green", color = "white") %>% 
   row_spec(11:15, background = "red", color = "white") 
 ```
+# Kevin De Bruyne in the Models
+\
+We used a single player to illustrate the difference in the models between leagues and show how the different predictions are made.
+\
 
-```{r echo = FALSE}
+```{r }
 new_obs_1 <- prem_ranger_test21 %>% filter(Player == "Kevin De Bruyne") %>% slice(1)
 
 #Pulls together the data needed for the break-down plot
@@ -3690,5 +3819,8 @@ ggdraw() + draw_image("https://resources.premierleague.com/premierleague/photos/
   
 ```
 
+# Conclusion
+
+In conclusion, we cleaned the data (mostly names), made five separate models, and looked at how those models compared to each other. The most difficult part of this task was making sure we could join the data sets and making the upsampling of the models correct (depending on the size of the leagues and the number of tots players it could vary a lot). We should mention that the knitted version of this does not match the version in rstudio, so in our final product we saved the images of the outputs that we wanted. Therefore, I'm not sure how reproducalbe this actually is, but all the code should be right.
 
 

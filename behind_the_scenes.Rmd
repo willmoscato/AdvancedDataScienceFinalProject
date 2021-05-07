@@ -18,14 +18,14 @@ library(tidyverse)
 library(tidymodels)
 library(lubridate)
 ```
-#Data Cleaning
+# Data Cleaning
 \
 The majority of the cleaning for this project was getting the names of the players from the different data sets to match up. Some players had different names in the fifa (video game) data set than what their actual name is, or they had some nickname either in the fifa data set or in their stats, or for a few players the spelling didn't match up. Other than that most of the variables were already very good and we just had to rename them and join all the data sets together.
 
 \
 We will run you through the cleaning for the premier league for 2017 and then include the code for all the other years and leagues, but it is essentially the same thing. 
 
-##Premier League
+## Premier League
 
 ```{r}
 fifa17 <- read_csv("fut_bin17_players.csv")
@@ -116,7 +116,7 @@ fifa21_names <- fifa21_clean %>%
 \
 We then took out all of the accents from the player names because there were no accents in the data set with all the stats.
 
-###2017
+### 2017
 
 ```{r}
 premnames17 <-premnames17 %>% 
@@ -238,7 +238,7 @@ From here on out it is essentially the same process iterated over year and leagu
 
 
 
-###2018
+### 2018
 
 
 ```{r}
@@ -345,7 +345,7 @@ fifa18_modeling <- fifa18_standard_plus_table %>%
 ```
 
 
-###2019
+### 2019
 ```{r}
 premnames19 <-premnames19 %>% 
   mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
@@ -466,7 +466,7 @@ dim(fifa19_modeling)
 
 
 
-###2021  
+### 2021  
 
 ```{r}
 premnames21 <-premnames21 %>% 
@@ -569,7 +569,7 @@ dim(fifa21_modeling)
 ```
 
 
-##LaLiga
+## LaLiga
 
 ```{r}
 la_liganames17 <- read.csv("16_17_la_liganames.csv")
@@ -593,7 +593,7 @@ la_ligatable21 <- read.csv("la_ligatable21.csv")
 
 
 
-###2017
+### 2017
 
 ```{r}
 la_liganames17 <-la_liganames17 %>% 
@@ -701,7 +701,7 @@ fifa17_modeling_la_liga <- fifa17_standard_plus_table_la_liga %>%
 
 
 
-###2018
+### 2018
 
 
 ```{r}
@@ -809,7 +809,7 @@ fifa18_modeling_la_liga <- fifa18_standard_plus_table_la_liga %>%
 ```
 
 
-###2019
+### 2019
 ```{r}
 la_liganames19 <-la_liganames19 %>% 
   mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
@@ -923,7 +923,7 @@ dim(fifa19_modeling_la_liga)
 
 
 
-###2021 
+### 2021 
 
 ```{r}
 la_liganames21 <-la_liganames21 %>% 
@@ -1025,7 +1025,7 @@ fifa21_modeling_la_liga <- fifa21_standard_plus_table_la_liga %>%
 dim(fifa21_modeling_la_liga)
 ```
 
-##Ligue1
+## Ligue1
 
 ```{r}
 ligue1_names17 <- read.csv("16_17_ligue1names.csv")
@@ -1047,7 +1047,7 @@ ligue1table21 <- read.csv("ligue1table21.csv")
 ```
 
 
-###2017
+### 2017
 
 ```{r}
 ligue1_names17 <-ligue1_names17 %>% 
@@ -1158,7 +1158,7 @@ ligue1_fifa17_modeling <- ligue1_fifa17_standard_plus_table %>%
 ```
 
 
-###2018
+### 2018
 
 
 ```{r}
@@ -1270,7 +1270,7 @@ ligue1_fifa18_modeling <- ligue1_fifa18_standard_plus_table %>%
 ```
 
 
-###2019
+### 2019
 ```{r}
 ligue1_names19 <- ligue1_names19 %>% 
   mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
@@ -1492,7 +1492,7 @@ dim(fifa21_modeling_ligue1)
 ```
 
 
-##Serie A
+## Serie A
 
 ```{r}
 serie_anames17 <- read.csv("16_17_serie_anames.csv")
@@ -1516,7 +1516,7 @@ serie_atable21 <- read.csv("serie_atable21.csv")
 
 
 
-###2017
+### 2017
 
 ```{r}
 serie_anames17 <-serie_anames17 %>% 
@@ -1625,7 +1625,7 @@ fifa17_modeling_serie_a <- fifa17_standard_plus_table_serie_a %>%
 
 
 
-###2018
+### 2018
 
 
 ```{r}
@@ -1733,7 +1733,7 @@ fifa18_modeling_serie_a <- fifa18_standard_plus_table_serie_a %>%
 ```
 
 
-###2019
+### 2019
 ```{r}
 serie_anames19 <-serie_anames19 %>% 
   mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
@@ -1951,7 +1951,7 @@ dim(fifa21_modeling_serie_a)
 
 
 
-##Bundesliga
+## Bundesliga
 
 ```{r}
 bundesliganames17 <- read.csv("16_17_bundesliganames.csv")
@@ -1975,7 +1975,7 @@ bundesligatable21 <- read.csv("bundesligatable21.csv")
 
 
 
-###2017
+### 2017
 
 ```{r}
 bundesliganames17 <-bundesliganames17 %>% 
@@ -2083,7 +2083,7 @@ fifa17_modeling_bundesliga <- fifa17_standard_plus_table_bundesliga %>%
 
 
 
-###2018
+### 2018
 
 
 ```{r}
@@ -2190,7 +2190,7 @@ fifa18_modeling_bundesliga <- fifa18_standard_plus_table_bundesliga %>%
 ```
 
 
-###2019
+### 2019
 ```{r}
 bundesliganames19 <-bundesliganames19 %>% 
   mutate(Player1 = gsub(".*\\\\", "", Player)) %>% 
@@ -2303,7 +2303,7 @@ dim(fifa19_modeling_bundesliga)
 
 
 
-###2021 
+### 2021 
 
 ```{r}
 bundesliganames21 <-bundesliganames21 %>% 
@@ -2405,7 +2405,7 @@ fifa21_modeling_bundesliga <- fifa21_standard_plus_table_bundesliga %>%
 dim(fifa21_modeling_bundesliga)
 ```
 
-## Exploratory plots and modeling
+# Exploratory plots and modeling
 
 ```{r premmod1, echo = FALSE}
 fifa19_modeling2 <- fifa19_modeling %>%
@@ -2544,7 +2544,6 @@ prem_rf_var_imp <-
 plot(prem_rf_var_imp)
 ```
 
-![VIP](RF_premier_league.JPG)
 
 
 ```{r premranger6, include = FALSE}
@@ -2563,7 +2562,7 @@ prem_preds1 %>%
   conf_mat(`revision`, .pred_class)
 ```
 
-The confusion matrix below shows that 17 players were classified as TOTS. 10 of these players were correctly classified, while the model felt that 7 players who were not given TOTS cards should have been given one. It also felt that 7 players who were given TOTS cards should not have been given one.
+
 
 
 ```{r premranger7, message = FALSE, echo = FALSE}
@@ -2588,7 +2587,7 @@ prem_ranger_test %>%
   conf_mat(revision, .pred_class)
 ```
 
-Below are the players that our testing model incorrectly classified. Many of these players were either undervalued or overvalued based on the performance of their team. It is clear that the choices for TOTS are someone subjective.
+
 
 ```{r premwrong1, echo = FALSE}
 prem_ranger_test %>% 

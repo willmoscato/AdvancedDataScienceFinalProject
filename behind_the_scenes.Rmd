@@ -1,6 +1,6 @@
 ---
 title: "Behind The Scenes"
-author: "Will Moscato"
+author: "Will Moscato, Alex Denzler, Jake Greenberg, Michael Helton"
 date: "5/3/2021"
 toc_float : TRUE
 code_download : TRUE
@@ -10,7 +10,7 @@ output: html_document
 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 ```
 
 ```{r}
@@ -2406,6 +2406,13 @@ dim(fifa21_modeling_bundesliga)
 ```
 
 # Exploratory plots and modeling
+\
+We will now take you through the exploratory plots and the modeling stage of the project. Much like the data cleaning the process for each league is mostly the same so we will just go through the Premier League in depth and then show all the code and briefly mention the differences for the other leagues. 
+\
+
+\
+First we added a year tag to the end of the player names in order to differentiate the same players from year to year when looking at what we got right and wrong. We also created the full modeling data set and made some of the characters factors so they can be used by the model.
+\
 
 ```{r premmod1, echo = FALSE}
 fifa19_modeling2 <- fifa19_modeling %>%
@@ -2423,7 +2430,9 @@ prem_modeling <- fifa17_modeling2 %>%
   bind_rows(fifa18_modeling2, fifa19_modeling2) %>% 
   mutate(revision = as.factor(revision), Nation = as.factor(Nation))
 ```
-
+\
+Next we filtered out the players and stats we didn't want in the modeling. We used 19 as the minutes_played_divided_by90 because that is half of the games, thus those people should be the starters. We have a bunch of extra variables that we got rid of because we thought we were going to try to do goalkeepers too, but there wasn't enough data.
+\
 ```{r premmod3, echo = FALSE}
 prem_modeling_outfield <- prem_modeling %>% 
   filter(position != "GK") %>% 
@@ -2431,14 +2440,18 @@ prem_modeling_outfield <- prem_modeling %>%
   mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", position))) %>% 
   select(-Goals_allowed, -GA90, -SoTA, -Saves, -Save_percent, -W, -L, -D, -CS, -CS_percent, -Pkatt_against, -PKA, -PKsv, -Pk_Save_percent, -PKm)
 ```
-
+\
+We then made the split.
+\
 ```{r premmod4, echo = FALSE}
 set.seed(494)
 prem_split <- initial_split(prem_modeling_outfield, prop = .75, strata = "revision")
 prem_training <- training(prem_split)
 prem_testing <- testing(prem_split)
 ```
-
+\
+Here is our first exploratory plot looking at the difference in the stats between training and testing.
+\
 ```{r message = FALSE, warning = FALSE, echo = FALSE}
 prem_train_metrics <- prem_training %>% 
   mutate(Type = "Training") %>% 
@@ -2463,6 +2476,9 @@ kable(prem_metrics_table, align = c(rep('c', 1))) %>%
   kable_styling(full_width = F) %>% 
   add_header_above(c("Premier League Training and Testing Group Comparison for Suspected KPIs" = 13), background = "purple", color = "white")
 ```
+\
+We then made the recipe for the model. We decided to use a random forest model because it made the most sense for predicting a binary response variable. We had also tried using a lasso model, but they were consistently worse for each league. We removed some redundant variables and some variables that are a little too specific to the certain player. We then decided to upsample the data to include more team of the seasons in the training data. This is where the different leagues really differ. We did some guess and check for each league in order to find the best upsampling that made the best model.
+\
 
 ```{r premranger1, include = FALSE}
 prem_ranger_recipe <- recipe(revision ~., data = prem_training) %>% 
@@ -2474,7 +2490,9 @@ prem_ranger_recipe %>%
   prep(prem_training) %>% 
   juice()
 ```
-
+\
+Next we created the workflow.
+\
 
 ```{r premranger2, include = FALSE}
 prem_ranger <- rand_forest(mtry = tune(), 
@@ -2490,7 +2508,9 @@ prem_ranger_wf <-
 
 prem_ranger_wf
 ```
-
+\
+Then we created the cross validation and tuned the model for the min n and mtry. Then we looked at the roc_auc and accuracy for the crossed validated model.
+\
 ```{r premranger3, include = FALSE}
 set.seed(494)
 prem_cv <- vfold_cv(prem_training, v = 5)
@@ -2506,7 +2526,9 @@ prem_ranger_cv <- prem_ranger_wf %>%
 
 collect_metrics(prem_ranger_cv)
 ```
-
+\
+Next we selected the best tuning using accuracy and finalized the workflow.
+\
 ```{r premranger4, echo = FALSE}
 prem_best1 <- prem_ranger_cv %>% 
   select_best(metric = "accuracy")
@@ -2514,13 +2536,17 @@ prem_best1 <- prem_ranger_cv %>%
 prem_ranger_final_wf<- prem_ranger_wf %>% 
   finalize_workflow(prem_best1)
 ```
-
+\
+Then we fit the model on the training data.
+\
 ```{r premranger5, include = FALSE}
 set.seed(494)
 prem_ranger_fit <- prem_ranger_final_wf %>% 
   fit(prem_training)
 ```
-
+\
+And created an explainer.
+\
 ```{r premranger5.1, echo = FALSE}
 set.seed(494)
 
@@ -2532,6 +2558,9 @@ prem_rf_explain <-
     label = "rf"
   )
 ```
+\
+We used the explainer to created a variable importance plot as this felt like one of the questions we were really trying to answer.
+\
 
 ```{r premvip1, echo = FALSE, eval=FALSE}
 set.seed(494)
@@ -2545,7 +2574,9 @@ plot(prem_rf_var_imp)
 ```
 
 
-
+\
+Then we fit the model on the training data and looked at accuracy and roc_auc.
+\
 ```{r premranger6, include = FALSE}
 prem_ranger_test <- prem_ranger_final_wf %>% 
   last_fit(prem_split)
@@ -2553,7 +2584,9 @@ prem_ranger_test <- prem_ranger_final_wf %>%
 prem_ranger_test %>% 
   collect_metrics()
 ```
-
+\
+Then we made a confusion matrix of the model on the testing data to see how well the model was working. This is what we mostly used to decide if the model was good or if something (like the upsampling) needed to change.
+\
 ```{r premconfuse1, include = FALSE}
 prem_preds1 <- prem_ranger_test %>% 
   collect_predictions()
@@ -2562,7 +2595,9 @@ prem_preds1 %>%
   conf_mat(`revision`, .pred_class)
 ```
 
-
+\
+Then we fit the model on the testing data in way that it would be usable to us and that we could see individual predicted probabilities. Then we made another confusion matrix and colored it and made it look nice and presentable.
+\
 
 
 ```{r premranger7, message = FALSE, echo = FALSE}
@@ -2587,13 +2622,17 @@ prem_ranger_test %>%
   conf_mat(revision, .pred_class)
 ```
 
-
+\
+Then we looked at what players the model was predicting incorrectly to better understand the pitfalls of the model.
+\
 
 ```{r premwrong1, echo = FALSE}
 prem_ranger_test %>% 
   filter(revision != .pred_class)
 ```
-
+\
+Then we created a modeling data set for the current season.
+\
 ```{r 21prem, echo = FALSE}
 prem_modeling21 <- fifa21_modeling %>% 
   mutate(revision = as.factor(revision), Nation = as.factor(Nation), Age = as.integer(Age))
@@ -2605,12 +2644,17 @@ prem_modeling_outfield21 <- prem_modeling21 %>%
   filter(minutes_played_divided_by90 >= 19) %>% 
   mutate(position = ifelse(position == "RWB", "RB", ifelse(position == "LWB", "LB", position)))
 ```
-
+\
+And we fit our model to it in order to see how well the model preformed on new data.
+\
 ```{r 21premranger1_1, echo = FALSE}
 prem_ranger_test21 <- prem_modeling_outfield21 %>% 
   bind_cols(predict(prem_ranger_fit, new_data = prem_modeling_outfield21, type = "prob")) %>% 
   bind_cols(predict(prem_ranger_fit, new_data = prem_modeling_outfield21)) 
 ```
+\
+We then used that to show our predicted team of the season for each league this year. We used the top five predicted probabilities for each position group because the model did not predict a lot of team of the seasons, but it tended to order things well.
+\
 
 ```{r, 21prempredictATT, echo = FALSE}
 prem_ranger_test_att <- prem_ranger_test21 %>% 
@@ -2651,7 +2695,7 @@ kable(prem_tots_formatted, align = c(rep('c',12)))  %>%
   row_spec(1:10, background = "green", color = "white") %>% 
   row_spec(11:15, background = "red", color = "white") 
 ```
-
+### Other Leagues Code
 ```{r laligamod1, echo = FALSE}
 fifa19_modeling_la_liga2 <- fifa19_modeling_la_liga %>%
   mutate(Player = paste(Player, '19'))
